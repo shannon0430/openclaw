@@ -134,7 +134,7 @@ export const nextcloudTalkPlugin: ChannelPlugin<ResolvedNextcloudTalkAccount> =
             },
           }),
       },
-      auth: nextcloudTalkApprovalAuth,
+      approvalCapability: nextcloudTalkApprovalAuth,
       doctor: nextcloudTalkDoctor,
       groups: {
         resolveRequireMention: ({ cfg, accountId, groupId }) => {

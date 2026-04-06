@@ -248,7 +248,7 @@ export const signalPlugin: ChannelPlugin<ResolvedSignalAccount, SignalProbe> =
         setup: signalSetupAdapter,
       }),
       actions: signalMessageActions,
-      auth: signalApprovalAuth,
+      approvalCapability: signalApprovalAuth,
       allowlist: buildDmGroupAccountAllowlistAdapter({
         channelId: "signal",
         resolveAccount: resolveSignalAccount,

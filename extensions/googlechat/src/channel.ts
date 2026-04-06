@@ -172,7 +172,7 @@ export const googlechatPlugin = createChatChannelPlugin({
           },
         }),
     },
-    auth: googleChatApprovalAuth,
+    approvalCapability: googleChatApprovalAuth,
     secrets: {
       secretTargetRegistryEntries,
       collectRuntimeConfigAssignments,
