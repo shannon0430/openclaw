@@ -658,6 +658,8 @@ is required.
             sandbox: "workspace-write",
             networkProxy: {
               enabled: true,
+              // Optional read-only host dependencies required by sandboxed commands.
+              readPaths: ["/opt/homebrew/bin/gh"],
               domains: {
                 "api.openai.com": "allow",
                 "blocked.example.com": "deny",
@@ -683,6 +685,9 @@ permission profile: Codex managed network enforcement is sandboxed
 networking, so a full-access profile would not protect outbound traffic.
 Domain entries use `allow` or `deny`; Unix socket entries use Codex's
 `allow` or `none` values.
+`readPaths` accepts at most 32 absolute paths and adds read-only filesystem
+entries to the generated profile. Use it only for narrow host dependencies;
+project access remains controlled by the selected base profile.
 
 ### Dynamic tool call timeouts
 

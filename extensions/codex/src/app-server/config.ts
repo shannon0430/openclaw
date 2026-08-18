@@ -125,6 +125,7 @@ export type CodexAppServerNetworkProxyConfig = {
   enabled?: boolean;
   profileName?: string;
   baseProfile?: CodexAppServerNetworkProxyBaseProfile;
+  readPaths?: string[];
   mode?: CodexAppServerNetworkProxyMode;
   domains?: Record<string, CodexAppServerNetworkProxyDomainPermission>;
   unixSockets?: Record<string, CodexAppServerNetworkProxyUnixSocketPermission>;
@@ -340,6 +341,16 @@ const codexAppServerNetworkProxySchema = z
     enabled: z.boolean().optional(),
     profileName: z.string().trim().min(1).optional(),
     baseProfile: z.enum(["read-only", "workspace"]).optional(),
+    readPaths: z
+      .array(
+        z
+          .string()
+          .trim()
+          .min(1)
+          .refine((value) => path.isAbsolute(value), "readPaths entries must be absolute paths"),
+      )
+      .max(32)
+      .optional(),
     mode: z.enum(["limited", "full"]).optional(),
     domains: z.record(z.string(), codexAppServerNetworkProxyDomainPermissionSchema).optional(),
     unixSockets: z
@@ -962,6 +973,9 @@ function resolveCodexAppServerNetworkProxy(
   const profile = {
     filesystem: {
       ":minimal": "read",
+      ...Object.fromEntries(
+        [...new Set(config.readPaths ?? [])].map((readPath) => [readPath, "read"] as const),
+      ),
       ":project_roots": {
         ".": fileSystemMode,
       },

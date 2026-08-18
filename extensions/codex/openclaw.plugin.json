@@ -219,6 +219,14 @@
                 "type": "string",
                 "enum": ["read-only", "workspace"]
               },
+              "readPaths": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
               "mode": {
                 "type": "string",
                 "enum": ["limited", "full"]

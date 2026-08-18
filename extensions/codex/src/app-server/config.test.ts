@@ -171,6 +171,7 @@ describe("Codex app-server config", () => {
           networkProxy: {
             enabled: true,
             profileName: "mock-proxy",
+            readPaths: ["/opt/example/bin/tool", "/opt/example/bin/tool"],
             mode: "limited",
             domains: {
               " api.openai.com ": "allow",
@@ -205,6 +206,7 @@ describe("Codex app-server config", () => {
           "mock-proxy": {
             filesystem: {
               ":minimal": "read",
+              "/opt/example/bin/tool": "read",
               ":project_roots": {
                 ".": "write",
               },
@@ -257,6 +259,19 @@ describe("Codex app-server config", () => {
     expect(profileName).toMatch(/^openclaw-network-[a-f0-9]{16}$/u);
     expect(runtime.networkProxy?.configPatch.default_permissions).toBe(profileName);
     expect(permissions[profileName ?? ""]?.filesystem[":project_roots"]["."]).toBe("read");
+  });
+
+  it("rejects relative network proxy read paths", () => {
+    expect(
+      readCodexPluginConfig({
+        appServer: {
+          networkProxy: {
+            enabled: true,
+            readPaths: ["relative/tool"],
+          },
+        },
+      }),
+    ).toEqual({});
   });
 
   it("clamps oversized app-server timer config", () => {

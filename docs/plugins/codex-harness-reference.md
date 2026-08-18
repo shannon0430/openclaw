@@ -125,6 +125,8 @@ export default {
             sandbox: "workspace-write",
             networkProxy: {
               enabled: true,
+              // Optional read-only host dependencies required by sandboxed commands.
+              readPaths: ["/opt/homebrew/bin/gh"],
               domains: {
                 "api.openai.com": "allow",
                 "blocked.example.com": "deny",
@@ -144,6 +146,10 @@ If the normal app-server runtime would be `danger-full-access`, enabling
 `networkProxy` uses workspace-style filesystem access for the generated
 permission profile instead. Codex-managed network enforcement is sandboxed
 networking, so a full-access profile would not protect outbound traffic.
+
+`readPaths` accepts at most 32 absolute paths and adds read-only filesystem
+entries to the generated profile. Use it only for narrow host dependencies;
+project access remains controlled by the selected base profile.
 
 The plugin blocks older or unversioned app-server handshakes: Codex app-server
 must report stable version `0.143.0` or newer.
