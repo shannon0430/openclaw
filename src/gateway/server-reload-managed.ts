@@ -337,6 +337,7 @@ export function startManagedGatewayConfigReloader(
       applyHotReload,
     });
 
+  let lastCommittedRuntimeConfig: OpenClawConfig | undefined;
   const configReloader = startGatewayConfigReloader({
     initialConfig: params.initialConfig,
     initialCompareConfig: params.initialCompareConfig,
@@ -362,9 +363,13 @@ export function startManagedGatewayConfigReloader(
         { dropIfSlow: true },
       );
     },
-    onRuntimeConfigCommitted: (plan, nextConfig) => {
+    onRuntimeConfigCommitted: (plan, committedRuntimeConfig) => {
+      // Secret resolution can make the committed runtime config a different
+      // object from the source-derived candidate. Record the committed one so a
+      // rebuild below stamps owners with the identity readers actually supply.
+      lastCommittedRuntimeConfig = committedRuntimeConfig;
       if (canAdvancePreparedModelRuntimeConfigInPlace(plan)) {
-        advancePreparedModelRuntimeConfig(nextConfig);
+        advancePreparedModelRuntimeConfig(committedRuntimeConfig);
       }
     },
     ...(params.prepareConfigCandidate
@@ -489,9 +494,18 @@ export function startManagedGatewayConfigReloader(
     onConfigRevisionApplied: publishAppliedConfigHash,
     onEffectiveConfigUnchanged,
     onNoopConfigCommit: async (plan, nextConfig, ownership, sourceConfig) => {
+      // Cleared per transaction so a rebuild can never inherit a config committed
+      // by an earlier one when this commit does not reach markRuntimeCommitted.
+      lastCommittedRuntimeConfig = undefined;
       await onNoopConfigCommit(plan, nextConfig, ownership, sourceConfig);
       if (!canAdvancePreparedModelRuntimeConfigInPlace(plan)) {
-        await refreshPreparedModelRuntimeSnapshots(nextConfig, { gatewayLifecycle: true });
+        // Rebuild against the committed runtime config, not the source-derived
+        // candidate. `secrets.providers.*` resolves to a different object, and
+        // stamping the rebuilt owner with the pre-resolution identity makes every
+        // strict catalog read reject it -- the failure this fix exists to remove.
+        await refreshPreparedModelRuntimeSnapshots(lastCommittedRuntimeConfig ?? nextConfig, {
+          gatewayLifecycle: true,
+        });
       }
     },
     onHotReload,
