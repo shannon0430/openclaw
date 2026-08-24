@@ -261,6 +261,7 @@ const hoisted = vi.hoisted(() => ({
   reloadEvents: [] as string[],
   loadModelCatalog: vi.fn(async (_params: { config: OpenClawConfig }) => []),
   resetModelCatalogCache: vi.fn(() => {}),
+  advancePreparedModelRuntimeConfig: vi.fn((_cfg: OpenClawConfig) => {}),
   markPreparedModelRuntimeSnapshotsStale: vi.fn(
     (
       _reason?: string,
@@ -372,6 +373,8 @@ vi.mock("../agents/model-catalog.js", () => ({
 }));
 
 vi.mock("../agents/prepared-model-runtime.js", () => ({
+  advancePreparedModelRuntimeConfig: (cfg: OpenClawConfig) =>
+    hoisted.advancePreparedModelRuntimeConfig(cfg),
   markPreparedModelRuntimeSnapshotsStale: (
     reason?: string,
     options?: { waitForReplacement?: boolean; preserveReplacementWait?: boolean },
@@ -931,6 +934,7 @@ afterEach(() => {
   hoisted.runtimeConfig.value = { session: { store: "/tmp/active-sessions.json" } };
   hoisted.assertOpenClawDatabasesReadyForRestart.mockClear();
   hoisted.reloadEvents.length = 0;
+  hoisted.advancePreparedModelRuntimeConfig.mockClear();
   hoisted.markPreparedModelRuntimeSnapshotsStale.mockClear();
   hoisted.rejectPendingPreparedModelRuntimeReplacement.mockClear();
   hoisted.refreshPreparedModelRuntimeSnapshots.mockClear();
@@ -951,9 +955,13 @@ async function runManagedOwnershipScenario(params: {
   kind: "noop" | "hot" | "restart";
   loggingChanged?: boolean;
   queueRevert: boolean;
+  secretProviderChanged?: boolean;
 }) {
   const initialConfig = {
     gateway: { reload: { mode: "off" as const } },
+    ...(params.secretProviderChanged
+      ? { secrets: { providers: { default: { source: "file" as const, path: "/old" } } } }
+      : {}),
     hooks: { enabled: true, token: "test-token", path: "/old" },
   } satisfies OpenClawConfig;
   const configA = {
@@ -967,6 +975,12 @@ async function runManagedOwnershipScenario(params: {
       token: "test-token",
       path: params.kind === "noop" ? "/old" : "/a",
     },
+    ...(params.kind === "noop"
+      ? { talk: { realtime: { instructions: "updated instructions" } } }
+      : {}),
+    ...(params.secretProviderChanged
+      ? { secrets: { providers: { default: { source: "file" as const, path: "/new" } } } }
+      : {}),
     ...(params.loggingChanged ? { logging: { level: "debug" as const } } : {}),
   } satisfies OpenClawConfig;
   const configB = structuredClone(initialConfig);
@@ -1024,9 +1038,34 @@ async function runManagedOwnershipScenario(params: {
 }
 
 describe("managed reload transaction ownership", () => {
+  it("advances prepared model config stamps for a no-op publication", async () => {
+    const result = await runManagedOwnershipScenario({ kind: "noop", queueRevert: false });
+
+    expect(hoisted.advancePreparedModelRuntimeConfig).toHaveBeenCalledExactlyOnceWith(
+      result.configA,
+    );
+    expect(hoisted.refreshPreparedModelRuntimeSnapshots).not.toHaveBeenCalled();
+  });
+
+  it("rebuilds prepared model owners for a no-op secret-provider publication", async () => {
+    const result = await runManagedOwnershipScenario({
+      kind: "noop",
+      queueRevert: false,
+      secretProviderChanged: true,
+    });
+
+    expect(hoisted.advancePreparedModelRuntimeConfig).not.toHaveBeenCalled();
+    expect(hoisted.refreshPreparedModelRuntimeSnapshots).toHaveBeenCalledExactlyOnceWith(
+      result.configA,
+      { gatewayLifecycle: true },
+    );
+  });
+
   it("applies a current in-process hot config", async () => {
     const result = await runManagedOwnershipScenario({ kind: "hot", queueRevert: false });
 
+    // Hot plans rebuild prepared owners. Advancing the stamp in place is reserved for no-op plans.
+    expect(hoisted.advancePreparedModelRuntimeConfig).not.toHaveBeenCalled();
     expect(result.activateRuntimeSecrets).toHaveBeenCalledOnce();
     expect(result.commitTerminalConfig).toHaveBeenCalledOnce();
     expect(result.acceptTerminalConfig).toHaveBeenCalledOnce();

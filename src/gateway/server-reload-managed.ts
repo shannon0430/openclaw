@@ -1,3 +1,7 @@
+import {
+  advancePreparedModelRuntimeConfig,
+  refreshPreparedModelRuntimeSnapshots,
+} from "../agents/prepared-model-runtime.js";
 import { copyConfigResolutionFacts } from "../config/resolution-facts.js";
 import type { OpenClawConfig } from "../config/types.openclaw.js";
 import { applyLoggingConfig } from "../logging/logger.js";
@@ -5,6 +9,8 @@ import { runWithGatewayIndependentRootWorkAdmission } from "../process/gateway-w
 import { getActiveSecretsRuntimeSnapshotRevisionState } from "../secrets/runtime-state.js";
 import { resetSkillSnapshotConfigFingerprintCache } from "../skills/runtime/snapshot-config-fingerprint.js";
 import { invalidateConfigGetResponseCache } from "./config-get-response.js";
+import { isNoopGatewayReloadPlan } from "./config-reload-plan.js";
+import { shouldRewarmProviderAuthState } from "./config-reload-recovery.js";
 import {
   startGatewayConfigReloader,
   type GatewayConfigReloadTransactionOwnership,
@@ -42,6 +48,10 @@ import {
   setRequiredSharedGatewaySessionGenerationIfOwned,
   type SharedGatewaySessionGenerationOwnership,
 } from "./server-shared-auth-generation.js";
+
+function canAdvancePreparedModelRuntimeConfigInPlace(plan: GatewayReloadPlan): boolean {
+  return isNoopGatewayReloadPlan(plan) && !shouldRewarmProviderAuthState(plan);
+}
 
 export function startManagedGatewayConfigReloader(
   params: ManagedGatewayConfigReloaderParams,
@@ -352,6 +362,11 @@ export function startManagedGatewayConfigReloader(
         { dropIfSlow: true },
       );
     },
+    onRuntimeConfigCommitted: (plan, nextConfig) => {
+      if (canAdvancePreparedModelRuntimeConfigInPlace(plan)) {
+        advancePreparedModelRuntimeConfig(nextConfig);
+      }
+    },
     ...(params.prepareConfigCandidate
       ? { prepareConfigCandidate: params.prepareConfigCandidate }
       : {}),
@@ -473,7 +488,12 @@ export function startManagedGatewayConfigReloader(
     },
     onConfigRevisionApplied: publishAppliedConfigHash,
     onEffectiveConfigUnchanged,
-    onNoopConfigCommit,
+    onNoopConfigCommit: async (plan, nextConfig, ownership, sourceConfig) => {
+      await onNoopConfigCommit(plan, nextConfig, ownership, sourceConfig);
+      if (!canAdvancePreparedModelRuntimeConfigInPlace(plan)) {
+        await refreshPreparedModelRuntimeSnapshots(nextConfig, { gatewayLifecycle: true });
+      }
+    },
     onHotReload,
     onRestart: runManagedRestart,
     log: {
