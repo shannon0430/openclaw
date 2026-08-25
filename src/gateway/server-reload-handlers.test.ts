@@ -953,6 +953,7 @@ afterEach(() => {
 
 async function runManagedOwnershipScenario(params: {
   kind: "noop" | "hot" | "restart";
+  getPluginMetadataSnapshot?: ManagedReloaderParams["getPluginMetadataSnapshot"];
   loggingChanged?: boolean;
   queueRevert: boolean;
   secretProviderChanged?: boolean;
@@ -1018,6 +1019,7 @@ async function runManagedOwnershipScenario(params: {
   activateSecretsRuntimeSnapshot(snapshot(initialConfig));
   const reloader = startManagedGatewayConfigReloader({
     initialConfig,
+    getPluginMetadataSnapshot: params.getPluginMetadataSnapshot,
     readSnapshot: vi.fn(async () => createValidConfigSnapshot(configB, "hash-b")) as never,
     subscribeToWrites: captureConfigWriteListener(writeListenerRef, false),
     activateRuntimeSecrets: activateRuntimeSecrets as never,
@@ -1059,16 +1061,23 @@ describe("managed reload transaction ownership", () => {
   });
 
   it("rebuilds prepared model owners for a no-op secret-provider publication", async () => {
+    const pluginMetadataSnapshot = {} as never;
     const result = await runManagedOwnershipScenario({
       kind: "noop",
       queueRevert: false,
       secretProviderChanged: true,
+      getPluginMetadataSnapshot: () => pluginMetadataSnapshot,
     });
 
     expect(hoisted.advancePreparedModelRuntimeConfig).not.toHaveBeenCalled();
     expect(hoisted.refreshPreparedModelRuntimeSnapshots).toHaveBeenCalledExactlyOnceWith(
       result.configA,
-      { gatewayLifecycle: true },
+      {
+        gatewayLifecycle: true,
+        catalogMode: "static",
+        allowGatewaySubagentBinding: true,
+        pluginMetadataSnapshot,
+      },
     );
   });
 
@@ -1077,11 +1086,13 @@ describe("managed reload transaction ownership", () => {
     // resolution yields a different object, the rebuilt owner carries an
     // identity no reader supplies, so every strict catalog read rejects it --
     // reviving the failure on the very fallback meant to be safe.
+    const pluginMetadataSnapshot = {} as never;
     const result = await runManagedOwnershipScenario({
       kind: "noop",
       queueRevert: false,
       secretProviderChanged: true,
       resolveToDistinctConfig: true,
+      getPluginMetadataSnapshot: () => pluginMetadataSnapshot,
     });
 
     const resolved = result.resolvedConfigs.at(-1);
@@ -1095,7 +1106,12 @@ describe("managed reload transaction ownership", () => {
     const [rebuiltWith, options] = hoisted.refreshPreparedModelRuntimeSnapshots.mock.calls[0] ?? [];
     expect(rebuiltWith).toBe(resolved);
     expect(rebuiltWith).not.toBe(result.configA);
-    expect(options).toEqual({ gatewayLifecycle: true });
+    expect(options).toEqual({
+      gatewayLifecycle: true,
+      catalogMode: "static",
+      allowGatewaySubagentBinding: true,
+      pluginMetadataSnapshot,
+    });
   });
 
   it("applies a current in-process hot config", async () => {

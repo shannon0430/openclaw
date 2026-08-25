@@ -503,8 +503,12 @@ export function startManagedGatewayConfigReloader(
         // candidate. `secrets.providers.*` resolves to a different object, and
         // stamping the rebuilt owner with the pre-resolution identity makes every
         // strict catalog read reject it -- the failure this fix exists to remove.
+        const pluginMetadataSnapshot = params.getPluginMetadataSnapshot?.();
         await refreshPreparedModelRuntimeSnapshots(lastCommittedRuntimeConfig ?? nextConfig, {
           gatewayLifecycle: true,
+          catalogMode: "static",
+          allowGatewaySubagentBinding: true,
+          ...(pluginMetadataSnapshot ? { pluginMetadataSnapshot } : {}),
         });
       }
     },
