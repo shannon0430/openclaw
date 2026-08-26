@@ -198,6 +198,26 @@ describe("prepared model catalog access", () => {
     );
   });
 
+  it("builds an exact scoped catalog when the published generation has another config", async () => {
+    const committedConfig = { agents: { defaults: { model: "openai/committed" } } };
+    const committedSnapshot = { ...fullSnapshot, config: committedConfig };
+    const scopedCatalog = {
+      entries: [{ provider: "openai", id: "gpt-5.4", name: "GPT-5.4" }],
+      routeVariants: [],
+    };
+    mocks.prepareSnapshot.mockResolvedValue(committedSnapshot);
+    mocks.prepareScopedCatalog.mockResolvedValue(scopedCatalog);
+
+    await expect(
+      loadPreparedModelCatalogSnapshot({
+        readOnly: true,
+        providerDiscoveryProviderIds: ["openai"],
+      }),
+    ).resolves.toBe(scopedCatalog);
+
+    expect(mocks.prepareScopedCatalog).toHaveBeenCalledOnce();
+  });
+
   it("keeps read-only catalog reads on configured facts and materializes full reads once", async () => {
     const configuredCatalog = {
       entries: [{ provider: "test", id: "configured", name: "Configured" }],

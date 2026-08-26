@@ -332,7 +332,10 @@ async function loadScopedReadOnlyModelCatalog(
     try {
       const prepared = await prepareModelRuntimeSnapshot(candidate);
       if (!preparedModelRuntimeConfigsMatch(prepared.config, candidate.config)) {
-        throw new PreparedModelCatalogConfigReplacedError(candidate.agentDir);
+        // Provider-scoped reads are allowed to fall through to an exact, read-only catalog
+        // preparation below. A concurrently replaced published owner is not usable for this
+        // caller, but it must not make explicit-model subagent validation fail permanently.
+        continue;
       }
       if (isPreparedModelCatalogFull(prepared.modelCatalog)) {
         return prepared.modelCatalog;
