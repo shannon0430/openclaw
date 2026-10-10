@@ -31,6 +31,27 @@ Provider selection never falls back per action. Switching providers closes the a
 - A vision-capable agent model.
 - Tool policy that exposes `computer`. Local onboarding selects Full when no profile is configured, but preserves an explicit `coding` profile, which excludes it. For Coding, add `computer` to `tools.alsoAllow`; ordinary sandboxed agents also need it in `tools.sandbox.tools.alsoAllow`. A cloud session's bound desktop is included in its default sandbox policy, while explicit allowlists and denies still apply. Full tool selection does not grant computer-control permissions. See [Tool profiles](/gateway/config-tools/tool-policy#tool-profiles).
 
+## Non-owner business conversations
+
+Gateway desktop and generic node administration remain owner-only. A non-owner
+conversation can receive a narrower paired-node `computer` when the operator
+explicitly grants `computer` in that agent's `tools.allow` or `tools.alsoAllow`
+and exactly one connected, approved node advertises both computer commands.
+For example, set `agents.entries.main.tools.alsoAllow: ["computer"]` for the
+business agent. A Full profile, wildcard, global grant, or run allowlist alone
+does not qualify. All conversation, inherited, runtime, and explicit deny
+policies still apply.
+
+The host binds this tool before the model sees its catalog. It has no `target`,
+`node`, `environmentId`, `gatewayUrl`, or `gatewayToken` selectors and rejects
+those arguments even if supplied outside the schema. It cannot discover or
+control the Gateway desktop. Its exact node connection, pairing generation,
+Gateway, and admitted run must remain current before every dispatch; changing
+any of them requires a fresh tool instance rather than redirecting old input.
+This exception applies only to unsandboxed, hosted agent runs with a
+vision-capable model. HTTP and loopback tool catalogs retain their owner-only
+ceiling, as do other management tools.
+
 ## Gateway desktop
 
 Enable `cua-computer` on the Gateway host and run the focused artifact check:
