@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "status": "exact_QA4_to_QA5_source_only_diff_closure",
+  "predecessorManifestSha256": "b85b60d3d5c97f5db0197f563738f98c61234305c8086aebd381d539b7fc4915",
+  "changedPredecessorOperationalSourceFiles": [
+    "INPUT-TEMPLATE.json",
+    "README.md",
+    "test-transfer-core.mjs",
+    "transfer-core.mjs"
+  ],
+  "newSourceTest": "test-sdk-license-provenance.mjs",
+  "allOtherRetainedPredecessorOperationalSourceFilesByteEqual": true,
+  "addedSourceSdkPrimitiveFields": [
+    "runtimeSourceCommit",
+    "packageAssemblySourceCommit",
+    "sourceArchiveCommit",
+    "licenseSourceCommit",
+    "sourceSdkUnchangedFromPublicBase",
+    "assemblerOnlyLicensePackagingChange",
+    "licenseSha256",
+    "allPackedMitLicenseNoticesByteEqualExactSource"
+  ],
+  "changes": [
+    {
+      "path": "INPUT-TEMPLATE.json",
+      "kind": "changed",
+      "predecessorSha256": "9d189bae706b3e899520d9276b6149cdde5ef3e6dc341b4d3c0c52cb70ea6fea",
+      "successorSha256": "7af557b798bf8429ec20c4f8768db30b35626aacf4af693affe3686d0089cc35",
+      "successorBytes": 1439
+    },
+    {
+      "path": "LOCAL-SOURCE-CHECKS-v4.json",
+      "kind": "removed",
+      "predecessorSha256": "8ace809bb205c70e679549e6a509bae1d472a90001e6a0c9d173761bcd407252",
+      "successorSha256": null,
+      "successorBytes": null
+    },
+    {
+      "path": "LOCAL-SOURCE-CHECKS-v5.json",
+      "kind": "added",
+      "predecessorSha256": null,
+      "successorSha256": "da0ddc78de278c6e7f7593a4f62b5c45a7274b1d71ef099bf5f5f78f65bfec5f",
+      "successorBytes": 16452
+    },
+    {
+      "path": "MATERIALIZATION-STATE.json",
+      "kind": "changed",
+      "predecessorSha256": "61810be5736e1fc7c3936024eb5eb032093be8374f38737494ee2c1750d2afa7",
+      "successorSha256": "68b3df6d276afab0499c2cd1fb4f1ed3152d39327c1b9f5ce5e7b1d0f26bd544",
+      "successorBytes": 4934
+    },
+    {
+      "path": "README.md",
+      "kind": "changed",
+      "predecessorSha256": "f6b2e8ed08e9bc4dd815ea6eb86f3ed4c0edd725e0bc00d4c46a1470b50da495",
+      "successorSha256": "36fdbf6ed6fa0dfdc8d7742f872b90e8be81479022b11f5f2e87bfe97c42ebe5",
+      "successorBytes": 19061
+    },
+    {
+      "path": "history/v4/LOCAL-SOURCE-CHECKS-v4.json",
+      "kind": "added",
+      "predecessorSha256": null,
+      "successorSha256": "8ace809bb205c70e679549e6a509bae1d472a90001e6a0c9d173761bcd407252",
+      "successorBytes": 7221
+    },
+    {
+      "path": "history/v4/MATERIALIZATION-STATE.json",
+      "kind": "added",
+      "predecessorSha256": null,
+      "successorSha256": "61810be5736e1fc7c3936024eb5eb032093be8374f38737494ee2c1750d2afa7",
+      "successorBytes": 3405
+    },
+    {
+      "path": "history/v4/PACKAGE-QA-PROPOSAL-MANIFEST.json",
+      "kind": "added",
+      "predecessorSha256": null,
+      "successorSha256": "b85b60d3d5c97f5db0197f563738f98c61234305c8086aebd381d539b7fc4915",
+      "successorBytes": 12901
+    },
+    {
+      "path": "history/v4/v3-to-v4.patch",
+      "kind": "added",
+      "predecessorSha256": null,
+      "successorSha256": "fbfc28eb361222eac6b95f741e52ed2cc4b48fd0bfa97b649546ec562e7fcedc",
+      "successorBytes": 120079
+    },
+    {
+      "path": "history/v5-preparation/LOCAL-SOURCE-PREPARATION-CHECKS-v5.json",
+      "kind": "added",
+      "predecessorSha256": null,
+      "successorSha256": "5e2f6a5705338b47a85ef83d4c4e7900cae1e4acec7c8422306ef7b75e243f93",
+      "successorBytes": 5234
+    },
+    {
+      "path": "history/v5-preparation/MATERIALIZATION-STATE.json",
+      "kind": "added",
+      "predecessorSha256": null,
+      "successorSha256": "2575498b51b1370fd2d18a1f874039966e1facc18e3407876cfffe691728615e",
+      "successorBytes": 834
+    },
+    {
+      "path": "test-sdk-license-provenance.mjs",
+      "kind": "added",
+      "predecessorSha256": null,
+      "successorSha256": "4716b5c8ad35211efb9ba0e4ef4b10cfb1be25922d3444f4e9f957b204cf477d",
+      "successorBytes": 5473
+    },
+    {
+      "path": "test-transfer-core.mjs",
+      "kind": "changed",
+      "predecessorSha256": "e69474a9df28db5187ef47e04dbb46740e66b7717140713edfad47add1d5bb3a",
+      "successorSha256": "0e829f8693c59aef672864394b79a0c7333fadd937f0411d6dd9b5f0d584c716",
+      "successorBytes": 10107
+    },
+    {
+      "path": "transfer-core.mjs",
+      "kind": "changed",
+      "predecessorSha256": "d17ec5453fc83cd1e4026554c84f12dca489d09c4f913fce352265083d66051c",
+      "successorSha256": "2133f4aa198ee90e523de6ec05055b8f2ce7f9c39e7cffbc547305ec8b2d76a7",
+      "successorBytes": 14516
+    },
+    {
+      "path": "v3-to-v4.patch",
+      "kind": "removed",
+      "predecessorSha256": "fbfc28eb361222eac6b95f741e52ed2cc4b48fd0bfa97b649546ec562e7fcedc",
+      "successorSha256": null,
+      "successorBytes": null
+    }
+  ],
+  "historicalRecordsMovedByteIdentical": [
+    {
+      "from": "PACKAGE-QA-PROPOSAL-MANIFEST.json",
+      "to": "history/v4/PACKAGE-QA-PROPOSAL-MANIFEST.json",
+      "sha256": "b85b60d3d5c97f5db0197f563738f98c61234305c8086aebd381d539b7fc4915"
+    },
+    {
+      "from": "LOCAL-SOURCE-CHECKS-v4.json",
+      "to": "history/v4/LOCAL-SOURCE-CHECKS-v4.json",
+      "sha256": "8ace809bb205c70e679549e6a509bae1d472a90001e6a0c9d173761bcd407252"
+    },
+    {
+      "from": "MATERIALIZATION-STATE.json",
+      "to": "history/v4/MATERIALIZATION-STATE.json",
+      "sha256": "61810be5736e1fc7c3936024eb5eb032093be8374f38737494ee2c1750d2afa7"
+    },
+    {
+      "from": "v3-to-v4.patch",
+      "to": "history/v4/v3-to-v4.patch",
+      "sha256": "fbfc28eb361222eac6b95f741e52ed2cc4b48fd0bfa97b649546ec562e7fcedc"
+    }
+  ],
+  "diffSelfExcludedPaths": [
+    "PACKAGE-QA-PROPOSAL-MANIFEST.json",
+    "SOURCE-DIFF-CLOSURE.json",
+    "v4-to-v5.patch"
+  ],
+  "historicalRecordsNotAcceptance": true,
+  "runtimeAndWindowsSourceGatesChanged": false,
+  "actualWindowsRun": false,
+  "actualTransferRun": false,
+  "liveActivation": false
+}

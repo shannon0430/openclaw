@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "nodeSyntaxFiles": 13,
+  "portableActualPowerShellVersion": "7.5.3",
+  "portableParserFiles": 5,
+  "newLifecycleProductionReaderSeamsPassed": 12,
+  "localActualNode": "22.23.1",
+  "unchangedPriorV2SourceChecksFileSha256": "17d0255fe9d8e01bdd3e151eec281dc0c5876ef8c2184dd5ceed4e1539e90321",
+  "oldChecksDoNotClaimV3WindowsAcceptance": true,
+  "WindowsExecuted": false,
+  "npmInstalls": 0,
+  "packageLifecycleExecutions": 0,
+  "taskOrLiveEffects": 0
+}

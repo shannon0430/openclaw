@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "owningOpenclawSource": "eb377ac59e6c9fd6c7705028034812becf00271b",
+  "inspectedDerivativeSource": "6449366519a551bd3c2658771091f5cbb8de48aa",
+  "files": [
+    {
+      "path": "scripts/install.ps1",
+      "sha256": "87406a49babeff0c18ff6b0a97c0428c87265baee5b16017e91aadef42e4a1c3",
+      "sameAsExactEb377": true
+    },
+    {
+      "path": "src/infra/update-global.ts",
+      "sha256": "31ef3a8663524070486f02d3fb0db662f9329bc548962ffae6e03bc5b8348236",
+      "sameAsExactEb377": true
+    },
+    {
+      "path": "scripts/lib/package-lifecycle-marker.mjs",
+      "sha256": "32c50197ecc6f10b78f9f8ef588b868e7cdf428233e00fb912044dee5da46e1a",
+      "sameAsExactEb377": true
+    }
+  ],
+  "installerClosure": "ordinaryentry_and_pending_and_legacyguard_absent",
+  "normalInstallCommandChanged": false,
+  "exactRootAllowFlagAdded": false,
+  "npm11_17PendingWarnings": "advisory_not_blocked",
+  "perDependencyLifecycleTraceClaimed": false,
+  "finalDerivativeVerificationStatus": "exact_final_source_git_blobs_byte_equal_owning_source",
+  "actualFinalGitBlobReadback": [
+    {
+      "path": "scripts/install.ps1",
+      "sha256": "87406a49babeff0c18ff6b0a97c0428c87265baee5b16017e91aadef42e4a1c3",
+      "bytes": 97393,
+      "byteEqualOwningEb377": true
+    },
+    {
+      "path": "src/infra/update-global.ts",
+      "sha256": "31ef3a8663524070486f02d3fb0db662f9329bc548962ffae6e03bc5b8348236",
+      "bytes": 52425,
+      "byteEqualOwningEb377": true
+    },
+    {
+      "path": "scripts/lib/package-lifecycle-marker.mjs",
+      "sha256": "32c50197ecc6f10b78f9f8ef588b868e7cdf428233e00fb912044dee5da46e1a",
+      "bytes": 381,
+      "byteEqualOwningEb377": true
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "passed": 12,
+  "failed": 0,
+  "productionGate": true,
+  "actualNode": "v22.23.1",
+  "actualPlatform": "darwin",
+  "npmInstalls": 0,
+  "packageLifecycleExecutions": 0,
+  "liveOrTaskEffects": 0,
+  "fixtureScope": "new own synthetic leaves only; not package install or Windows acceptance"
+}

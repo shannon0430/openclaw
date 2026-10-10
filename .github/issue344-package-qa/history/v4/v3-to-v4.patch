@@ -1,0 +1,1884 @@
+--- a/INPUT-TEMPLATE.json
++++ b/INPUT-TEMPLATE.json
+@@ -1,18 +1,39 @@
+ {
+   "schemaVersion": 1,
+-  "status": "example_only_missing_final_evidence_refused",
+-  "finalOpenclawSourceCommit": null,
+-  "cuaSourceCommit": "891efae2cc01a38260a303b0329785e5c4d7b03c",
+-  "finalDllSha256": "601adefd44cc982dd4a1ff2e80dae8b056b971f830521d7e6acbb7dde8420f94",
++  "status": "example_only_missing_parent_input_paths_review_and_eligibility_refused",
++  "finalOpenclawSourceCommit": "6449366519a551bd3c2658771091f5cbb8de48aa",
++  "cuaSourceCommit": "a80258ee1ff1e1b38ca87eb571f4552c3b853c54",
++  "finalDllSha256": "34bbf44ff85ffbd08a0c0a33fc47a97ece9490bc648878f9900a2de8be9e5bd4",
+   "officialAddonSha256": "93f220e8a5cbf25aff23321f20a868368a204f1026b8dce45c5a4f84290de09f",
+   "proposalManifestSha256": null,
+   "publicSourceLicenseOnlyOwnerReviewed": false,
+-  "openclawTar": {"path": null, "sha256": null},
+-  "sourceSdkTar": {"path": null, "sha256": null},
+-  "nativeTar": {"path": null, "sha256": null},
+-  "nativeQaReceipt": {"path": null, "sha256": null},
+-  "officialAddonProvenanceReceipt": {"path": null, "sha256": null},
+-  "sourceSdkBuildReceipt": {"path": null, "sha256": null},
+-  "sourceRebakeReceipt": {"path": null, "sha256": null},
++  "openclawTar": {
++    "path": null,
++    "sha256": "33e795deacd98c9ec1727492e2dfd2cf7a7367f3feb8e4912da6c06d63a75ac2"
++  },
++  "sourceSdkTar": {
++    "path": null,
++    "sha256": "d7f98ec0a225681383e02cfa67126893059dce94aa88587a08701205308f3b11"
++  },
++  "nativeTar": {
++    "path": null,
++    "sha256": "569c75fcda91e2a56dc6f88d486b71882fae332ee58d3be0e454223c331f594e"
++  },
++  "nativeQaReceipt": {
++    "path": null,
++    "sha256": "ff6c33317626eb861eb2dbadbee348781700c25f9629ab1ffc2dd2e8940cf43f"
++  },
++  "officialAddonProvenanceReceipt": {
++    "path": null,
++    "sha256": "dfa6c621a96b6f5fc8b705658323cf9f84a8aa5bbba2243ff69162d51980fef6"
++  },
++  "sourceSdkBuildReceipt": {
++    "path": null,
++    "sha256": "b3a5bcb18580c82c8ad73ef2781dd9194920197df9d3abdf73a73a4e52e7856b"
++  },
++  "sourceRebakeReceipt": {
++    "path": null,
++    "sha256": "841ec0c303050676e1e3975ea58013b40652551cb0d41229f449be90d67cb673"
++  },
+   "eligibility": null
+ }
+--- a/LIFECYCLE-OWNER-SOURCE.json
++++ b/LIFECYCLE-OWNER-SOURCE.json
+@@ -1,7 +1,7 @@
+ {
+   "schemaVersion": 1,
+   "owningOpenclawSource": "eb377ac59e6c9fd6c7705028034812becf00271b",
+-  "inspectedDerivativeSource": "f3eb17ededbc2d7f10d5c9630ccad05b77431d55",
++  "inspectedDerivativeSource": "6449366519a551bd3c2658771091f5cbb8de48aa",
+   "files": [
+     {
+       "path": "scripts/install.ps1",
+@@ -23,5 +23,26 @@
+   "normalInstallCommandChanged": false,
+   "exactRootAllowFlagAdded": false,
+   "npm11_17PendingWarnings": "advisory_not_blocked",
+-  "perDependencyLifecycleTraceClaimed": false
++  "perDependencyLifecycleTraceClaimed": false,
++  "finalDerivativeVerificationStatus": "exact_final_source_git_blobs_byte_equal_owning_source",
++  "actualFinalGitBlobReadback": [
++    {
++      "path": "scripts/install.ps1",
++      "sha256": "87406a49babeff0c18ff6b0a97c0428c87265baee5b16017e91aadef42e4a1c3",
++      "bytes": 97393,
++      "byteEqualOwningEb377": true
++    },
++    {
++      "path": "src/infra/update-global.ts",
++      "sha256": "31ef3a8663524070486f02d3fb0db662f9329bc548962ffae6e03bc5b8348236",
++      "bytes": 52425,
++      "byteEqualOwningEb377": true
++    },
++    {
++      "path": "scripts/lib/package-lifecycle-marker.mjs",
++      "sha256": "32c50197ecc6f10b78f9f8ef588b868e7cdf428233e00fb912044dee5da46e1a",
++      "bytes": 381,
++      "byteEqualOwningEb377": true
++    }
++  ]
+ }
+--- a/LOCAL-LIFECYCLE-REGRESSION.json
++++ /dev/null
+@@ -1,12 +0,0 @@
+-{
+-  "schemaVersion": 1,
+-  "passed": 12,
+-  "failed": 0,
+-  "productionGate": true,
+-  "actualNode": "v22.23.1",
+-  "actualPlatform": "darwin",
+-  "npmInstalls": 0,
+-  "packageLifecycleExecutions": 0,
+-  "liveOrTaskEffects": 0,
+-  "fixtureScope": "new own synthetic leaves only; not package install or Windows acceptance"
+-}
+--- a/LOCAL-SOURCE-CHECKS-v3.json
++++ /dev/null
+@@ -1,14 +0,0 @@
+-{
+-  "schemaVersion": 1,
+-  "nodeSyntaxFiles": 13,
+-  "portableActualPowerShellVersion": "7.5.3",
+-  "portableParserFiles": 5,
+-  "newLifecycleProductionReaderSeamsPassed": 12,
+-  "localActualNode": "22.23.1",
+-  "unchangedPriorV2SourceChecksFileSha256": "17d0255fe9d8e01bdd3e151eec281dc0c5876ef8c2184dd5ceed4e1539e90321",
+-  "oldChecksDoNotClaimV3WindowsAcceptance": true,
+-  "WindowsExecuted": false,
+-  "npmInstalls": 0,
+-  "packageLifecycleExecutions": 0,
+-  "taskOrLiveEffects": 0
+-}
+--- /dev/null
++++ b/LOCAL-SOURCE-CHECKS-v4.json
+@@ -0,0 +1,207 @@
++{
++  "schemaVersion": 1,
++  "status": "PASS_QA4_SOURCE_CHECKS_ONLY_NOT_WINDOWS_ACCEPTANCE",
++  "observedAtUtc": "2026-10-10T11:43:11.922635+00:00",
++  "node": "v24.19.0",
++  "actualPlatform": "darwin",
++  "syntaxFiles": [
++    {
++      "path": "Upload-Issue344QaPrereleaseInputs.mjs",
++      "sha256": "354ac118bf48b92b536dfa3be346df5d7bfdd18b29af8e7e974066d52fceb620",
++      "syntaxExit": 0
++    },
++    {
++      "path": "dependencies/artifact-assembly-v1/create-slot-inputs.mjs",
++      "sha256": "b0d41d373048991d72ccc84e3c18667e1adfcab95b13ca227bf9d3289d558306",
++      "syntaxExit": 0
++    },
++    {
++      "path": "dependencies/artifact-assembly-v1/package-qa-matrix.mjs",
++      "sha256": "a80ae91221dd00a4df953c22882c29ee6b71c6a3f5988c0ce9b2ef530e20e6dd",
++      "syntaxExit": 0
++    },
++    {
++      "path": "dependencies/artifact-assembly-v1/package-qa-probe.mjs",
++      "sha256": "02a57175950a7f61e751f8c76f8a7646388ce36fafeeac8d6d6ba7a168c19c15",
++      "syntaxExit": 0
++    },
++    {
++      "path": "dependencies/artifact-assembly-v1/sdk-wire-qa.mjs",
++      "sha256": "f9b0966f31d791bfe876799fc1004a9f603d504c95c16b3d8549d483934cde85",
++      "syntaxExit": 0
++    },
++    {
++      "path": "dependencies/artifact-assembly-v2/seal-package-qa-slot.mjs",
++      "sha256": "f153142120aae11ea5e8f0dbfcadc4d4ef94280903d54e30c4341437b5398f05",
++      "syntaxExit": 0
++    },
++    {
++      "path": "fetch-release-inputs.mjs",
++      "sha256": "e2bc84916b555965f786ecf81cf185bcb9c24bfe55994e8ae7276d67999c9d92",
++      "syntaxExit": 0
++    },
++    {
++      "path": "prepare-public-inputs.mjs",
++      "sha256": "519562fc0e3926dd820f9c7b4f84ce265fe63feb474dabc587ced8147befd97a",
++      "syntaxExit": 0
++    },
++    {
++      "path": "required-root-lifecycle.mjs",
++      "sha256": "9b5dfc50242fca3afd821486454b748baafc1d627c2a12aa2fe68aabad97fb19",
++      "syntaxExit": 0
++    },
++    {
++      "path": "test-required-root-lifecycle.mjs",
++      "sha256": "5ff2ec922885f4947cff07f1695a3e23baa19a225ccbce82171ab5dbde812541",
++      "syntaxExit": 0
++    },
++    {
++      "path": "test-transfer-core.mjs",
++      "sha256": "e69474a9df28db5187ef47e04dbb46740e66b7717140713edfad47add1d5bb3a",
++      "syntaxExit": 0
++    },
++    {
++      "path": "transfer-core.mjs",
++      "sha256": "d17ec5453fc83cd1e4026554c84f12dca489d09c4f913fce352265083d66051c",
++      "syntaxExit": 0
++    },
++    {
++      "path": "verify-proposal.mjs",
++      "sha256": "ab44cd79088808cb5d7bf1a4e0ceecb6f0b38b29c1208d9ae769767c6e8ffd38",
++      "syntaxExit": 0
++    }
++  ],
++  "actualInertSeamTests": {
++    "schemaVersion": 1,
++    "passed": 40,
++    "failed": 0,
++    "cases": [
++      "materialized_source_contract_only",
++      "pending_inputs",
++      "missing_commit",
++      "zero_digest",
++      "duplicate_asset",
++      "missing_asset",
++      "arbitrary_asset_name",
++      "draft_not_public_qa_prerelease",
++      "native_pending",
++      "owned_fixture_missing",
++      "partial_build",
++      "fake_package_pass",
++      "oversized_asset",
++      "sanitizer_preserves_unrun_false_and_omits_localpath",
++      "sanitizer_refuses_secret_field",
++      "projection_only_generic_source_proof_and_original_hash",
++      "projection_refuses_path_in_allowed_field",
++      "frozen_tar_binding_drift_refused",
++      "other_valid_source_commit_refused",
++      "private_extra_eligibility_top_field_refused",
++      "private_extra_eligibility_nested_field_refused",
++      "pending_canonical_activation_not_a_disposable_qa_block",
++      "public_projection_extra_private_field_refused",
++      "stale_predecessor_source_refused",
++      "stale_predecessor_cua_refused",
++      "stale_predecessor_dll_refused",
++      "stale_predecessor_native_tar_refused",
++      "stale_predecessor_full_tar_refused",
++      "stale_predecessor_focused_run_refused",
++      "stale_predecessor_selected_count_refused",
++      "stale_predecessor_native_proof_refused",
++      "stale_predecessor_sdk_proof_refused",
++      "stale_predecessor_official_proof_refused",
++      "stale_predecessor_complete_proof_refused",
++      "stale_predecessor_canonical_run_refused",
++      "stale_predecessor_canonical_source_refused",
++      "new_native_schema_fields_projected_verbatim_without_invented_owned_count",
++      "new_native_schema_field_nested_object_refused",
++      "new_native_schema_field_private_path_refused",
++      "public_projection_cannot_invent_nested_native_ownership"
++    ],
++    "scope": "actual production manifest/sanitizer seams using inert synthetic records; no upload/download/Windows/package/native execution"
++  },
++  "requiredRootLifecycleProductionReader": {
++    "schemaVersion": 1,
++    "passed": 12,
++    "failed": 0,
++    "productionGate": true,
++    "actualNode": "v24.19.0",
++    "actualPlatform": "darwin",
++    "npmInstalls": 0,
++    "packageLifecycleExecutions": 0,
++    "liveOrTaskEffects": 0,
++    "fixtureScope": "new own synthetic leaves only; not package install or Windows acceptance"
++  },
++  "portableParserAndSameCSharpCompile": {
++    "version": "7.5.3",
++    "parsedFiles": [
++      {
++        "file": "Invoke-Issue344PackageQa.ps1",
++        "errors": 0
++      },
++      {
++        "file": "Test-Issue344CandidateSeal.ps1",
++        "errors": 0
++      },
++      {
++        "file": "Test-Issue344HelperGates.ps1",
++        "errors": 0
++      },
++      {
++        "file": "dependencies/generic-slot-primitives-v1/GenericSlotMetadata.psm1",
++        "errors": 0
++      },
++      {
++        "file": "dependencies/generic-slot-primitives-v1/Test-KanonNativeHandles.ps1",
++        "errors": 0
++      }
++    ],
++    "PInvokeCalls": 0,
++    "originalCSharpBodyCompiled": true,
++    "Windows51Executed": false,
++    "taskOrProcessOperations": 0
++  },
++  "actionlintVersion": "1.7.12\ninstalled from Homebrew\nbuilt with go1.26.3 compiler for darwin/arm64",
++  "actionlintExit": 0,
++  "workflowSha256": "ac43eab855f8f9bbcd77cf768b78d55bc42ae229f84547be30b906ed9085e188",
++  "actualImmutableReceiptProjectionSeam": [
++    {
++      "kind": "nativeQaReceipt",
++      "originalSha256": "ff6c33317626eb861eb2dbadbee348781700c25f9629ab1ffc2dd2e8940cf43f",
++      "projectionBytes": 1359,
++      "explicitAllowlist": true,
++      "statusFieldsUnchanged": true,
++      "noNewExecutionEvidence": true
++    },
++    {
++      "kind": "officialAddonProvenanceReceipt",
++      "originalSha256": "dfa6c621a96b6f5fc8b705658323cf9f84a8aa5bbba2243ff69162d51980fef6",
++      "projectionBytes": 1419,
++      "explicitAllowlist": true,
++      "statusFieldsUnchanged": true,
++      "noNewExecutionEvidence": true
++    },
++    {
++      "kind": "sourceSdkBuildReceipt",
++      "originalSha256": "b3a5bcb18580c82c8ad73ef2781dd9194920197df9d3abdf73a73a4e52e7856b",
++      "projectionBytes": 1326,
++      "explicitAllowlist": true,
++      "statusFieldsUnchanged": true,
++      "noNewExecutionEvidence": true
++    },
++    {
++      "kind": "sourceRebakeReceipt",
++      "originalSha256": "841ec0c303050676e1e3975ea58013b40652551cb0d41229f449be90d67cb673",
++      "projectionBytes": 1541,
++      "explicitAllowlist": true,
++      "statusFieldsUnchanged": true,
++      "noNewExecutionEvidence": true
++    }
++  ],
++  "Windows51Executed": false,
++  "nativeFixtureExecuted": false,
++  "packageInstallationExecuted": false,
++  "releaseOrGitWrites": 0,
++  "CiDispatches": 0,
++  "helperSemanticSourceGatesExecuted": false,
++  "ownedSyntheticTestFixturesRemoved": true
++}
+--- a/LOCAL-SOURCE-CHECKS.json
++++ /dev/null
+@@ -1,164 +0,0 @@
+-{
+-  "schemaVersion": 1,
+-  "status": "source_checks_only_not_windows_acceptance",
+-  "node": "v24.19.0",
+-  "syntaxFiles": [
+-    {
+-      "path": "Upload-Issue344QaPrereleaseInputs.mjs",
+-      "sha256": "354ac118bf48b92b536dfa3be346df5d7bfdd18b29af8e7e974066d52fceb620",
+-      "syntaxExit": 0
+-    },
+-    {
+-      "path": "dependencies/artifact-assembly-v1/create-slot-inputs.mjs",
+-      "sha256": "b0d41d373048991d72ccc84e3c18667e1adfcab95b13ca227bf9d3289d558306",
+-      "syntaxExit": 0
+-    },
+-    {
+-      "path": "dependencies/artifact-assembly-v1/package-qa-matrix.mjs",
+-      "sha256": "a80ae91221dd00a4df953c22882c29ee6b71c6a3f5988c0ce9b2ef530e20e6dd",
+-      "syntaxExit": 0
+-    },
+-    {
+-      "path": "dependencies/artifact-assembly-v1/package-qa-probe.mjs",
+-      "sha256": "02a57175950a7f61e751f8c76f8a7646388ce36fafeeac8d6d6ba7a168c19c15",
+-      "syntaxExit": 0
+-    },
+-    {
+-      "path": "dependencies/artifact-assembly-v1/sdk-wire-qa.mjs",
+-      "sha256": "f9b0966f31d791bfe876799fc1004a9f603d504c95c16b3d8549d483934cde85",
+-      "syntaxExit": 0
+-    },
+-    {
+-      "path": "dependencies/artifact-assembly-v2/seal-package-qa-slot.mjs",
+-      "sha256": "f153142120aae11ea5e8f0dbfcadc4d4ef94280903d54e30c4341437b5398f05",
+-      "syntaxExit": 0
+-    },
+-    {
+-      "path": "fetch-release-inputs.mjs",
+-      "sha256": "e2bc84916b555965f786ecf81cf185bcb9c24bfe55994e8ae7276d67999c9d92",
+-      "syntaxExit": 0
+-    },
+-    {
+-      "path": "prepare-public-inputs.mjs",
+-      "sha256": "519562fc0e3926dd820f9c7b4f84ce265fe63feb474dabc587ced8147befd97a",
+-      "syntaxExit": 0
+-    },
+-    {
+-      "path": "test-transfer-core.mjs",
+-      "sha256": "4f11fc27c562d06c342788299cf134f5c4cc15dfcc17d8f6a808dbf13cefe19c",
+-      "syntaxExit": 0
+-    },
+-    {
+-      "path": "transfer-core.mjs",
+-      "sha256": "61f8c1253e3221faff6b27508e90fdd145730e5227274e105986063792bb28d4",
+-      "syntaxExit": 0
+-    },
+-    {
+-      "path": "verify-proposal.mjs",
+-      "sha256": "ab44cd79088808cb5d7bf1a4e0ceecb6f0b38b29c1208d9ae769767c6e8ffd38",
+-      "syntaxExit": 0
+-    }
+-  ],
+-  "actualInertSeamTests": {
+-    "schemaVersion": 1,
+-    "passed": 23,
+-    "failed": 0,
+-    "cases": [
+-      "materialized_source_contract_only",
+-      "pending_inputs",
+-      "missing_commit",
+-      "zero_digest",
+-      "duplicate_asset",
+-      "missing_asset",
+-      "arbitrary_asset_name",
+-      "draft_not_public_qa_prerelease",
+-      "native_pending",
+-      "owned_fixture_missing",
+-      "partial_build",
+-      "fake_package_pass",
+-      "oversized_asset",
+-      "sanitizer_preserves_unrun_false_and_omits_localpath",
+-      "sanitizer_refuses_secret_field",
+-      "projection_only_generic_source_proof_and_original_hash",
+-      "projection_refuses_path_in_allowed_field",
+-      "frozen_tar_binding_drift_refused",
+-      "other_valid_source_commit_refused",
+-      "private_extra_eligibility_top_field_refused",
+-      "private_extra_eligibility_nested_field_refused",
+-      "pending_canonical_activation_not_a_disposable_qa_block",
+-      "public_projection_extra_private_field_refused"
+-    ],
+-    "scope": "actual production manifest/sanitizer seams using inert synthetic records; no upload/download/Windows/package/native execution"
+-  },
+-  "portableParser": {
+-    "Windows51Executed": false,
+-    "runtime": "7.5.3",
+-    "files": [
+-      {
+-        "errors": 0,
+-        "file": "Invoke-Issue344PackageQa.ps1"
+-      },
+-      {
+-        "errors": 0,
+-        "file": "Test-Issue344CandidateSeal.ps1"
+-      },
+-      {
+-        "errors": 0,
+-        "file": "Test-Issue344HelperGates.ps1"
+-      },
+-      {
+-        "errors": 0,
+-        "file": "dependencies/generic-slot-primitives-v1/GenericSlotMetadata.psm1"
+-      },
+-      {
+-        "errors": 0,
+-        "file": "dependencies/generic-slot-primitives-v1/Test-KanonNativeHandles.ps1"
+-      }
+-    ]
+-  },
+-  "portableSameCSharpCompile": {
+-    "runtime": "7.5.3",
+-    "PInvokeCalls": 0,
+-    "Windows51Executed": false,
+-    "originalCSharpBodyCompiled": true,
+-    "taskOrProcessOperations": 0
+-  },
+-  "workflowSha256": "ac43eab855f8f9bbcd77cf768b78d55bc42ae229f84547be30b906ed9085e188",
+-  "actionlintExit": 0,
+-  "actualImmutableReceiptProjectionSeam": [
+-    {
+-      "kind": "nativeQaReceipt",
+-      "originalSha256": "40c0ce05a118bf893a96ec6891d4fba61f093d5670d2c017478ec2f7f52ead82",
+-      "projectionBytes": 1647,
+-      "explicitAllowlist": true,
+-      "statusFieldsUnchanged": true
+-    },
+-    {
+-      "kind": "officialAddonProvenanceReceipt",
+-      "originalSha256": "6293a94de97363275140da7f3f326ba9c38aa8f00d595efbd394826c39028099",
+-      "projectionBytes": 1419,
+-      "explicitAllowlist": true,
+-      "statusFieldsUnchanged": true
+-    },
+-    {
+-      "kind": "sourceSdkBuildReceipt",
+-      "originalSha256": "e15e7999d6bc670c02d21bd71717ddc991674d3a5c842ff88644bbcebf27f386",
+-      "projectionBytes": 1424,
+-      "explicitAllowlist": true,
+-      "statusFieldsUnchanged": true
+-    },
+-    {
+-      "kind": "sourceRebakeReceipt",
+-      "originalSha256": "d875590854904b9e26d4553f0f5dac2e9532e16af2f06ea3af6f857fa34299cf",
+-      "projectionBytes": 1541,
+-      "explicitAllowlist": true,
+-      "statusFieldsUnchanged": true
+-    }
+-  ],
+-  "Windows51Executed": false,
+-  "nativeFixtureExecuted": false,
+-  "packageInstallationExecuted": false,
+-  "releaseOrGitWrites": 0,
+-  "CiDispatches": 0,
+-  "helperSemanticSourceGatesExecuted": false
+-}
+--- /dev/null
++++ b/MATERIALIZATION-STATE.json
+@@ -0,0 +1,75 @@
++{
++  "schemaVersion": 1,
++  "status": "materialized_actual_QA4_source_proofs_only_windows_and_transfer_unperformed",
++  "finalOpenclawSourceCommit": "6449366519a551bd3c2658771091f5cbb8de48aa",
++  "finalOpenclawTarSha256": "33e795deacd98c9ec1727492e2dfd2cf7a7367f3feb8e4912da6c06d63a75ac2",
++  "finalOpenclawTarBytes": 95897600,
++  "completePackageVerificationReceiptSha256": "841ec0c303050676e1e3975ea58013b40652551cb0d41229f449be90d67cb673",
++  "sourceDigestRebakeReceiptSha256": "e4843cca1d24ada6b5daa94d5beca2dedee55a0a6e7e11fe1bae727aaf2ab672",
++  "sourceSdkBuildReceiptSha256": "b3a5bcb18580c82c8ad73ef2781dd9194920197df9d3abdf73a73a4e52e7856b",
++  "focusedNativeReceiptSha256": "ff6c33317626eb861eb2dbadbee348781700c25f9629ab1ffc2dd2e8940cf43f",
++  "officialAddonProvenanceReceiptSha256": "dfa6c621a96b6f5fc8b705658323cf9f84a8aa5bbba2243ff69162d51980fef6",
++  "lifecycleOwnerFinalGitBlobsReverified": true,
++  "sourcePortableChecksReceiptSha256": "8ace809bb205c70e679549e6a509bae1d472a90001e6a0c9d173761bcd407252",
++  "predecessorSourceFilesChanged": [
++    "INPUT-TEMPLATE.json",
++    "LIFECYCLE-OWNER-SOURCE.json",
++    "README.md",
++    "test-transfer-core.mjs",
++    "transfer-core.mjs"
++  ],
++  "predecessorSourceFilesUnchanged": [
++    "Invoke-Issue344PackageQa.ps1",
++    "LIFECYCLE-SOURCE-NOTES.md",
++    "SOURCE-DEPENDENCIES.json",
++    "SOURCE-GATES.json",
++    "Test-Issue344CandidateSeal.ps1",
++    "Test-Issue344HelperGates.ps1",
++    "Upload-Issue344QaPrereleaseInputs.mjs",
++    "dependencies/artifact-assembly-v1/ASSEMBLY-PROPOSAL-MANIFEST.json",
++    "dependencies/artifact-assembly-v1/create-slot-inputs.mjs",
++    "dependencies/artifact-assembly-v1/package-qa-matrix.mjs",
++    "dependencies/artifact-assembly-v1/package-qa-probe.mjs",
++    "dependencies/artifact-assembly-v1/sdk-wire-qa.mjs",
++    "dependencies/artifact-assembly-v2/ASSEMBLY-SEAL-MANIFEST.json",
++    "dependencies/artifact-assembly-v2/seal-package-qa-slot.mjs",
++    "dependencies/generic-slot-primitives-v1/EXTRACTION-PROVENANCE.json",
++    "dependencies/generic-slot-primitives-v1/GenericSlotMetadata.psm1",
++    "dependencies/generic-slot-primitives-v1/Test-KanonNativeHandles.ps1",
++    "fetch-release-inputs.mjs",
++    "issue344-package-qa.yml",
++    "prepare-public-inputs.mjs",
++    "required-root-lifecycle.mjs",
++    "test-required-root-lifecycle.mjs",
++    "verify-proposal.mjs"
++  ],
++  "historicalProofFilesMovedByteIdentical": [
++    {
++      "from": "LOCAL-LIFECYCLE-REGRESSION.json",
++      "to": "history/v3/LOCAL-LIFECYCLE-REGRESSION.json",
++      "sha256": "92e6525b43de5be0339682564a6cb02ada4985c66a9f9c1dc6b45bca7a555263"
++    },
++    {
++      "from": "LOCAL-SOURCE-CHECKS-v3.json",
++      "to": "history/v3/LOCAL-SOURCE-CHECKS-v3.json",
++      "sha256": "e22cc2d272a90dd953d1b9f1f282fe51029d45a81b01e300353ff6917dde294c"
++    },
++    {
++      "from": "LOCAL-SOURCE-CHECKS.json",
++      "to": "history/v3/LOCAL-SOURCE-CHECKS.json",
++      "sha256": "17d0255fe9d8e01bdd3e151eec281dc0c5876ef8c2184dd5ceed4e1539e90321"
++    },
++    {
++      "from": "v2-to-v3.patch",
++      "to": "history/v3/v2-to-v3.patch",
++      "sha256": "f6753799211d5bd7a8e37e930119f198a428e8c767f9091a4670de341126395c"
++    }
++  ],
++  "noEarlierLocalResultCountedAsNewEvidence": true,
++  "WindowsExecuted": false,
++  "publicTransferExecuted": false,
++  "independentSourceReviewPending": true,
++  "actualPublicByteReviewPending": true,
++  "liveActivation": false,
++  "deploymentReady": false
++}
+--- a/README.md
++++ b/README.md
+@@ -1,10 +1,14 @@
+-# Issue344 owned Windows complete-package QA — SOURCE proposal
++# Issue344 owned Windows complete-package QA — QA4 SOURCE proposal
+ 
+-This bundle is not deployment, npm publication, a successful Windows run, or Dell Excel acceptance. The management owner supplies only exact source/license artifacts after the normal complete OpenClaw build/package and exact focused native 668-unit + two-owned-fixture proof have passed. The closed generic eligibility schema binds four immutable source/build proof hashes and rejects unknown top-level/nested private fields. It fixes deploymentReady=false and the canonical gate as pending separate live acceptance. Missing hashes, unfinished required source/focused-native gates, missing owned-fixture cases, incomplete source-policy bundled plugin set, or a placeholder eligibility receipt are refused before installation.
++This bundle is not deployment, npm publication, a successful Windows run, or Dell Excel acceptance. The management owner supplies only exact source/license artifacts after the normal complete OpenClaw build/package and exact focused native 695-unit + two-owned-fixture proof have passed. The closed generic eligibility schema binds four immutable source/build proof hashes and rejects unknown top-level/nested private fields. It fixes deploymentReady=false and the canonical gate as pending separate live acceptance. Missing hashes, unfinished required source/focused-native gates, missing owned-fixture cases, incomplete source-policy bundled plugin set, or a placeholder eligibility receipt are refused before installation.
++
++## Source-only status
++
++This successor binds actual new native/source SDK/complete-package proof identities, not predecessor acceptance. Parent input paths, public-byte review, eligibility receipt and proposal digest must still be materialized separately; the example input remains non-executable. Historical local records are retained unchanged under `history/v3/` and never counted as QA4 checks. Windows package execution, transfer and live/Excel acceptance are unperformed here.
+ 
+ ## Exact boundaries
+ 
+-- CUA source: `891efae2cc01a38260a303b0329785e5c4d7b03c`; actual final DLL SHA256 `601adefd44cc982dd4a1ff2e80dae8b056b971f830521d7e6acbb7dde8420f94`; unchanged official 0.28.2 addon `93f220e8a5cbf25aff23321f20a868368a204f1026b8dce45c5a4f84290de09f`.
++- CUA source: `a80258ee1ff1e1b38ca87eb571f4552c3b853c54`; actual final DLL SHA256 `34bbf44ff85ffbd08a0c0a33fc47a97ece9490bc648878f9900a2de8be9e5bd4`; unchanged official 0.28.2 addon `93f220e8a5cbf25aff23321f20a868368a204f1026b8dce45c5a4f84290de09f`.
+ - OpenClaw source commit/tar/proofs must be actual final receipts, not assumed from an earlier adapter-only CI build. The normal source policy packs the 63 root-bundled manifests, not every external plugin source manifest. Full normal packaging uses `scripts/package-openclaw-for-docker.mjs`, without `--skip-build`, plugin narrowing, dependency copying, or dist overlays.
+ - Windows x64 Node **24.19.0** and npm **11.17.0**, normal `npm install --omit=dev --include=optional`, including ordinary lifecycle scripts.
+ - Five fresh-process public probes before and after exactly one physical rename of our own disposable root: packed CLI version, real packed plugin registration without invoking handlers, real production doctor, actual generated SDK/DLL loader ABI, and typed SDK foreign-carrier wire.
+@@ -17,12 +21,12 @@
+ 
+ ## Parent-only materialization and transfer
+ 
+-Integrate this entire reviewed bundle at `.github/issue344-package-qa/` and the byte-identical workflow at `.github/workflows/issue344-package-qa.yml`, on the new branch `source/issue344-package-qa-20261010`. A push limited to this exact QA branch registers the alias workflow; its main job is guarded `github.event_name == workflow_dispatch`, so registration does not run package QA or mutate the default branch. Parent then manually dispatches that exact source branch. The workflow verifies its actual Git-object bytes against the reviewed mirror after forcing LF checkout. No integration or dispatch is performed by this proposal.
++Integrate this entire reviewed bundle at `.github/issue344-package-qa/` and the byte-identical workflow at `.github/workflows/issue344-package-qa.yml`, on the reviewed branch `source/issue344-package-qa-20261010`. A push limited to this exact QA branch registers the alias workflow; its main job is guarded `github.event_name == workflow_dispatch`, so registration does not run package QA or mutate the default branch. Parent then manually dispatches that exact source branch. The workflow verifies its actual Git-object bytes against the reviewed mirror after forcing LF checkout. No integration or dispatch is performed by this proposal.
+ 
+ 1. Complete and independently verify final source package and focused native lane; canonical all/GUI remains a separate live-activation gate and may be pending during this disposable package QA; fill every actual value in the input template, including a newly written eligibility receipt. Explicitly review all public inputs as source/license-only and sanitized. Proof receipts are projected through strict generic source/build-QA primitive allowlists, bound to immutable private original-file hashes. Included status fields are unchanged; raw logs/XML/environment, local paths and actual Dell task/process/companion/reservation/config/activation metadata are excluded. This is not an exhaustive generic sanitizer; the parent reviews the actual public bytes.
+ 2. Allocate a NEW excluded management temporary lease and declare retention/cleanup before copying large tars. Run `node prepare-public-inputs.mjs <actual-inputs.json> <new-lease/prepared>` with exact Node24.19. The new bundle has three unchanged tars and five JSON proofs. Unknown/pending values fail; no GitHub write occurs.
+ 3. Only the management owner may run `node Upload-Issue344QaPrereleaseInputs.mjs <prepared/prepared-inputs.json> <new-lease/upload-journal>`. It uses normal authenticated `gh` on **shannon0430/openclaw**, creates one internal QA prerelease pinned to the exact source commit, uploads each fixed-name asset once with no clobber, downloads and rehashes each actual asset, then uploads the ID/hash manifest LAST. It creates only the explicit unofficial, non-production prerelease with `--latest=false`, no discussion and no npm publication. It never dispatches CI. Durable intent is fsynced before every write. Existing journal, failed upload, ambiguous create/readback, or changed IDs => stop; reconcile the same action read-only, never rerun or use a new journal to evade single-flight.
+-4. The owner reads `parent-dispatch-inputs.json`, integrates the exact frozen workflow/source and dispatches that one branch with the actual four scalar IDs/hashes. A read-only `contents:read` + `actions:read` Actions token is used only in the transfer step, never inherited by npm. Every asset is fetched by numeric ID and actual SHA256, not latest/tag lookup; exact preexisting tag is refused before create and the actual Git tag (bounded annotated-tag dereference) is independently bound to the final source commit; API prerelease/non-draft/target/asset membership and actual focused native green and canonical activation dispatch/workflow metadata are rechecked. Canonical metadata pins dispatch head27bbe and source-ref891ef separately; a pending canonical lane is recorded honestly, not counted as QA-green or used as a serial installation blocker. Token is not forwarded to the signed HTTPS asset host.
++4. The owner reads `parent-dispatch-inputs.json`, integrates the exact frozen workflow/source and dispatches that one branch with the actual four scalar IDs/hashes. A read-only `contents:read` + `actions:read` Actions token is used only in the transfer step, never inherited by npm. Every asset is fetched by numeric ID and actual SHA256, not latest/tag lookup; exact preexisting tag is refused before create and the actual Git tag (bounded annotated-tag dereference) is independently bound to the final source commit; API prerelease/non-draft/target/asset membership and actual focused native green and canonical activation dispatch/workflow metadata are rechecked. Canonical metadata pins dispatch head27bbe and source-refa80258 separately; a pending canonical lane is recorded honestly, not counted as QA-green or used as a serial installation blocker. Token is not forwarded to the signed HTTPS asset host.
+ 5. Download the resulting Actions artifacts once; verify actual run/source/proposal/transfer hashes and seal inventory before considering future activation. Artifacts contain all hidden inventory files. The expanded output is source/license-only and not installed anywhere live.
+ 
+ GitHub release assets are the supported parent upload/download path. The REST Actions-artifact API does not upload arbitrary local artifacts; `upload-artifact` is used only inside the authorized Actions job. The original unfrozen draft design was **explicitly replaced by the parent** because draft listings can require push access. The selected public-fork **internal QA prerelease** is clearly marked unofficial/non-production, `prerelease=true`, `make_latest=false`, no discussion, with only reviewed source/license bytes. Read-only Actions acquisition is still measured, not assumed: any 403/404 or ID/hash drift fails before installation; no credential/scope fallback or silent release mutation is implemented.
+@@ -50,5 +54,19 @@
+ its localNode22 result is not Windows/installed lifecycle acceptance. Prior25
+ frozen v2 files/dependencies are preserved or separately diffed, never rewritten
+ in v2. Public transfer classification of new source files must be parent-reviewed
+-before publication. Native successor provenance/eligibility binding stays a
+-separate parent-owned source revision; historical f3eb metadata is not a cure.
++before publication. This V3 paragraph describes the historical strengthening only. QA4 now separately
++binds the actual new source/native/package proofs below; historical f3eb metadata
++is never accepted as new-candidate evidence.
++
++
++## QA4 exact successor binding
++
++- Focused native run38047527482 is verified695/695 + two separately scoped owned fixtures; immutable native receipt `ff6c33317626eb861eb2dbadbee348781700c25f9629ab1ffc2dd2e8940cf43f`. Owned real-focus/fake-insertion and actual synthetic Edit consumption are not conflated with Dell Excel acceptance.
++- New source SDK receipt `b3a5bcb18580c82c8ad73ef2781dd9194920197df9d3abdf73a73a4e52e7856b`; official reused artifact receipt `dfa6c621a96b6f5fc8b705658323cf9f84a8aa5bbba2243ff69162d51980fef6` derives from retained original official provenance, zero acquisitions. SDK tar `d7f98ec0a225681383e02cfa67126893059dce94aa88587a08701205308f3b11`,74125 bytes; Win32 tar `569c75fcda91e2a56dc6f88d486b71882fae332ee58d3be0e454223c331f594e`,9237829 bytes.
++- Actual canonical dispatch run38048621661 binds reviewed alias head27bbe, source-refa80258, unchanged all/GUI/zero-skips contract. Its result is a separate parent-owned activation gate; no success is assumed here.
++- Closed native public projection adds only original primitive schema/status/nativeAuthorManifestSha256/nativePatchSha256 fields. It never publishes nested ownership/session/window metadata or invents an owned-fixture count in the original receipt. The generic eligibility695/2 count is derived separately from the verified original.
++- Exact unchanged generic dependencies retain historical origin manifests; old891ef/601ade metadata in those frozen manifests is not current eligibility. V3 lifecycle/probe/parser/native/seal implementations remain unchanged. All three lifecycle owner hashes were read as Git blobs from the actual final commit and verified byte-equal to their unchanged owning eb377 source.
++
++Final clean OpenClaw source is `6449366519a551bd3c2658771091f5cbb8de48aa`. Its normal complete tar is `33e795deacd98c9ec1727492e2dfd2cf7a7367f3feb8e4912da6c06d63a75ac2`,95897600 bytes. Complete-package verification receipt `841ec0c303050676e1e3975ea58013b40652551cb0d41229f449be90d67cb673` records12696 regular files,63 bundled plugin manifests and716 canonical owner artifacts. It is the proof projected by the existing asset key `sourceRebakeReceipt`; this historical asset name does not relabel the separate source digest-rebake receipt `e4843cca1d24ada6b5daa94d5beca2dedee55a0a6e7e11fe1bae727aaf2ab672`. Source-verifier review `98da5bdbfbdbe354aac2204e68fe276e84fdbf9d4ced15081568375e4be77b5a` is separate.
++
++Local QA4 source checks are recorded in `LOCAL-SOURCE-CHECKS-v4.json`. They exercise the real closed transfer/projection contracts and lifecycle production reader against inert records/own disposable fixtures, plus exact JS syntax/actionlint and portable PowerShell7.5.3 parsing/C# compilation. They do not install packages, invoke native APIs, prove Windows5.1 execution, publish artifacts or provide live acceptance. Final independent source review and actual public input byte review remain parent-owned.
+--- /dev/null
++++ b/history/QA4-PREPARATION-STATE.json
+@@ -0,0 +1,21 @@
++{
++  "schemaVersion": 1,
++  "status": "preparation_only_pending_final_source_package_evidence",
++  "predecessorManifestSha256": "19b27eed263e170963c51a219c2466209cf119682c69136609d4e6f0ab6ed72f",
++  "predecessorIndependentReviewSha256": "1d114915a753a54c2488c1ac8c18db0153e44061d7f36c134196c4c627e77f32",
++  "copiedAndRehashedPredecessorFiles": 32,
++  "pendingActualValues": [
++    "openclawTarSha256",
++    "openclawTarBytes",
++    "completePackageVerificationReceiptSha256"
++  ],
++  "sourcePortableChecksRun": false,
++  "finalManifestFrozen": false,
++  "publicTransferExecuted": false,
++  "WindowsExecuted": false,
++  "deploymentReady": false,
++  "liveActivation": false,
++  "finalOpenclawSourceCommit": "6449366519a551bd3c2658771091f5cbb8de48aa",
++  "sourceDigestRebakeReceiptSha256": "e4843cca1d24ada6b5daa94d5beca2dedee55a0a6e7e11fe1bae727aaf2ab672",
++  "lifecycleOwnerFinalGitBlobReadbackComplete": true
++}
+--- /dev/null
++++ b/history/v3/LOCAL-LIFECYCLE-REGRESSION.json
+@@ -0,0 +1,12 @@
++{
++  "schemaVersion": 1,
++  "passed": 12,
++  "failed": 0,
++  "productionGate": true,
++  "actualNode": "v22.23.1",
++  "actualPlatform": "darwin",
++  "npmInstalls": 0,
++  "packageLifecycleExecutions": 0,
++  "liveOrTaskEffects": 0,
++  "fixtureScope": "new own synthetic leaves only; not package install or Windows acceptance"
++}
+--- /dev/null
++++ b/history/v3/LOCAL-SOURCE-CHECKS-v3.json
+@@ -0,0 +1,14 @@
++{
++  "schemaVersion": 1,
++  "nodeSyntaxFiles": 13,
++  "portableActualPowerShellVersion": "7.5.3",
++  "portableParserFiles": 5,
++  "newLifecycleProductionReaderSeamsPassed": 12,
++  "localActualNode": "22.23.1",
++  "unchangedPriorV2SourceChecksFileSha256": "17d0255fe9d8e01bdd3e151eec281dc0c5876ef8c2184dd5ceed4e1539e90321",
++  "oldChecksDoNotClaimV3WindowsAcceptance": true,
++  "WindowsExecuted": false,
++  "npmInstalls": 0,
++  "packageLifecycleExecutions": 0,
++  "taskOrLiveEffects": 0
++}
+--- /dev/null
++++ b/history/v3/LOCAL-SOURCE-CHECKS.json
+@@ -0,0 +1,164 @@
++{
++  "schemaVersion": 1,
++  "status": "source_checks_only_not_windows_acceptance",
++  "node": "v24.19.0",
++  "syntaxFiles": [
++    {
++      "path": "Upload-Issue344QaPrereleaseInputs.mjs",
++      "sha256": "354ac118bf48b92b536dfa3be346df5d7bfdd18b29af8e7e974066d52fceb620",
++      "syntaxExit": 0
++    },
++    {
++      "path": "dependencies/artifact-assembly-v1/create-slot-inputs.mjs",
++      "sha256": "b0d41d373048991d72ccc84e3c18667e1adfcab95b13ca227bf9d3289d558306",
++      "syntaxExit": 0
++    },
++    {
++      "path": "dependencies/artifact-assembly-v1/package-qa-matrix.mjs",
++      "sha256": "a80ae91221dd00a4df953c22882c29ee6b71c6a3f5988c0ce9b2ef530e20e6dd",
++      "syntaxExit": 0
++    },
++    {
++      "path": "dependencies/artifact-assembly-v1/package-qa-probe.mjs",
++      "sha256": "02a57175950a7f61e751f8c76f8a7646388ce36fafeeac8d6d6ba7a168c19c15",
++      "syntaxExit": 0
++    },
++    {
++      "path": "dependencies/artifact-assembly-v1/sdk-wire-qa.mjs",
++      "sha256": "f9b0966f31d791bfe876799fc1004a9f603d504c95c16b3d8549d483934cde85",
++      "syntaxExit": 0
++    },
++    {
++      "path": "dependencies/artifact-assembly-v2/seal-package-qa-slot.mjs",
++      "sha256": "f153142120aae11ea5e8f0dbfcadc4d4ef94280903d54e30c4341437b5398f05",
++      "syntaxExit": 0
++    },
++    {
++      "path": "fetch-release-inputs.mjs",
++      "sha256": "e2bc84916b555965f786ecf81cf185bcb9c24bfe55994e8ae7276d67999c9d92",
++      "syntaxExit": 0
++    },
++    {
++      "path": "prepare-public-inputs.mjs",
++      "sha256": "519562fc0e3926dd820f9c7b4f84ce265fe63feb474dabc587ced8147befd97a",
++      "syntaxExit": 0
++    },
++    {
++      "path": "test-transfer-core.mjs",
++      "sha256": "4f11fc27c562d06c342788299cf134f5c4cc15dfcc17d8f6a808dbf13cefe19c",
++      "syntaxExit": 0
++    },
++    {
++      "path": "transfer-core.mjs",
++      "sha256": "61f8c1253e3221faff6b27508e90fdd145730e5227274e105986063792bb28d4",
++      "syntaxExit": 0
++    },
++    {
++      "path": "verify-proposal.mjs",
++      "sha256": "ab44cd79088808cb5d7bf1a4e0ceecb6f0b38b29c1208d9ae769767c6e8ffd38",
++      "syntaxExit": 0
++    }
++  ],
++  "actualInertSeamTests": {
++    "schemaVersion": 1,
++    "passed": 23,
++    "failed": 0,
++    "cases": [
++      "materialized_source_contract_only",
++      "pending_inputs",
++      "missing_commit",
++      "zero_digest",
++      "duplicate_asset",
++      "missing_asset",
++      "arbitrary_asset_name",
++      "draft_not_public_qa_prerelease",
++      "native_pending",
++      "owned_fixture_missing",
++      "partial_build",
++      "fake_package_pass",
++      "oversized_asset",
++      "sanitizer_preserves_unrun_false_and_omits_localpath",
++      "sanitizer_refuses_secret_field",
++      "projection_only_generic_source_proof_and_original_hash",
++      "projection_refuses_path_in_allowed_field",
++      "frozen_tar_binding_drift_refused",
++      "other_valid_source_commit_refused",
++      "private_extra_eligibility_top_field_refused",
++      "private_extra_eligibility_nested_field_refused",
++      "pending_canonical_activation_not_a_disposable_qa_block",
++      "public_projection_extra_private_field_refused"
++    ],
++    "scope": "actual production manifest/sanitizer seams using inert synthetic records; no upload/download/Windows/package/native execution"
++  },
++  "portableParser": {
++    "Windows51Executed": false,
++    "runtime": "7.5.3",
++    "files": [
++      {
++        "errors": 0,
++        "file": "Invoke-Issue344PackageQa.ps1"
++      },
++      {
++        "errors": 0,
++        "file": "Test-Issue344CandidateSeal.ps1"
++      },
++      {
++        "errors": 0,
++        "file": "Test-Issue344HelperGates.ps1"
++      },
++      {
++        "errors": 0,
++        "file": "dependencies/generic-slot-primitives-v1/GenericSlotMetadata.psm1"
++      },
++      {
++        "errors": 0,
++        "file": "dependencies/generic-slot-primitives-v1/Test-KanonNativeHandles.ps1"
++      }
++    ]
++  },
++  "portableSameCSharpCompile": {
++    "runtime": "7.5.3",
++    "PInvokeCalls": 0,
++    "Windows51Executed": false,
++    "originalCSharpBodyCompiled": true,
++    "taskOrProcessOperations": 0
++  },
++  "workflowSha256": "ac43eab855f8f9bbcd77cf768b78d55bc42ae229f84547be30b906ed9085e188",
++  "actionlintExit": 0,
++  "actualImmutableReceiptProjectionSeam": [
++    {
++      "kind": "nativeQaReceipt",
++      "originalSha256": "40c0ce05a118bf893a96ec6891d4fba61f093d5670d2c017478ec2f7f52ead82",
++      "projectionBytes": 1647,
++      "explicitAllowlist": true,
++      "statusFieldsUnchanged": true
++    },
++    {
++      "kind": "officialAddonProvenanceReceipt",
++      "originalSha256": "6293a94de97363275140da7f3f326ba9c38aa8f00d595efbd394826c39028099",
++      "projectionBytes": 1419,
++      "explicitAllowlist": true,
++      "statusFieldsUnchanged": true
++    },
++    {
++      "kind": "sourceSdkBuildReceipt",
++      "originalSha256": "e15e7999d6bc670c02d21bd71717ddc991674d3a5c842ff88644bbcebf27f386",
++      "projectionBytes": 1424,
++      "explicitAllowlist": true,
++      "statusFieldsUnchanged": true
++    },
++    {
++      "kind": "sourceRebakeReceipt",
++      "originalSha256": "d875590854904b9e26d4553f0f5dac2e9532e16af2f06ea3af6f857fa34299cf",
++      "projectionBytes": 1541,
++      "explicitAllowlist": true,
++      "statusFieldsUnchanged": true
++    }
++  ],
++  "Windows51Executed": false,
++  "nativeFixtureExecuted": false,
++  "packageInstallationExecuted": false,
++  "releaseOrGitWrites": 0,
++  "CiDispatches": 0,
++  "helperSemanticSourceGatesExecuted": false
++}
+--- /dev/null
++++ b/history/v3/PACKAGE-QA-PROPOSAL-MANIFEST.json
+@@ -0,0 +1,238 @@
++{
++  "schemaVersion": 1,
++  "status": "frozen_source_only_review_candidate",
++  "scope": "public_source_license_only_package_QA_and_generic_readonly_primitives",
++  "liveActivation": false,
++  "deploymentReady": false,
++  "helperSemanticAcceptance": false,
++  "files": [
++    {
++      "path": "INPUT-TEMPLATE.json",
++      "bytes": 856,
++      "sha256": "12d6ede9197ce9083a630a2794b88564e12267196478994c4443dca9a44d34eb"
++    },
++    {
++      "path": "Invoke-Issue344PackageQa.ps1",
++      "bytes": 10278,
++      "sha256": "2e938b57786c266b05e0b1327e1fe5b8eb5b2f2a051919f5c25bec66de3da557"
++    },
++    {
++      "path": "LIFECYCLE-OWNER-SOURCE.json",
++      "bytes": 960,
++      "sha256": "87def504e8fdb5da7b4f1e9d892d87596fd54b0b8b20eec5995e414e142836dc"
++    },
++    {
++      "path": "LIFECYCLE-SOURCE-NOTES.md",
++      "bytes": 2756,
++      "sha256": "62fbd9000083d80c7b906a2c070eb375aa9f14d012216fe41ad56fbbb6f17abd"
++    },
++    {
++      "path": "LOCAL-LIFECYCLE-REGRESSION.json",
++      "bytes": 315,
++      "sha256": "92e6525b43de5be0339682564a6cb02ada4985c66a9f9c1dc6b45bca7a555263"
++    },
++    {
++      "path": "LOCAL-SOURCE-CHECKS-v3.json",
++      "bytes": 476,
++      "sha256": "e22cc2d272a90dd953d1b9f1f282fe51029d45a81b01e300353ff6917dde294c"
++    },
++    {
++      "path": "LOCAL-SOURCE-CHECKS.json",
++      "bytes": 5321,
++      "sha256": "17d0255fe9d8e01bdd3e151eec281dc0c5876ef8c2184dd5ceed4e1539e90321"
++    },
++    {
++      "path": "README.md",
++      "bytes": 11232,
++      "sha256": "bfab285d9ca03f91c8b5ac75f7c96194a01bd8986737b347bfc0fc5e69fb160f"
++    },
++    {
++      "path": "SOURCE-DEPENDENCIES.json",
++      "bytes": 1851,
++      "sha256": "626459d5bab689a6364d71f55ffbc6f0ec849ff68c49a5d8bc0b25d81b3ba54d"
++    },
++    {
++      "path": "SOURCE-GATES.json",
++      "bytes": 1248,
++      "sha256": "647d894ee0becf5c70ed6be2ac2f238ec163fcc9b3073b3344786027218598eb"
++    },
++    {
++      "path": "Test-Issue344CandidateSeal.ps1",
++      "bytes": 1468,
++      "sha256": "912d83886b18d7458c0614404bbc63b8b601952750b8e96c760c90cb6856184e"
++    },
++    {
++      "path": "Test-Issue344HelperGates.ps1",
++      "bytes": 2570,
++      "sha256": "221874224a692fe5884d1f536397d150e22144e3d66f17cf79da015f8d84ebe7"
++    },
++    {
++      "path": "Upload-Issue344QaPrereleaseInputs.mjs",
++      "bytes": 7900,
++      "sha256": "354ac118bf48b92b536dfa3be346df5d7bfdd18b29af8e7e974066d52fceb620"
++    },
++    {
++      "path": "dependencies/artifact-assembly-v1/ASSEMBLY-PROPOSAL-MANIFEST.json",
++      "bytes": 5262,
++      "sha256": "215904c5686a81b770ffdce326aa2bb8b7c24371706424f10a7462263645d44f"
++    },
++    {
++      "path": "dependencies/artifact-assembly-v1/create-slot-inputs.mjs",
++      "bytes": 3394,
++      "sha256": "b0d41d373048991d72ccc84e3c18667e1adfcab95b13ca227bf9d3289d558306"
++    },
++    {
++      "path": "dependencies/artifact-assembly-v1/package-qa-matrix.mjs",
++      "bytes": 5592,
++      "sha256": "a80ae91221dd00a4df953c22882c29ee6b71c6a3f5988c0ce9b2ef530e20e6dd"
++    },
++    {
++      "path": "dependencies/artifact-assembly-v1/package-qa-probe.mjs",
++      "bytes": 11892,
++      "sha256": "02a57175950a7f61e751f8c76f8a7646388ce36fafeeac8d6d6ba7a168c19c15"
++    },
++    {
++      "path": "dependencies/artifact-assembly-v1/sdk-wire-qa.mjs",
++      "bytes": 3535,
++      "sha256": "f9b0966f31d791bfe876799fc1004a9f603d504c95c16b3d8549d483934cde85"
++    },
++    {
++      "path": "dependencies/artifact-assembly-v2/ASSEMBLY-SEAL-MANIFEST.json",
++      "bytes": 718,
++      "sha256": "f72281b39632e4f8a510c082dce5a05cf446f313f81dcb8543270c295bcb4e0b"
++    },
++    {
++      "path": "dependencies/artifact-assembly-v2/seal-package-qa-slot.mjs",
++      "bytes": 3906,
++      "sha256": "f153142120aae11ea5e8f0dbfcadc4d4ef94280903d54e30c4341437b5398f05"
++    },
++    {
++      "path": "dependencies/generic-slot-primitives-v1/EXTRACTION-PROVENANCE.json",
++      "bytes": 2616,
++      "sha256": "3695bb9d1231a65ecdcc8a06b33ae63925316a39c31d010c0959ad1fcbbdf9b1"
++    },
++    {
++      "path": "dependencies/generic-slot-primitives-v1/GenericSlotMetadata.psm1",
++      "bytes": 8923,
++      "sha256": "be0b46846180c2d6e9ecca86b0739ed62227a99b69e2e621bfeeff9c1ddeaafd"
++    },
++    {
++      "path": "dependencies/generic-slot-primitives-v1/Test-KanonNativeHandles.ps1",
++      "bytes": 3729,
++      "sha256": "e28c15ffad2ad8ac1a8e782e5cbffb359624540b62afaed02e25274173d3b513"
++    },
++    {
++      "path": "fetch-release-inputs.mjs",
++      "bytes": 8196,
++      "sha256": "e2bc84916b555965f786ecf81cf185bcb9c24bfe55994e8ae7276d67999c9d92"
++    },
++    {
++      "path": "issue344-package-qa.yml",
++      "bytes": 4029,
++      "sha256": "ac43eab855f8f9bbcd77cf768b78d55bc42ae229f84547be30b906ed9085e188"
++    },
++    {
++      "path": "prepare-public-inputs.mjs",
++      "bytes": 3405,
++      "sha256": "519562fc0e3926dd820f9c7b4f84ce265fe63feb474dabc587ced8147befd97a"
++    },
++    {
++      "path": "required-root-lifecycle.mjs",
++      "bytes": 3338,
++      "sha256": "9b5dfc50242fca3afd821486454b748baafc1d627c2a12aa2fe68aabad97fb19"
++    },
++    {
++      "path": "test-required-root-lifecycle.mjs",
++      "bytes": 4675,
++      "sha256": "5ff2ec922885f4947cff07f1695a3e23baa19a225ccbce82171ab5dbde812541"
++    },
++    {
++      "path": "test-transfer-core.mjs",
++      "bytes": 5764,
++      "sha256": "4f11fc27c562d06c342788299cf134f5c4cc15dfcc17d8f6a808dbf13cefe19c"
++    },
++    {
++      "path": "transfer-core.mjs",
++      "bytes": 12740,
++      "sha256": "61f8c1253e3221faff6b27508e90fdd145730e5227274e105986063792bb28d4"
++    },
++    {
++      "path": "v2-to-v3.patch",
++      "bytes": 22322,
++      "sha256": "f6753799211d5bd7a8e37e930119f198a428e8c767f9091a4670de341126395c"
++    },
++    {
++      "path": "verify-proposal.mjs",
++      "bytes": 1804,
++      "sha256": "ab44cd79088808cb5d7bf1a4e0ceecb6f0b38b29c1208d9ae769767c6e8ffd38"
++    }
++  ],
++  "selectedTransfer": "explicit_parent_selected_public_internal_QA_prerelease_not_latest_not_official_not_production",
++  "requiredSourceInputs": {
++    "openclawSourceCommit": "f3eb17ededbc2d7f10d5c9630ccad05b77431d55",
++    "openclawTarSha256": "5894d14f4dbd4a9e259d79e9c5b3a89520c79b91a272dda978163266a8d14048",
++    "openclawTarBytes": 95907840,
++    "sourceSdkTarSha256": "d7f98ec0a225681383e02cfa67126893059dce94aa88587a08701205308f3b11",
++    "nativeTarSha256": "c67d99918be009f4ed21429608b3b3383c9868c7661fb9d25cb465f16e0d46ef",
++    "nativeDllSha256": "601adefd44cc982dd4a1ff2e80dae8b056b971f830521d7e6acbb7dde8420f94",
++    "officialAddonSha256": "93f220e8a5cbf25aff23321f20a868368a204f1026b8dce45c5a4f84290de09f",
++    "eligibilityReceipt": "not_materialized_here_refuse_missing_focused668_plus2_and_complete_source_proofs_canonical_activation_separate"
++  },
++  "requiredWindowsCounts": {
++    "publicProbesBefore": 5,
++    "publicProductionNegatives": 8,
++    "physicalRelocations": 1,
++    "publicProbesAfter": 5,
++    "actual51ParserFiles": 5,
++    "ownedNativePrimitivesIncludingFileSymlink": 7,
++    "actual51ProductionSealConsumer": 1,
++    "helperSemanticCases": 0,
++    "requiredRootLifecycleReadbacks": 3,
++    "requiredRootLifecycleSourceRegressions": 12
++  },
++  "localChecks": {
++    "nodeSyntaxFiles": 11,
++    "inertActualSeamsPassed": 23,
++    "portableParserFiles": 5,
++    "sameCSharpBodyCompile": true,
++    "PInvokeCalls": 0,
++    "actionlintExit": 0
++  },
++  "actualWindowsRun": false,
++  "actualTransferRun": false,
++  "supersedesSourceCandidateManifestSha256": "6bfba602d1c2a4cf4c38d57701a155dc9c7d33fd8fb6cbec1f424460e3b2429d",
++  "revisionScope": [
++    "QA-only exact required OpenClaw root marker/legacyguard/ordinary-entry/digest closure before probes andseal",
++    "normal npm11.17 command unchanged; pending warnings advisory, not blocked scripts",
++    "12production lifecycle reader regressions; no scripts/install/config replay",
++    "all source activation/helper/native/admission semantics and previousv2 unchanged"
++  ],
++  "canonicalActivationMetadata": {
++    "runId": 38042245292,
++    "dispatchHeadSha": "27bbeaa4940c801da76645df952815b28143f011",
++    "certifiedSourceRef": "891efae2cc01a38260a303b0329785e5c4d7b03c",
++    "liveAcceptance": "pending_separate_gate_not_package_QA_green"
++  },
++  "localChecksV3": {
++    "nodeSyntaxFiles": 13,
++    "portableParserFiles": 5,
++    "lifecycleReaderSeamsPassed": 12,
++    "actualNode": "22.23.1",
++    "actualPlatform": "darwin",
++    "actualPortablePowerShell": "7.5.3",
++    "npmInstalls": 0,
++    "WindowsOrTaskEffects": 0,
++    "exactV2PatchApplyReadback": true
++  },
++  "lifecycleInterpretation": {
++    "owningSource": "eb377ac59e6c9fd6c7705028034812becf00271b",
++    "normalInstallCommandUnchanged": true,
++    "exactRootAllowFlagAdded": false,
++    "wildcardOrDependencyBlanketPermissionAdded": false,
++    "pendingWarningMeansBlocked": false,
++    "oldV2GreenPreservedWithMissingAssertionLimit": true,
++    "dependencyScriptTraceClaimed": false
++  },
++  "futureNativeSuccessorBinding": "parent_owned_separate_source_proof_revision_required; historicalf3eb601ade_not_newnativeacceptance",
++  "incrementalPatchSha256": "f6753799211d5bd7a8e37e930119f198a428e8c767f9091a4670de341126395c"
++}
+--- /dev/null
++++ b/history/v3/REVIEW.json
+@@ -0,0 +1,56 @@
++{
++  "schema": 1,
++  "status": "PASS_SOURCE_ONLY_PACKAGE_WINDOWS_PENDING",
++  "manifestSha256": "19b27eed263e170963c51a219c2466209cf119682c69136609d4e6f0ab6ed72f",
++  "incrementalPatchSha256": "f6753799211d5bd7a8e37e930119f198a428e8c767f9091a4670de341126395c",
++  "predecessorManifestSha256": "6bfba602d1c2a4cf4c38d57701a155dc9c7d33fd8fb6cbec1f424460e3b2429d",
++  "priorIndependentSourceReviewSha256": "248020bd3b162057eff33d7cb68870987e26b531a95cf7edbedc46684911cf39",
++  "actualLocalChecksSha256": "df8a05519c2dac54d4ffb61459d74cdb8c752324ff6bed122a6cd81aab41d10f",
++  "exact33FileClosure": true,
++  "exactV2PatchApplyResultBytes": true,
++  "onlyChangedPriorFiles": [
++    "Invoke-Issue344PackageQa.ps1",
++    "README.md"
++  ],
++  "requiredRootLifecycleReaderSha256": "9b5dfc50242fca3afd821486454b748baafc1d627c2a12aa2fe68aabad97fb19",
++  "requiredRootLifecycleTestsSha256": "5ff2ec922885f4947cff07f1695a3e23baa19a225ccbce82171ab5dbde812541",
++  "workflowUnchangedSha256": "ac43eab855f8f9bbcd77cf768b78d55bc42ae229f84547be30b906ed9085e188",
++  "sourceOwnerThreeFilesExactEb377AndF3ebGitBlobsVerified": true,
++  "sourceReviewFindings": [
++    "One normal npm11.17 install command unchanged; no --ignore-scripts, configuration mutation, wildcard permission, copied dependencies, postinstall replay or new auto-healing",
++    "Three read-only checks run before first probes, after the single relocation and before final inventory/seal; same tar digest retained",
++    "Exact declared slot root dependency, tar digest, installed name and ordinary directory/entry gates precede absence checks",
++    "lstat refuses present marker regardless of file/directory/dangling symlink; unknown metadata errors are not converted to absent",
++    "Required closure matches owning source marker/legacyguard/entry definition, with ordinary-path strengthening; this is not proof of every dependency lifecycle execution",
++    "12 actual-production-reader synthetic regressions include positive, marker types, legacy guard, missing/symlink entry, wrong names/spec, changed tar, unreadable marker, owned relocation; own fixtures removed",
++    "Prior workflow, eligibility/closed projections, generic extraction/C# body, native7/51parser5/seal consumer, eight production negatives and public5+5 relocation checks unchanged",
++    "New source/docs contain generic licensed QA/source identifiers only; no scoped Dell hostname/principal/task/action/observation/preimage or secret payload introduced",
++    "Historical f3eb/601ade inputs explicitly do not accept new native successor; parent must separately rebind final DLL/SDK/full package/receipts before changed-source QA or LIVE"
++  ],
++  "actualChecks": {
++    "node": "v24.19.0",
++    "platform": "darwin",
++    "lifecycleProductionReaderCases": 12,
++    "transferProductionSeams": 23,
++    "nodeSyntaxFiles": 13,
++    "portablePS7_5_3ParserFiles": 5,
++    "actionlintExit": 0,
++    "npmInstalls": 0,
++    "packageLifecycleExecutions": 0,
++    "nativePInvokeCalls": 0,
++    "taskOrLiveEffects": 0
++  },
++  "limits": [
++    "Windows Node24.19/npm11.17 normal install and marker closure unrun by reviewer",
++    "PowerShell5.1/native7 actual source fixture remains mandatory; portable parser is not native acceptance",
++    "Ordinary-path metadata gates are not atomic no-beneath filesystem confinement; fixtures are unique owned disposable roots",
++    "Marker absence proves required source closure, not a full per-dependency script trace",
++    "Pending warning text alone is not treated as blocked lifecycle; no advisory-policy change introduced",
++    "Canonical native/all/GUI zero-skips and deployed Excel success remain separate LIVE acceptance gates",
++    "Public transfer of newly integrated source bytes requires parent exact artifact classification/rebinding; this review performs no publication"
++  ],
++  "sourceRepoChanged": false,
++  "ciDispatched": false,
++  "assetsPublished": false,
++  "deploymentReady": false
++}
+--- /dev/null
++++ b/history/v3/v2-to-v3.patch
+@@ -0,0 +1,312 @@
++diff --git a/Invoke-Issue344PackageQa.ps1 b/Invoke-Issue344PackageQa.ps1
++index 900630c..c938c25 100644
++--- a/Invoke-Issue344PackageQa.ps1
+++++ b/Invoke-Issue344PackageQa.ps1
++@@ -48,17 +48,23 @@ try {
++     if ($env:GITHUB_OUTPUT) { [IO.File]::AppendAllText($env:GITHUB_OUTPUT,"evidence=$evidence`nowned_root=$base`n",$utf8) }
++     # Child/native fixtures must use our new C:\ temporary lease, not runner D:\ temp.
++     $env:TEMP=$base; $env:TMP=$base; $env:npm_config_cache=Join-Path $base 'npm-cache'
+++    $lifecycleNegatives=Run-Node 'required-root-lifecycle-source-negatives' @((Join-Path $proposal 'test-required-root-lifecycle.mjs'))
+++    if ($lifecycleNegatives.passed -ne 12 -or $lifecycleNegatives.failed -ne 0 -or -not $lifecycleNegatives.productionGate -or $lifecycleNegatives.npmInstalls -ne 0 -or $lifecycleNegatives.packageLifecycleExecutions -ne 0) { throw 'required_lifecycle_source_gate_not_passed' }
++     $readonlyGates=Run-51 'actual-51-readonly-package-primitives' @('-File',(Join-Path $proposal 'Test-Issue344HelperGates.ps1'),'-ProposalRoot',$proposal)
++     $created=Run-Node 'create-owned-slot' @((Join-Path $proposal 'dependencies/artifact-assembly-v1/create-slot-inputs.mjs'),(Join-Path $InputsRoot 'slot-inputs.json'),$slotA)
++     if (-not $created.newOwnedQaRootCreated -or $created.installStarted) { throw 'new_slot_not_proven' }
++     Push-Location -LiteralPath $slotA
++     try {
++-        # Normal package lifecycle. No ignore-scripts, copied deps or slot overlay.
+++        # Normal npm11.17 lifecycle; null allow-scripts warnings are advisory.
+++        # Do not change wildcard/dependency permissions, ignore scripts or replay.
+++        # Installed required-root marker closure is measured before any probes.
++         $npmOutput=& $npm install --omit=dev --include=optional --no-audit --no-fund 2>&1
++         $npmExit=$LASTEXITCODE
++         [IO.File]::WriteAllText((Join-Path $evidence 'normal-npm-install.log'),($npmOutput -join "`n")+"`n",$utf8)
++         if ($npmExit -ne 0) { throw 'normal_npm_install_failed' }
++     } finally { Pop-Location }
+++    $lifecycleBefore=Run-Node 'required-root-lifecycle-before-probes' @((Join-Path $proposal 'required-root-lifecycle.mjs'),$slotA)
+++    if (-not $lifecycleBefore.requiredRootLifecycleCompleted) { throw 'required_root_lifecycle_not_complete' }
++     $before=Public-Probes 'before-relocation' $slotA
++     $matrix=Run-Node 'production-eight-negatives' @((Join-Path $proposal 'dependencies/artifact-assembly-v1/package-qa-matrix.mjs'),$slotA)
++     if ($matrix.negatives -ne 8 -or $matrix.positive -ne 1 -or -not $matrix.originalLeavesRestored -or -not $matrix.freshProcessEachCheck) { throw 'exact_production_negative_matrix_required' }
++@@ -77,13 +83,17 @@ try {
++     if ($gate.directoryIdentityFormat -ne 'volumeHex8:fileIndexHex16' -or $identityBefore -cnotmatch '^[a-f0-9]{8}:[a-f0-9]{16}$' -or $identityBefore -cne $identityAfter) { throw 'physical_root_identity_changed' }
++     if ((Get-FileHash -LiteralPath (Join-Path $slotB 'release-bindings.json') -Algorithm SHA256).Hash -ne $bindingsBefore) { throw 'relocation_binding_changed' }
++     Write-NewJson (Join-Path $evidence 'relocation-confirmed.json') @{schema=1;physicalRelocations=1;identityBefore=$identityBefore;identityAfter=$identityAfter;bindingUnchanged=$true}
+++    $lifecycleAfter=Run-Node 'required-root-lifecycle-after-relocation' @((Join-Path $proposal 'required-root-lifecycle.mjs'),$slotB)
+++    if (-not $lifecycleAfter.requiredRootLifecycleCompleted -or $lifecycleAfter.requiredRootTarSha256 -cne $lifecycleBefore.requiredRootTarSha256) { throw 'required_root_lifecycle_relocation_mismatch' }
++     $after=Public-Probes 'after-relocation' $slotB
+++    $lifecycleBeforeSeal=Run-Node 'required-root-lifecycle-before-seal' @((Join-Path $proposal 'required-root-lifecycle.mjs'),$slotB)
+++    if (-not $lifecycleBeforeSeal.requiredRootLifecycleCompleted -or $lifecycleBeforeSeal.requiredRootTarSha256 -cne $lifecycleAfter.requiredRootTarSha256) { throw 'required_root_lifecycle_not_complete_before_seal' }
++     $inventory=Join-Path $evidence 'candidate-inventory.json'
++     $seal=Run-Node 'emit-compatible-seal' @((Join-Path $proposal 'dependencies/artifact-assembly-v2/seal-package-qa-slot.mjs'),$slotB,$inventory)
++     if ($seal.sdkCopies -ne 1 -or $seal.nativeCopies -ne 1 -or $seal.reparseAccepted -or $seal.activationAccepted) { throw 'seal_closure_not_proven' }
++     $consumer=Run-51 'actual-51-production-seal-consumer' @('-File',(Join-Path $proposal 'Test-Issue344CandidateSeal.ps1'),'-ProposalRoot',$proposal,'-Slot',$slotB,'-Inventory',$inventory)
++     if (-not $consumer.productionSealConsumerVerified -or $consumer.activationAccepted -or $consumer.taskActionsInvoked -ne 0) { throw 'actual_production_seal_consumer_required' }
++-    Write-NewJson (Join-Path $evidence 'package-qa-result.json') @{schema=1;status='owned_windows_package_qa_passed_not_live_acceptance';node=(& $node --version).Trim();npm=(& $npm --version).Trim();readOnlyPackageFixtureGates=$readonlyGates;helperSemanticSourceGatesExecuted=$false;deploymentReady=$false;normalInstallExit=0;publicBefore=$before;productionNegativeMatrix=$matrix;physicalRelocations=1;publicAfter=$after;sealEmitter=$seal;actual51SealConsumer=$consumer;liveActivation=$false;realPlatformInput=$false;excelAcceptance=$false;taskActionsInvoked=0}
+++    Write-NewJson (Join-Path $evidence 'package-qa-result.json') @{schema=1;status='owned_windows_package_qa_passed_not_live_acceptance';node=(& $node --version).Trim();npm=(& $npm --version).Trim();readOnlyPackageFixtureGates=$readonlyGates;helperSemanticSourceGatesExecuted=$false;deploymentReady=$false;normalInstallExit=0;npmLifecyclePolicy='npm11_17_advisory_standard_install_unmodified';requiredRootLifecycleReadbacks=3;requiredRootLifecycleBefore=$lifecycleBefore;requiredRootLifecycleAfter=$lifecycleAfter;requiredRootLifecycleBeforeSeal=$lifecycleBeforeSeal;lifecycleSourceNegatives=$lifecycleNegatives;publicBefore=$before;productionNegativeMatrix=$matrix;physicalRelocations=1;publicAfter=$after;sealEmitter=$seal;actual51SealConsumer=$consumer;liveActivation=$false;realPlatformInput=$false;excelAcceptance=$false;taskActionsInvoked=0}
++     if ($env:GITHUB_OUTPUT) { [IO.File]::AppendAllText($env:GITHUB_OUTPUT,"candidate_slot=$slotB`n",$utf8) }
++ } catch {
++     if (-not (Test-Path -LiteralPath (Join-Path $evidence 'package-qa-failed.json'))) { Write-NewJson (Join-Path $evidence 'package-qa-failed.json') @{schema=1;status='failed_or_outcome_unknown';passed=$false;liveActivation=$false;automaticReplayAllowed=$false;ownedRootRetained=$true} }
++diff --git a/LIFECYCLE-OWNER-SOURCE.json b/LIFECYCLE-OWNER-SOURCE.json
++new file mode 100644
++index 0000000..661639a
++--- /dev/null
+++++ b/LIFECYCLE-OWNER-SOURCE.json
++@@ -0,0 +1,27 @@
+++{
+++  "schemaVersion": 1,
+++  "owningOpenclawSource": "eb377ac59e6c9fd6c7705028034812becf00271b",
+++  "inspectedDerivativeSource": "f3eb17ededbc2d7f10d5c9630ccad05b77431d55",
+++  "files": [
+++    {
+++      "path": "scripts/install.ps1",
+++      "sha256": "87406a49babeff0c18ff6b0a97c0428c87265baee5b16017e91aadef42e4a1c3",
+++      "sameAsExactEb377": true
+++    },
+++    {
+++      "path": "src/infra/update-global.ts",
+++      "sha256": "31ef3a8663524070486f02d3fb0db662f9329bc548962ffae6e03bc5b8348236",
+++      "sameAsExactEb377": true
+++    },
+++    {
+++      "path": "scripts/lib/package-lifecycle-marker.mjs",
+++      "sha256": "32c50197ecc6f10b78f9f8ef588b868e7cdf428233e00fb912044dee5da46e1a",
+++      "sameAsExactEb377": true
+++    }
+++  ],
+++  "installerClosure": "ordinaryentry_and_pending_and_legacyguard_absent",
+++  "normalInstallCommandChanged": false,
+++  "exactRootAllowFlagAdded": false,
+++  "npm11_17PendingWarnings": "advisory_not_blocked",
+++  "perDependencyLifecycleTraceClaimed": false
+++}
++diff --git a/LIFECYCLE-SOURCE-NOTES.md b/LIFECYCLE-SOURCE-NOTES.md
++new file mode 100644
++index 0000000..f18b87e
++--- /dev/null
+++++ b/LIFECYCLE-SOURCE-NOTES.md
++@@ -0,0 +1,42 @@
+++# QA-v3 required root lifecycle closure (no install run)
+++
+++Owning source is exactOpenClaw eb377ac59e6c9fd6c7705028034812becf00271b;
+++the read-only f3eb source lease byte-equals it for the three recorded files.
+++
+++`Test-NpmLifecycleCompleted` in scripts/install.ps1 requires ordinary expected
+++entry and absence of .openclaw-lifecycle-pending and dist/openclaw-install-guard.
+++The local QA slot is a private cwd envelope, so the measured package root is its
+++exact node_modules/openclaw, not a presumed global npm root. Root identity is
+++bound to the created package.json dependency file:artifacts/openclaw.tgz, its
+++sealed artifact digest and the installed package name, with ordinary path gates.
+++
+++The owning Get-NpmLifecycleAllowArgument/update-global source selects npm11.16+
+++allow-scripts policy and exact resolved install-target identity. That global
+++single-target installer flag is NOT automatically applied to this cwd envelope.
+++QA-v3 leaves the original one normal npm11.17 install command unchanged; no
+++allowflag, wildcard permission, dependency blanket approval, npm configuration
+++write or install/postinstall replay is added.
+++
+++Parent independently read pinned npm11.17 Arborist rebuild.js229–238: null
+++allow-scripts entries remain ADVISORY under default strict-allow-scripts=false.
+++Warnings naming four packages do not establish blocked scripts. Parent also
+++observed required pending-marker absence in the actual expanded old install,
+++while the marker was in its original tar. This is consistent with the owning
+++normal postinstall closure; it is not a per-package execution trace. Oldpackage
+++QA green is preserved with its explicit incomplete-lifecycle-assertion limit,
+++not relabelled a lifecycle failure or live eligibility.
+++
+++QA-v3 adds three read-only exact-root closure checks: before the first public
+++probe, after the sole owned relocation before next probes, and immediately
+++before inventory/seal. Any marker type, dangling symlink, legacy guard, unknown
+++metadata/read denial, missing/unordinary entry, wrong root declaration, or digest
+++change refuses without any healing/replay. No marker contents are read/printed.
+++The finite own-synthetic production reader regression group has12cases. It does
+++not execute npm, OpenClaw scripts, package postinstall, node task, GUI or Excel.
+++
+++Available local Node22.23.1/macOS validates source seams only. Actual future
+++WindowsQA remains pinned Node24.19.0/npm11.17.0 and mandatory own fixtures;
+++private helper-v3 semantics/live/native input/Excel acceptance stay excluded.
+++Successor native/package eligibility receipts are parent-bound separately; old
+++f3eb/601ade proofs do not certify the new native candidate. No actual new package
+++installation, workflow dispatch, source repo change or live action occurred.
++diff --git a/LOCAL-LIFECYCLE-REGRESSION.json b/LOCAL-LIFECYCLE-REGRESSION.json
++new file mode 100644
++index 0000000..c7c97f5
++--- /dev/null
+++++ b/LOCAL-LIFECYCLE-REGRESSION.json
++@@ -0,0 +1,12 @@
+++{
+++  "schemaVersion": 1,
+++  "passed": 12,
+++  "failed": 0,
+++  "productionGate": true,
+++  "actualNode": "v22.23.1",
+++  "actualPlatform": "darwin",
+++  "npmInstalls": 0,
+++  "packageLifecycleExecutions": 0,
+++  "liveOrTaskEffects": 0,
+++  "fixtureScope": "new own synthetic leaves only; not package install or Windows acceptance"
+++}
++diff --git a/LOCAL-SOURCE-CHECKS-v3.json b/LOCAL-SOURCE-CHECKS-v3.json
++new file mode 100644
++index 0000000..6aee305
++--- /dev/null
+++++ b/LOCAL-SOURCE-CHECKS-v3.json
++@@ -0,0 +1,14 @@
+++{
+++  "schemaVersion": 1,
+++  "nodeSyntaxFiles": 13,
+++  "portableActualPowerShellVersion": "7.5.3",
+++  "portableParserFiles": 5,
+++  "newLifecycleProductionReaderSeamsPassed": 12,
+++  "localActualNode": "22.23.1",
+++  "unchangedPriorV2SourceChecksFileSha256": "17d0255fe9d8e01bdd3e151eec281dc0c5876ef8c2184dd5ceed4e1539e90321",
+++  "oldChecksDoNotClaimV3WindowsAcceptance": true,
+++  "WindowsExecuted": false,
+++  "npmInstalls": 0,
+++  "packageLifecycleExecutions": 0,
+++  "taskOrLiveEffects": 0
+++}
++diff --git a/README.md b/README.md
++index 123e7eb..879f1a9 100644
++--- a/README.md
+++++ b/README.md
++@@ -38,3 +38,17 @@ Windows owns one GUID root under LocalAppData Temp on C:\; it writes an ownershi
++ Local checks here: Node syntax, inert actual manifest/projection seams, workflow actionlint, and portable PowerShell7 parser checks only. No helper semantic acceptance is asserted. Required future Windows5.1/native/package/transfer runs are **unrun** until the owner dispatches and verifies them. Canonical all/GUI/no-skips is still required separately before any LIVE acceptance; this package-only run never makes deploymentReady=true. Source review is not proof of prerelease readability, normal installation, ABI on Windows, full expanded seal acceptance, real task fences, or Excel behavior.
++ 
++ Official API references: [releases](https://docs.github.com/en/rest/releases/releases), [release assets](https://docs.github.com/en/rest/releases/assets), [Actions artifacts](https://docs.github.com/en/rest/actions/artifacts?apiVersion=2026-03-10).
+++
+++
+++## V3 lifecycle-only source strengthening
+++
+++See LIFECYCLE-SOURCE-NOTES.md and hash-bound owner source. npm11.17 warnings are
+++advisory, not evidence of blocked scripts. The original normal install remains
+++unchanged. New exact-root marker/legacyguard/ordinary-entry/digest checks run
+++before probes and seal (three read-only observations) and refuse without replay.
+++Production reader synthetic positive/negative12-case regression is additional;
+++its localNode22 result is not Windows/installed lifecycle acceptance. Prior25
+++frozen v2 files/dependencies are preserved or separately diffed, never rewritten
+++in v2. Public transfer classification of new source files must be parent-reviewed
+++before publication. Native successor provenance/eligibility binding stays a
+++separate parent-owned source revision; historical f3eb metadata is not a cure.
++diff --git a/required-root-lifecycle.mjs b/required-root-lifecycle.mjs
++new file mode 100644
++index 0000000..14d5d51
++--- /dev/null
+++++ b/required-root-lifecycle.mjs
++@@ -0,0 +1,63 @@
+++// Read-only QA gate for the created slot's exact OpenClaw root dependency.
+++// npm11.17 allow-scripts null entries are advisory, not proof of blocked scripts.
+++// Marker closure follows pinned scripts/install.ps1 Test-NpmLifecycleCompleted;
+++// no lifecycle execution, config change, blanket permission or automatic replay.
+++import assert from 'node:assert/strict';
+++import fs from 'node:fs';
+++import path from 'node:path';
+++import { createHash } from 'node:crypto';
+++import { fileURLToPath } from 'node:url';
+++
+++function ordinaryDirectory(p) {
+++  const s = fs.lstatSync(p);
+++  assert(s.isDirectory() && !s.isSymbolicLink(), 'qa_lifecycle_directory_not_ordinary');
+++}
+++function ordinaryFile(p) {
+++  const s = fs.lstatSync(p);
+++  assert(s.isFile() && !s.isSymbolicLink(), 'qa_lifecycle_leaf_not_ordinary');
+++  return p;
+++}
+++function markerAbsent(p) {
+++  try { fs.lstatSync(p); }
+++  catch (e) {
+++    if (e?.code === 'ENOENT') return true;
+++    throw new Error('qa_lifecycle_marker_unreadable');
+++  }
+++  return false; // A regular file, directory or dangling symlink all mean present.
+++}
+++
+++export function assertRequiredRootLifecycle(slot) {
+++  const root = path.resolve(slot);
+++  ordinaryDirectory(root);
+++  const declared = JSON.parse(fs.readFileSync(ordinaryFile(path.join(root, 'package.json')), 'utf8'));
+++  assert(declared.private === true && declared.name === 'forone-kanon-issue344-node-slot', 'qa_lifecycle_slot_identity_mismatch');
+++  assert(declared.dependencies?.openclaw === 'file:artifacts/openclaw.tgz', 'qa_lifecycle_root_dependency_mismatch');
+++  const bindings = JSON.parse(fs.readFileSync(ordinaryFile(path.join(root, 'release-bindings.json')), 'utf8'));
+++  assert(/^[a-f0-9]{64}$/.test(bindings.openclawTarSha256), 'qa_lifecycle_root_digest_missing');
+++  ordinaryDirectory(path.join(root, 'artifacts'));
+++  const tar = ordinaryFile(path.join(root, 'artifacts', 'openclaw.tgz'));
+++  assert.equal(createHash('sha256').update(fs.readFileSync(tar)).digest('hex'), bindings.openclawTarSha256, 'qa_lifecycle_root_digest_mismatch');
+++  const modules = path.join(root, 'node_modules');
+++  const pkg = path.join(modules, 'openclaw');
+++  ordinaryDirectory(modules); ordinaryDirectory(pkg); ordinaryDirectory(path.join(pkg, 'dist'));
+++  const installed = JSON.parse(fs.readFileSync(ordinaryFile(path.join(pkg, 'package.json')), 'utf8'));
+++  assert(installed.name === 'openclaw', 'qa_lifecycle_installed_identity_mismatch');
+++  ordinaryFile(path.join(pkg, 'dist', 'entry.js'));
+++  assert(markerAbsent(path.join(pkg, '.openclaw-lifecycle-pending')), 'qa_lifecycle_required_root_pending');
+++  assert(markerAbsent(path.join(pkg, 'dist', 'openclaw-install-guard')), 'qa_lifecycle_legacy_guard_present');
+++  return {
+++    schemaVersion: 1,
+++    requiredRootLifecycleCompleted: true,
+++    requiredRootIdentity: 'openclaw:file:artifacts/openclaw.tgz',
+++    requiredRootTarSha256: bindings.openclawTarSha256,
+++    ordinaryEntryVerified: true,
+++    pendingMarkerAbsent: true,
+++    legacyGuardAbsent: true,
+++    packageLifecycleExecutions: 0,
+++    dependencyLifecycleTraceClaimed: false,
+++  };
+++}
+++if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+++  assert(process.platform === 'win32' && process.arch === 'x64' && process.version === 'v24.19.0', 'actual_windows_node_required');
+++  console.log(JSON.stringify(assertRequiredRootLifecycle(process.argv[2])));
+++}
++diff --git a/test-required-root-lifecycle.mjs b/test-required-root-lifecycle.mjs
++new file mode 100644
++index 0000000..7d175b2
++--- /dev/null
+++++ b/test-required-root-lifecycle.mjs
++@@ -0,0 +1,48 @@
+++// Actual production read-only gate on own synthetic leaves; never npm/scripts.
+++import assert from 'node:assert/strict';
+++import fs from 'node:fs';
+++import os from 'node:os';
+++import path from 'node:path';
+++import { createHash } from 'node:crypto';
+++import { assertRequiredRootLifecycle } from './required-root-lifecycle.mjs';
+++
+++const lease = fs.mkdtempSync(path.join(os.tmpdir(), 'issue344-lifecycle-gate-'));
+++let passed = 0;
+++function fixture(label) {
+++  const root = path.join(lease, label);
+++  fs.mkdirSync(path.join(root, 'node_modules', 'openclaw', 'dist'), { recursive: true });
+++  fs.mkdirSync(path.join(root, 'artifacts'));
+++  fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ private: true, name: 'forone-kanon-issue344-node-slot', dependencies: { openclaw: 'file:artifacts/openclaw.tgz' } }));
+++  const tar = Buffer.from('owned synthetic lifecycle gate input only');
+++  fs.writeFileSync(path.join(root, 'artifacts', 'openclaw.tgz'), tar);
+++  fs.writeFileSync(path.join(root, 'release-bindings.json'), JSON.stringify({ openclawTarSha256: createHash('sha256').update(tar).digest('hex') }));
+++  fs.writeFileSync(path.join(root, 'node_modules', 'openclaw', 'package.json'), JSON.stringify({ name: 'openclaw' }));
+++  fs.writeFileSync(path.join(root, 'node_modules', 'openclaw', 'dist', 'entry.js'), '// synthetic fixture, never executed\n');
+++  return root;
+++}
+++function caseOnce(label, run) { run(fixture(label)); passed++; }
+++try {
+++  caseOnce('positive', r => { const w = assertRequiredRootLifecycle(r); assert.equal(w.requiredRootLifecycleCompleted, true); assert.equal(w.packageLifecycleExecutions, 0); });
+++  caseOnce('pending-file', r => { fs.writeFileSync(path.join(r, 'node_modules/openclaw/.openclaw-lifecycle-pending'), ''); assert.throws(() => assertRequiredRootLifecycle(r), /required_root_pending/); });
+++  caseOnce('legacy-file', r => { fs.writeFileSync(path.join(r, 'node_modules/openclaw/dist/openclaw-install-guard'), ''); assert.throws(() => assertRequiredRootLifecycle(r), /legacy_guard_present/); });
+++  caseOnce('pending-directory', r => { fs.mkdirSync(path.join(r, 'node_modules/openclaw/.openclaw-lifecycle-pending')); assert.throws(() => assertRequiredRootLifecycle(r), /required_root_pending/); });
+++  caseOnce('dangling-pending-symlink', r => { fs.symlinkSync(path.join(r, 'does-not-exist'), path.join(r, 'node_modules/openclaw/.openclaw-lifecycle-pending'), 'file'); assert.throws(() => assertRequiredRootLifecycle(r), /required_root_pending/); });
+++  caseOnce('entry-missing', r => { fs.unlinkSync(path.join(r, 'node_modules/openclaw/dist/entry.js')); assert.throws(() => assertRequiredRootLifecycle(r)); });
+++  caseOnce('installed-name', r => { fs.writeFileSync(path.join(r, 'node_modules/openclaw/package.json'), '{"name":"not-openclaw"}'); assert.throws(() => assertRequiredRootLifecycle(r), /installed_identity_mismatch/); });
+++  caseOnce('entry-symlink', r => { const e = path.join(r, 'node_modules/openclaw/dist/entry.js'); fs.renameSync(e, e+'.own'); fs.symlinkSync(e+'.own', e, 'file'); assert.throws(() => assertRequiredRootLifecycle(r), /leaf_not_ordinary/); });
+++  caseOnce('declared-root-wildcard', r => { fs.writeFileSync(path.join(r, 'package.json'), JSON.stringify({ private:true, name:'forone-kanon-issue344-node-slot', dependencies:{openclaw:'*'} })); assert.throws(() => assertRequiredRootLifecycle(r), /root_dependency_mismatch/); });
+++  caseOnce('tar-digest-change', r => { fs.appendFileSync(path.join(r, 'artifacts/openclaw.tgz'), 'changed'); assert.throws(() => assertRequiredRootLifecycle(r), /root_digest_mismatch/); });
+++  caseOnce('marker-unreadable-not-absent', r => {
+++    const original = fs.lstatSync;
+++    const marker = path.join(r, 'node_modules', 'openclaw', '.openclaw-lifecycle-pending');
+++    try {
+++      fs.lstatSync = function(p, ...args) { if (p === marker) { const error = new Error('owned fake metadata denial'); error.code = 'EACCES'; throw error; } return original.call(this, p, ...args); };
+++      assert.throws(() => assertRequiredRootLifecycle(r), /marker_unreadable/);
+++    } finally { fs.lstatSync = original; }
+++  });
+++  caseOnce('one-owned-relocation', r => { const after=r+'-relocated'; fs.renameSync(r,after); assert.equal(assertRequiredRootLifecycle(after).requiredRootLifecycleCompleted,true); });
+++  assert.equal(passed, 12);
+++  console.log(JSON.stringify({ schemaVersion:1, passed, failed:0, productionGate:true, actualNode:process.version,
+++    actualPlatform:process.platform, npmInstalls:0, packageLifecycleExecutions:0, liveOrTaskEffects:0,
+++    fixtureScope:'new own synthetic leaves only; not package install or Windows acceptance' }));
+++} finally { fs.rmSync(lease, { recursive:true, force:false }); }
+--- a/test-transfer-core.mjs
++++ b/test-transfer-core.mjs
+@@ -1,7 +1,8 @@
+ import assert from 'node:assert/strict';
+ import { validateManifest, sanitizePublicReceipt, projectPublicReceipt, validatePublicProjection, PROOF_ORIGINALS, FINAL_OPENCLAW, TAR_BINDINGS, IMMUTABLE_PROOF_HASHES, ASSETS, CUA_HEAD, DLL, ADDON } from './transfer-core.mjs';
++// Inert schema records use only the materialized actual final source/package bindings.
+ const c=FINAL_OPENCLAW;
+-function fixture() { return { schemaVersion:1,status:'materialized_reviewed_package_qa_inputs',repository:'shannon0430/openclaw',finalOpenclawSourceCommit:c,cuaSourceCommit:CUA_HEAD,finalDllSha256:DLL,officialAddonSha256:ADDON,proposalManifestSha256:'a'.repeat(64),release:{id:1,draft:false,prerelease:true,makeLatest:false,targetCommitish:c,tag:'issue344-package-qa-'+c.slice(0,16)},eligibility:{schemaVersion:1,status:'accepted_for_isolated_package_qa_only',liveActivation:false,deploymentReady:false,windowsPackageQaAlreadyPassed:false,focusedNative:{repository:'shannon0430/cua',runId:38040866092,headSha:CUA_HEAD,workflowPath:'.github/workflows/issue344-keyboard-native-qa.yml',conclusion:'success',unitCasesPassed:668,ownedFixturesPassed:2,node:'24.19.0',rust:'1.97.1'},sourceRelease:{sourceCommit:c,version:'2026.9.6',fullBuildExit:0,packageCheckExit:0,normalPackageHelper:'scripts/package-openclaw-for-docker.mjs',completePluginSet:true,declarationsUiMetadata:true,selectionNarrowing:false,skipBuild:false},canonicalActivationGate:{repository:'shannon0430/cua',runId:38042245292,dispatchHeadSha:'27bbeaa4940c801da76645df952815b28143f011',sourceRef:CUA_HEAD,workflowPath:'.github/workflows/issue344-canonical-windows-all.yml',workflowSha256:'aca159f5198db42e26aa939b63c6903f5644a5115fec8f4fca5ef77f7107c223',dispatchBranch:'source/issue344-canonical-windows-qa-20261010',event:'workflow_dispatch',lane:'all',requireGui:true,noSkippedCasesRequired:true,activationEligibility:'pending_separate_live_acceptance'},immutableProofHashes:{...IMMUTABLE_PROOF_HASHES}},assets:Object.entries(ASSETS).map(([key,name],i)=>({key,name,id:i+10,bytes:TAR_BINDINGS[key]?.bytes??1,sha256:TAR_BINDINGS[key]?.sha256??'b'.repeat(64),state:'uploaded'})) }; }
++function fixture() { return { schemaVersion:1,status:'materialized_reviewed_package_qa_inputs',repository:'shannon0430/openclaw',finalOpenclawSourceCommit:c,cuaSourceCommit:CUA_HEAD,finalDllSha256:DLL,officialAddonSha256:ADDON,proposalManifestSha256:'a'.repeat(64),release:{id:1,draft:false,prerelease:true,makeLatest:false,targetCommitish:c,tag:'issue344-package-qa-'+c.slice(0,16)},eligibility:{schemaVersion:1,status:'accepted_for_isolated_package_qa_only',liveActivation:false,deploymentReady:false,windowsPackageQaAlreadyPassed:false,focusedNative:{repository:'shannon0430/cua',runId:38047527482,headSha:CUA_HEAD,workflowPath:'.github/workflows/issue344-keyboard-native-qa.yml',conclusion:'success',unitCasesPassed:695,ownedFixturesPassed:2,node:'24.19.0',rust:'1.97.1'},sourceRelease:{sourceCommit:c,version:'2026.9.6',fullBuildExit:0,packageCheckExit:0,normalPackageHelper:'scripts/package-openclaw-for-docker.mjs',completePluginSet:true,declarationsUiMetadata:true,selectionNarrowing:false,skipBuild:false},canonicalActivationGate:{repository:'shannon0430/cua',runId:38048621661,dispatchHeadSha:'27bbeaa4940c801da76645df952815b28143f011',sourceRef:CUA_HEAD,workflowPath:'.github/workflows/issue344-canonical-windows-all.yml',workflowSha256:'aca159f5198db42e26aa939b63c6903f5644a5115fec8f4fca5ef77f7107c223',dispatchBranch:'source/issue344-canonical-windows-qa-20261010',event:'workflow_dispatch',lane:'all',requireGui:true,noSkippedCasesRequired:true,activationEligibility:'pending_separate_live_acceptance'},immutableProofHashes:{...IMMUTABLE_PROOF_HASHES}},assets:Object.entries(ASSETS).map(([key,name],i)=>({key,name,id:i+10,bytes:TAR_BINDINGS[key]?.bytes??1,sha256:TAR_BINDINGS[key]?.sha256??'b'.repeat(64),state:'uploaded'})) }; }
+ const cases=[];function test(name,fn) { fn();cases.push(name); }
+ test('materialized_source_contract_only',()=>validateManifest(fixture()));
+ for(const [name,change] of [['pending_inputs',m=>m.status='pending'],['missing_commit',m=>m.finalOpenclawSourceCommit=null],['zero_digest',m=>m.assets[0].sha256='0'.repeat(64)],['duplicate_asset',m=>m.assets[1].id=m.assets[0].id],['missing_asset',m=>m.assets.pop()],['arbitrary_asset_name',m=>m.assets[0].name='../escape'],['draft_not_public_qa_prerelease',m=>m.release.draft=true],['native_pending',m=>m.eligibility.focusedNative.conclusion='in_progress'],['owned_fixture_missing',m=>m.eligibility.focusedNative.ownedFixturesPassed=1],['partial_build',m=>m.eligibility.sourceRelease.skipBuild=true],['fake_package_pass',m=>m.eligibility.windowsPackageQaAlreadyPassed=true],['oversized_asset',m=>m.assets[0].bytes=1073741825]]) test(name,()=>{const m=fixture();change(m);assert.throws(()=>validateManifest(m));});
+@@ -15,4 +16,30 @@
+ test('private_extra_eligibility_nested_field_refused',()=>{const m=fixture();m.eligibility.sourceRelease.rawXml='not-public';assert.throws(()=>validateManifest(m));});
+ test('pending_canonical_activation_not_a_disposable_qa_block',()=>{const m=fixture();validateManifest(m);assert.equal(m.eligibility.canonicalActivationGate.activationEligibility,'pending_separate_live_acceptance');assert.equal(m.eligibility.deploymentReady,false);});
+ test('public_projection_extra_private_field_refused',()=>{const x=projectPublicReceipt('sourceRebakeReceipt',{status:'source_verified',sourceSha:c,tarSha256:'e'.repeat(64)},PROOF_ORIGINALS.sourceRebakeReceipt);validatePublicProjection('sourceRebakeReceipt',x);x.privateReservation={not:'public'};assert.throws(()=>validatePublicProjection('sourceRebakeReceipt',x));});
++
++for(const [name,change] of [
++  ['stale_predecessor_source_refused',m=>m.finalOpenclawSourceCommit='f3eb17ededbc2d7f10d5c9630ccad05b77431d55'],
++  ['stale_predecessor_cua_refused',m=>m.cuaSourceCommit='891efae2cc01a38260a303b0329785e5c4d7b03c'],
++  ['stale_predecessor_dll_refused',m=>m.finalDllSha256='601adefd44cc982dd4a1ff2e80dae8b056b971f830521d7e6acbb7dde8420f94'],
++  ['stale_predecessor_native_tar_refused',m=>{const a=m.assets.find(a=>a.key==='nativeTar');a.sha256='c67d99918be009f4ed21429608b3b3383c9868c7661fb9d25cb465f16e0d46ef';a.bytes=9234968;}],
++  ['stale_predecessor_full_tar_refused',m=>{const a=m.assets.find(a=>a.key==='openclawTar');a.sha256='5894d14f4dbd4a9e259d79e9c5b3a89520c79b91a272dda978163266a8d14048';a.bytes=95907840;}],
++  ['stale_predecessor_focused_run_refused',m=>m.eligibility.focusedNative.runId=38040866092],
++  ['stale_predecessor_selected_count_refused',m=>m.eligibility.focusedNative.unitCasesPassed=668],
++  ['stale_predecessor_native_proof_refused',m=>m.eligibility.immutableProofHashes.focusedNativeVerificationReceiptSha256='40c0ce05a118bf893a96ec6891d4fba61f093d5670d2c017478ec2f7f52ead82'],
++  ['stale_predecessor_sdk_proof_refused',m=>m.eligibility.immutableProofHashes.sourceSdkBuildReceiptSha256='e15e7999d6bc670c02d21bd71717ddc991674d3a5c842ff88644bbcebf27f386'],
++  ['stale_predecessor_official_proof_refused',m=>m.eligibility.immutableProofHashes.officialAddonProvenanceReceiptSha256='6293a94de97363275140da7f3f326ba9c38aa8f00d595efbd394826c39028099'],
++  ['stale_predecessor_complete_proof_refused',m=>m.eligibility.immutableProofHashes.completePackageVerificationReceiptSha256='d875590854904b9e26d4553f0f5dac2e9532e16af2f06ea3af6f857fa34299cf'],
++  ['stale_predecessor_canonical_run_refused',m=>m.eligibility.canonicalActivationGate.runId=38042245292],
++  ['stale_predecessor_canonical_source_refused',m=>m.eligibility.canonicalActivationGate.sourceRef='891efae2cc01a38260a303b0329785e5c4d7b03c']
++])test(name,()=>{const m=fixture();change(m);assert.throws(()=>validateManifest(m));});
++test('new_native_schema_fields_projected_verbatim_without_invented_owned_count',()=>{
++  const original={schema:1,status:'PASS_FOCUSED_NATIVE_QA_ONLY',runId:38047527482,headSha:CUA_HEAD,conclusion:'success',passedUnitCases:695,nativeAuthorManifestSha256:'c'.repeat(64),nativePatchSha256:'d'.repeat(64),ownedFixtureResults:[{windowsSessionId:2,fieldConsumption:true}],checks:{fixture:true},parentBinaryLease:'/private/owned/lease'};
++  const x=projectPublicReceipt('nativeQaReceipt',original,PROOF_ORIGINALS.nativeQaReceipt);
++  for(const key of ['schema','status','nativeAuthorManifestSha256','nativePatchSha256'])assert.equal(x.proof[key],original[key]);
++  assert(!Object.hasOwn(x.proof,'ownedFixturesPassed'));assert(!Object.hasOwn(x.proof,'ownedFixtureResults'));assert(!Object.hasOwn(x.proof,'checks'));assert(!JSON.stringify(x).includes('/private/'));validatePublicProjection('nativeQaReceipt',x);
++});
++test('new_native_schema_field_nested_object_refused',()=>assert.throws(()=>projectPublicReceipt('nativeQaReceipt',{schema:1,status:{private:'nested'},runId:38047527482},PROOF_ORIGINALS.nativeQaReceipt)));
++test('new_native_schema_field_private_path_refused',()=>assert.throws(()=>projectPublicReceipt('nativeQaReceipt',{schema:1,status:'/private/owned/proof',runId:38047527482},PROOF_ORIGINALS.nativeQaReceipt)));
++test('public_projection_cannot_invent_nested_native_ownership',()=>{const x=projectPublicReceipt('nativeQaReceipt',{schema:1,status:'PASS_FOCUSED_NATIVE_QA_ONLY',runId:38047527482},PROOF_ORIGINALS.nativeQaReceipt);x.proof.ownedFixtureResults=[{private:'not-public'}];assert.throws(()=>validatePublicProjection('nativeQaReceipt',x));});
++
+ console.log(JSON.stringify({schemaVersion:1,passed:cases.length,failed:0,cases,scope:'actual production manifest/sanitizer seams using inert synthetic records; no upload/download/Windows/package/native execution'}));
+--- a/transfer-core.mjs
++++ b/transfer-core.mjs
+@@ -2,11 +2,12 @@
+ import fs from 'node:fs';
+ import path from 'node:path';
+ import { createHash } from 'node:crypto';
+-export const FINAL_OPENCLAW = 'f3eb17ededbc2d7f10d5c9630ccad05b77431d55';
+-export const TAR_BINDINGS = Object.freeze({openclawTar:{sha256:'5894d14f4dbd4a9e259d79e9c5b3a89520c79b91a272dda978163266a8d14048',bytes:95907840},sourceSdkTar:{sha256:'d7f98ec0a225681383e02cfa67126893059dce94aa88587a08701205308f3b11',bytes:74125},nativeTar:{sha256:'c67d99918be009f4ed21429608b3b3383c9868c7661fb9d25cb465f16e0d46ef',bytes:9234968}});
++// QA4 exact actual source/build proof bindings; historical candidate constants are rejected.
++export const FINAL_OPENCLAW = '6449366519a551bd3c2658771091f5cbb8de48aa';
++export const TAR_BINDINGS = Object.freeze({openclawTar:{sha256:'33e795deacd98c9ec1727492e2dfd2cf7a7367f3feb8e4912da6c06d63a75ac2',bytes:95897600},sourceSdkTar:{sha256:'d7f98ec0a225681383e02cfa67126893059dce94aa88587a08701205308f3b11',bytes:74125},nativeTar:{sha256:'569c75fcda91e2a56dc6f88d486b71882fae332ee58d3be0e454223c331f594e',bytes:9237829}});
+ export const REPOSITORY = 'shannon0430/openclaw';
+-export const CUA_HEAD = '891efae2cc01a38260a303b0329785e5c4d7b03c';
+-export const DLL = '601adefd44cc982dd4a1ff2e80dae8b056b971f830521d7e6acbb7dde8420f94';
++export const CUA_HEAD = 'a80258ee1ff1e1b38ca87eb571f4552c3b853c54';
++export const DLL = '34bbf44ff85ffbd08a0c0a33fc47a97ece9490bc648878f9900a2de8be9e5bd4';
+ export const ADDON = '93f220e8a5cbf25aff23321f20a868368a204f1026b8dce45c5a4f84290de09f';
+ export const ASSETS = Object.freeze({ openclawTar: 'openclaw.tgz', sourceSdkTar: 'cua-sdk.tgz', nativeTar: 'cua-win.tgz', nativeQaReceipt: 'native-qa.json', officialAddonProvenanceReceipt: 'official-addon.json', sourceSdkBuildReceipt: 'source-sdk-build.json', sourceRebakeReceipt: 'source-rebake.json', sourceReleaseEligibilityReceipt: 'source-release-eligibility.json' });
+ export function digest(v) { assert(typeof v==='string' && /^[a-f0-9]{64}$/.test(v) && v!=='0'.repeat(64), 'missing_final_sha256'); return v; }
+@@ -14,17 +15,20 @@
+ export function positive(v) { assert(Number.isSafeInteger(v) && v>0, 'missing_positive_id'); return v; }
+ export function hash(file) { const h=createHash('sha256'); const fd=fs.openSync(file,'r'); const b=Buffer.allocUnsafe(1048576); try { for(;;) { const n=fs.readSync(fd,b,0,b.length,null); if(!n)break; h.update(b.subarray(0,n)); } return h.digest('hex'); } finally { fs.closeSync(fd); } }
+ export function ordinary(file) { const p=path.resolve(file); assert((process.platform==='win32'?fs.realpathSync(p).toLowerCase()===p.toLowerCase():fs.realpathSync(p)===p) && fs.lstatSync(p).isFile() && !fs.lstatSync(p).isSymbolicLink(), 'nonphysical_input'); return p; }
+-export const IMMUTABLE_PROOF_HASHES=Object.freeze({focusedNativeVerificationReceiptSha256:'40c0ce05a118bf893a96ec6891d4fba61f093d5670d2c017478ec2f7f52ead82',completePackageVerificationReceiptSha256:'d875590854904b9e26d4553f0f5dac2e9532e16af2f06ea3af6f857fa34299cf',sourceSdkBuildReceiptSha256:'e15e7999d6bc670c02d21bd71717ddc991674d3a5c842ff88644bbcebf27f386',officialAddonProvenanceReceiptSha256:'6293a94de97363275140da7f3f326ba9c38aa8f00d595efbd394826c39028099'});
++export const IMMUTABLE_PROOF_HASHES=Object.freeze({focusedNativeVerificationReceiptSha256:'ff6c33317626eb861eb2dbadbee348781700c25f9629ab1ffc2dd2e8940cf43f',completePackageVerificationReceiptSha256:'841ec0c303050676e1e3975ea58013b40652551cb0d41229f449be90d67cb673',sourceSdkBuildReceiptSha256:'b3a5bcb18580c82c8ad73ef2781dd9194920197df9d3abdf73a73a4e52e7856b',officialAddonProvenanceReceiptSha256:'dfa6c621a96b6f5fc8b705658323cf9f84a8aa5bbba2243ff69162d51980fef6'});
+ function exactKeys(x,keys){assert(x&&typeof x==='object'&&!Array.isArray(x),'generic_object_required');assert.deepEqual(Object.keys(x).sort(),[...keys].sort(),'unknown_or_missing_generic_proof_field');}
+ export function eligibility(x,finalCommit){
++  // Pending/null preparation bindings cannot become eligibility even in a standalone schema call.
++  commit(FINAL_OPENCLAW);Object.values(IMMUTABLE_PROOF_HASHES).forEach(digest);
++  for(const b of Object.values(TAR_BINDINGS)){digest(b.sha256);positive(b.bytes);}
+   exactKeys(x,['schemaVersion','status','liveActivation','deploymentReady','windowsPackageQaAlreadyPassed','focusedNative','sourceRelease','canonicalActivationGate','immutableProofHashes']);
+   assert(x.schemaVersion===1&&x.status==='accepted_for_isolated_package_qa_only'&&x.liveActivation===false&&x.deploymentReady===false&&x.windowsPackageQaAlreadyPassed===false,'false_package_or_live_acceptance');
+   const n=x.focusedNative;exactKeys(n,['repository','runId','headSha','workflowPath','conclusion','unitCasesPassed','ownedFixturesPassed','node','rust']);
+-  assert(n.repository==='shannon0430/cua'&&n.runId===38040866092&&n.headSha===CUA_HEAD&&n.workflowPath==='.github/workflows/issue344-keyboard-native-qa.yml'&&n.conclusion==='success'&&n.unitCasesPassed===668&&n.ownedFixturesPassed===2&&n.node==='24.19.0'&&n.rust==='1.97.1','focused_native_not_proven');
++  assert(n.repository==='shannon0430/cua'&&n.runId===38047527482&&n.headSha===CUA_HEAD&&n.workflowPath==='.github/workflows/issue344-keyboard-native-qa.yml'&&n.conclusion==='success'&&n.unitCasesPassed===695&&n.ownedFixturesPassed===2&&n.node==='24.19.0'&&n.rust==='1.97.1','focused_native_not_proven');
+   const r=x.sourceRelease;exactKeys(r,['sourceCommit','version','fullBuildExit','packageCheckExit','normalPackageHelper','completePluginSet','declarationsUiMetadata','selectionNarrowing','skipBuild']);
+   assert(r.sourceCommit===commit(finalCommit)&&r.sourceCommit===FINAL_OPENCLAW&&r.version==='2026.9.6'&&r.fullBuildExit===0&&r.packageCheckExit===0&&r.normalPackageHelper==='scripts/package-openclaw-for-docker.mjs'&&r.completePluginSet===true&&r.declarationsUiMetadata===true&&r.selectionNarrowing===false&&r.skipBuild===false,'full_source_package_not_proven');
+   const a=x.canonicalActivationGate;exactKeys(a,['repository','runId','dispatchHeadSha','sourceRef','workflowPath','workflowSha256','dispatchBranch','event','lane','requireGui','noSkippedCasesRequired','activationEligibility']);
+-  assert(a.repository==='shannon0430/cua'&&a.runId===38042245292&&a.dispatchHeadSha==='27bbeaa4940c801da76645df952815b28143f011'&&a.sourceRef===CUA_HEAD&&a.workflowPath==='.github/workflows/issue344-canonical-windows-all.yml'&&a.workflowSha256==='aca159f5198db42e26aa939b63c6903f5644a5115fec8f4fca5ef77f7107c223'&&a.dispatchBranch==='source/issue344-canonical-windows-qa-20261010'&&a.event==='workflow_dispatch'&&a.lane==='all'&&a.requireGui===true&&a.noSkippedCasesRequired===true&&a.activationEligibility==='pending_separate_live_acceptance','canonical_activation_identity_or_boundary_changed');
++  assert(a.repository==='shannon0430/cua'&&a.runId===38048621661&&a.dispatchHeadSha==='27bbeaa4940c801da76645df952815b28143f011'&&a.sourceRef===CUA_HEAD&&a.workflowPath==='.github/workflows/issue344-canonical-windows-all.yml'&&a.workflowSha256==='aca159f5198db42e26aa939b63c6903f5644a5115fec8f4fca5ef77f7107c223'&&a.dispatchBranch==='source/issue344-canonical-windows-qa-20261010'&&a.event==='workflow_dispatch'&&a.lane==='all'&&a.requireGui===true&&a.noSkippedCasesRequired===true&&a.activationEligibility==='pending_separate_live_acceptance','canonical_activation_identity_or_boundary_changed');
+   exactKeys(x.immutableProofHashes,Object.keys(IMMUTABLE_PROOF_HASHES));assert.deepEqual(x.immutableProofHashes,IMMUTABLE_PROOF_HASHES,'immutable_source_proof_binding_changed');
+   return x;
+ }
+@@ -61,7 +65,7 @@
+   // Deliberate source/build-QA allowlists, not a promise of generic sanitization.
+   // Private deployment receipts, paths, logs/XML/environment/config are excluded.
+   const allow = {
+-    nativeQaReceipt: ['runId','runUrl','headSha','conclusion','archiveSha256','apiArchiveDigestVerified','sourceManifestSha256','keyboardPatchSha256','passedUnitCases','nativeCompilationVerified','totalSelectedTestsPassed','ownedFixturesPassed','workflowSha256','authorManifestSha256','verificationConclusion','liveWrites'],
++    nativeQaReceipt: ['schema','status','nativeAuthorManifestSha256','nativePatchSha256','runId','runUrl','headSha','conclusion','archiveSha256','apiArchiveDigestVerified','sourceManifestSha256','keyboardPatchSha256','passedUnitCases','nativeCompilationVerified','totalSelectedTestsPassed','ownedFixturesPassed','workflowSha256','authorManifestSha256','verificationConclusion','liveWrites'],
+     officialAddonProvenanceReceipt: ['result','package','version','actualTarBytes','actualTarSha256','actualTarSha1','actualTarIntegrity','integrityMatchesRegistryAndNormalPack','allMembersRegular','acceptedRegularAddonSha256','license','requiredNoticeSha256','noticeByteEqualsExactCandidateSource','baselineDllNotUsedAsCandidate','installationPerformed','registrySignatureOrAttestationCryptographicVerification'],
+     sourceSdkBuildReceipt: ['result','sourceCommit','baseCommit','sourceSdkAndCanonicalScriptsUnchangedFromPublicBase','frozenAssemblyManifestSha256','sourceArchiveSha256','sourceArchiveBytes','sourceArchiveFiles','npmCiExit','normalBuildExit','canonicalPackExit','canonicalAssemblerSha256','allPackedSdkFilesByteMatchSourceBuiltDist','allTarMembersRegular','candidateNativeOnlyWindowsX64Pair','requiredNoticeRetainedAndByteEqualExactSourceAndOfficialTar','sourceSdkContainsNoColocatedOrOtherPlatformNativeBinary'],
+     sourceRebakeReceipt: ['status','sourceSha','sourceClean','tarSha256','tarBytes','entries','regularFiles','uncompressedBytes','allCanonicalPluginManifests','allCanonicalBundledPluginPackArtifacts','sourceLicenseByteEquality','packInventoryModeSizePathEquality','pluginManifestOnlyExpectedRuntimeEntryRewrite','standardPackTarballIntegrityCheck','fullDefaultBuildNoSkipOrPluginNarrowing','inventorySha256','packReceiptSha256','buildLogSha256','artifactKind','windowsProductionInstallAndFreshImportQa','fullCanonicalWindowsGate','deploymentReady','liveWrites','businessReplays']
+--- a/v2-to-v3.patch
++++ /dev/null
+@@ -1,312 +0,0 @@
+-diff --git a/Invoke-Issue344PackageQa.ps1 b/Invoke-Issue344PackageQa.ps1
+-index 900630c..c938c25 100644
+---- a/Invoke-Issue344PackageQa.ps1
+-+++ b/Invoke-Issue344PackageQa.ps1
+-@@ -48,17 +48,23 @@ try {
+-     if ($env:GITHUB_OUTPUT) { [IO.File]::AppendAllText($env:GITHUB_OUTPUT,"evidence=$evidence`nowned_root=$base`n",$utf8) }
+-     # Child/native fixtures must use our new C:\ temporary lease, not runner D:\ temp.
+-     $env:TEMP=$base; $env:TMP=$base; $env:npm_config_cache=Join-Path $base 'npm-cache'
+-+    $lifecycleNegatives=Run-Node 'required-root-lifecycle-source-negatives' @((Join-Path $proposal 'test-required-root-lifecycle.mjs'))
+-+    if ($lifecycleNegatives.passed -ne 12 -or $lifecycleNegatives.failed -ne 0 -or -not $lifecycleNegatives.productionGate -or $lifecycleNegatives.npmInstalls -ne 0 -or $lifecycleNegatives.packageLifecycleExecutions -ne 0) { throw 'required_lifecycle_source_gate_not_passed' }
+-     $readonlyGates=Run-51 'actual-51-readonly-package-primitives' @('-File',(Join-Path $proposal 'Test-Issue344HelperGates.ps1'),'-ProposalRoot',$proposal)
+-     $created=Run-Node 'create-owned-slot' @((Join-Path $proposal 'dependencies/artifact-assembly-v1/create-slot-inputs.mjs'),(Join-Path $InputsRoot 'slot-inputs.json'),$slotA)
+-     if (-not $created.newOwnedQaRootCreated -or $created.installStarted) { throw 'new_slot_not_proven' }
+-     Push-Location -LiteralPath $slotA
+-     try {
+--        # Normal package lifecycle. No ignore-scripts, copied deps or slot overlay.
+-+        # Normal npm11.17 lifecycle; null allow-scripts warnings are advisory.
+-+        # Do not change wildcard/dependency permissions, ignore scripts or replay.
+-+        # Installed required-root marker closure is measured before any probes.
+-         $npmOutput=& $npm install --omit=dev --include=optional --no-audit --no-fund 2>&1
+-         $npmExit=$LASTEXITCODE
+-         [IO.File]::WriteAllText((Join-Path $evidence 'normal-npm-install.log'),($npmOutput -join "`n")+"`n",$utf8)
+-         if ($npmExit -ne 0) { throw 'normal_npm_install_failed' }
+-     } finally { Pop-Location }
+-+    $lifecycleBefore=Run-Node 'required-root-lifecycle-before-probes' @((Join-Path $proposal 'required-root-lifecycle.mjs'),$slotA)
+-+    if (-not $lifecycleBefore.requiredRootLifecycleCompleted) { throw 'required_root_lifecycle_not_complete' }
+-     $before=Public-Probes 'before-relocation' $slotA
+-     $matrix=Run-Node 'production-eight-negatives' @((Join-Path $proposal 'dependencies/artifact-assembly-v1/package-qa-matrix.mjs'),$slotA)
+-     if ($matrix.negatives -ne 8 -or $matrix.positive -ne 1 -or -not $matrix.originalLeavesRestored -or -not $matrix.freshProcessEachCheck) { throw 'exact_production_negative_matrix_required' }
+-@@ -77,13 +83,17 @@ try {
+-     if ($gate.directoryIdentityFormat -ne 'volumeHex8:fileIndexHex16' -or $identityBefore -cnotmatch '^[a-f0-9]{8}:[a-f0-9]{16}$' -or $identityBefore -cne $identityAfter) { throw 'physical_root_identity_changed' }
+-     if ((Get-FileHash -LiteralPath (Join-Path $slotB 'release-bindings.json') -Algorithm SHA256).Hash -ne $bindingsBefore) { throw 'relocation_binding_changed' }
+-     Write-NewJson (Join-Path $evidence 'relocation-confirmed.json') @{schema=1;physicalRelocations=1;identityBefore=$identityBefore;identityAfter=$identityAfter;bindingUnchanged=$true}
+-+    $lifecycleAfter=Run-Node 'required-root-lifecycle-after-relocation' @((Join-Path $proposal 'required-root-lifecycle.mjs'),$slotB)
+-+    if (-not $lifecycleAfter.requiredRootLifecycleCompleted -or $lifecycleAfter.requiredRootTarSha256 -cne $lifecycleBefore.requiredRootTarSha256) { throw 'required_root_lifecycle_relocation_mismatch' }
+-     $after=Public-Probes 'after-relocation' $slotB
+-+    $lifecycleBeforeSeal=Run-Node 'required-root-lifecycle-before-seal' @((Join-Path $proposal 'required-root-lifecycle.mjs'),$slotB)
+-+    if (-not $lifecycleBeforeSeal.requiredRootLifecycleCompleted -or $lifecycleBeforeSeal.requiredRootTarSha256 -cne $lifecycleAfter.requiredRootTarSha256) { throw 'required_root_lifecycle_not_complete_before_seal' }
+-     $inventory=Join-Path $evidence 'candidate-inventory.json'
+-     $seal=Run-Node 'emit-compatible-seal' @((Join-Path $proposal 'dependencies/artifact-assembly-v2/seal-package-qa-slot.mjs'),$slotB,$inventory)
+-     if ($seal.sdkCopies -ne 1 -or $seal.nativeCopies -ne 1 -or $seal.reparseAccepted -or $seal.activationAccepted) { throw 'seal_closure_not_proven' }
+-     $consumer=Run-51 'actual-51-production-seal-consumer' @('-File',(Join-Path $proposal 'Test-Issue344CandidateSeal.ps1'),'-ProposalRoot',$proposal,'-Slot',$slotB,'-Inventory',$inventory)
+-     if (-not $consumer.productionSealConsumerVerified -or $consumer.activationAccepted -or $consumer.taskActionsInvoked -ne 0) { throw 'actual_production_seal_consumer_required' }
+--    Write-NewJson (Join-Path $evidence 'package-qa-result.json') @{schema=1;status='owned_windows_package_qa_passed_not_live_acceptance';node=(& $node --version).Trim();npm=(& $npm --version).Trim();readOnlyPackageFixtureGates=$readonlyGates;helperSemanticSourceGatesExecuted=$false;deploymentReady=$false;normalInstallExit=0;publicBefore=$before;productionNegativeMatrix=$matrix;physicalRelocations=1;publicAfter=$after;sealEmitter=$seal;actual51SealConsumer=$consumer;liveActivation=$false;realPlatformInput=$false;excelAcceptance=$false;taskActionsInvoked=0}
+-+    Write-NewJson (Join-Path $evidence 'package-qa-result.json') @{schema=1;status='owned_windows_package_qa_passed_not_live_acceptance';node=(& $node --version).Trim();npm=(& $npm --version).Trim();readOnlyPackageFixtureGates=$readonlyGates;helperSemanticSourceGatesExecuted=$false;deploymentReady=$false;normalInstallExit=0;npmLifecyclePolicy='npm11_17_advisory_standard_install_unmodified';requiredRootLifecycleReadbacks=3;requiredRootLifecycleBefore=$lifecycleBefore;requiredRootLifecycleAfter=$lifecycleAfter;requiredRootLifecycleBeforeSeal=$lifecycleBeforeSeal;lifecycleSourceNegatives=$lifecycleNegatives;publicBefore=$before;productionNegativeMatrix=$matrix;physicalRelocations=1;publicAfter=$after;sealEmitter=$seal;actual51SealConsumer=$consumer;liveActivation=$false;realPlatformInput=$false;excelAcceptance=$false;taskActionsInvoked=0}
+-     if ($env:GITHUB_OUTPUT) { [IO.File]::AppendAllText($env:GITHUB_OUTPUT,"candidate_slot=$slotB`n",$utf8) }
+- } catch {
+-     if (-not (Test-Path -LiteralPath (Join-Path $evidence 'package-qa-failed.json'))) { Write-NewJson (Join-Path $evidence 'package-qa-failed.json') @{schema=1;status='failed_or_outcome_unknown';passed=$false;liveActivation=$false;automaticReplayAllowed=$false;ownedRootRetained=$true} }
+-diff --git a/LIFECYCLE-OWNER-SOURCE.json b/LIFECYCLE-OWNER-SOURCE.json
+-new file mode 100644
+-index 0000000..661639a
+---- /dev/null
+-+++ b/LIFECYCLE-OWNER-SOURCE.json
+-@@ -0,0 +1,27 @@
+-+{
+-+  "schemaVersion": 1,
+-+  "owningOpenclawSource": "eb377ac59e6c9fd6c7705028034812becf00271b",
+-+  "inspectedDerivativeSource": "f3eb17ededbc2d7f10d5c9630ccad05b77431d55",
+-+  "files": [
+-+    {
+-+      "path": "scripts/install.ps1",
+-+      "sha256": "87406a49babeff0c18ff6b0a97c0428c87265baee5b16017e91aadef42e4a1c3",
+-+      "sameAsExactEb377": true
+-+    },
+-+    {
+-+      "path": "src/infra/update-global.ts",
+-+      "sha256": "31ef3a8663524070486f02d3fb0db662f9329bc548962ffae6e03bc5b8348236",
+-+      "sameAsExactEb377": true
+-+    },
+-+    {
+-+      "path": "scripts/lib/package-lifecycle-marker.mjs",
+-+      "sha256": "32c50197ecc6f10b78f9f8ef588b868e7cdf428233e00fb912044dee5da46e1a",
+-+      "sameAsExactEb377": true
+-+    }
+-+  ],
+-+  "installerClosure": "ordinaryentry_and_pending_and_legacyguard_absent",
+-+  "normalInstallCommandChanged": false,
+-+  "exactRootAllowFlagAdded": false,
+-+  "npm11_17PendingWarnings": "advisory_not_blocked",
+-+  "perDependencyLifecycleTraceClaimed": false
+-+}
+-diff --git a/LIFECYCLE-SOURCE-NOTES.md b/LIFECYCLE-SOURCE-NOTES.md
+-new file mode 100644
+-index 0000000..f18b87e
+---- /dev/null
+-+++ b/LIFECYCLE-SOURCE-NOTES.md
+-@@ -0,0 +1,42 @@
+-+# QA-v3 required root lifecycle closure (no install run)
+-+
+-+Owning source is exactOpenClaw eb377ac59e6c9fd6c7705028034812becf00271b;
+-+the read-only f3eb source lease byte-equals it for the three recorded files.
+-+
+-+`Test-NpmLifecycleCompleted` in scripts/install.ps1 requires ordinary expected
+-+entry and absence of .openclaw-lifecycle-pending and dist/openclaw-install-guard.
+-+The local QA slot is a private cwd envelope, so the measured package root is its
+-+exact node_modules/openclaw, not a presumed global npm root. Root identity is
+-+bound to the created package.json dependency file:artifacts/openclaw.tgz, its
+-+sealed artifact digest and the installed package name, with ordinary path gates.
+-+
+-+The owning Get-NpmLifecycleAllowArgument/update-global source selects npm11.16+
+-+allow-scripts policy and exact resolved install-target identity. That global
+-+single-target installer flag is NOT automatically applied to this cwd envelope.
+-+QA-v3 leaves the original one normal npm11.17 install command unchanged; no
+-+allowflag, wildcard permission, dependency blanket approval, npm configuration
+-+write or install/postinstall replay is added.
+-+
+-+Parent independently read pinned npm11.17 Arborist rebuild.js229–238: null
+-+allow-scripts entries remain ADVISORY under default strict-allow-scripts=false.
+-+Warnings naming four packages do not establish blocked scripts. Parent also
+-+observed required pending-marker absence in the actual expanded old install,
+-+while the marker was in its original tar. This is consistent with the owning
+-+normal postinstall closure; it is not a per-package execution trace. Oldpackage
+-+QA green is preserved with its explicit incomplete-lifecycle-assertion limit,
+-+not relabelled a lifecycle failure or live eligibility.
+-+
+-+QA-v3 adds three read-only exact-root closure checks: before the first public
+-+probe, after the sole owned relocation before next probes, and immediately
+-+before inventory/seal. Any marker type, dangling symlink, legacy guard, unknown
+-+metadata/read denial, missing/unordinary entry, wrong root declaration, or digest
+-+change refuses without any healing/replay. No marker contents are read/printed.
+-+The finite own-synthetic production reader regression group has12cases. It does
+-+not execute npm, OpenClaw scripts, package postinstall, node task, GUI or Excel.
+-+
+-+Available local Node22.23.1/macOS validates source seams only. Actual future
+-+WindowsQA remains pinned Node24.19.0/npm11.17.0 and mandatory own fixtures;
+-+private helper-v3 semantics/live/native input/Excel acceptance stay excluded.
+-+Successor native/package eligibility receipts are parent-bound separately; old
+-+f3eb/601ade proofs do not certify the new native candidate. No actual new package
+-+installation, workflow dispatch, source repo change or live action occurred.
+-diff --git a/LOCAL-LIFECYCLE-REGRESSION.json b/LOCAL-LIFECYCLE-REGRESSION.json
+-new file mode 100644
+-index 0000000..c7c97f5
+---- /dev/null
+-+++ b/LOCAL-LIFECYCLE-REGRESSION.json
+-@@ -0,0 +1,12 @@
+-+{
+-+  "schemaVersion": 1,
+-+  "passed": 12,
+-+  "failed": 0,
+-+  "productionGate": true,
+-+  "actualNode": "v22.23.1",
+-+  "actualPlatform": "darwin",
+-+  "npmInstalls": 0,
+-+  "packageLifecycleExecutions": 0,
+-+  "liveOrTaskEffects": 0,
+-+  "fixtureScope": "new own synthetic leaves only; not package install or Windows acceptance"
+-+}
+-diff --git a/LOCAL-SOURCE-CHECKS-v3.json b/LOCAL-SOURCE-CHECKS-v3.json
+-new file mode 100644
+-index 0000000..6aee305
+---- /dev/null
+-+++ b/LOCAL-SOURCE-CHECKS-v3.json
+-@@ -0,0 +1,14 @@
+-+{
+-+  "schemaVersion": 1,
+-+  "nodeSyntaxFiles": 13,
+-+  "portableActualPowerShellVersion": "7.5.3",
+-+  "portableParserFiles": 5,
+-+  "newLifecycleProductionReaderSeamsPassed": 12,
+-+  "localActualNode": "22.23.1",
+-+  "unchangedPriorV2SourceChecksFileSha256": "17d0255fe9d8e01bdd3e151eec281dc0c5876ef8c2184dd5ceed4e1539e90321",
+-+  "oldChecksDoNotClaimV3WindowsAcceptance": true,
+-+  "WindowsExecuted": false,
+-+  "npmInstalls": 0,
+-+  "packageLifecycleExecutions": 0,
+-+  "taskOrLiveEffects": 0
+-+}
+-diff --git a/README.md b/README.md
+-index 123e7eb..879f1a9 100644
+---- a/README.md
+-+++ b/README.md
+-@@ -38,3 +38,17 @@ Windows owns one GUID root under LocalAppData Temp on C:\; it writes an ownershi
+- Local checks here: Node syntax, inert actual manifest/projection seams, workflow actionlint, and portable PowerShell7 parser checks only. No helper semantic acceptance is asserted. Required future Windows5.1/native/package/transfer runs are **unrun** until the owner dispatches and verifies them. Canonical all/GUI/no-skips is still required separately before any LIVE acceptance; this package-only run never makes deploymentReady=true. Source review is not proof of prerelease readability, normal installation, ABI on Windows, full expanded seal acceptance, real task fences, or Excel behavior.
+- 
+- Official API references: [releases](https://docs.github.com/en/rest/releases/releases), [release assets](https://docs.github.com/en/rest/releases/assets), [Actions artifacts](https://docs.github.com/en/rest/actions/artifacts?apiVersion=2026-03-10).
+-+
+-+
+-+## V3 lifecycle-only source strengthening
+-+
+-+See LIFECYCLE-SOURCE-NOTES.md and hash-bound owner source. npm11.17 warnings are
+-+advisory, not evidence of blocked scripts. The original normal install remains
+-+unchanged. New exact-root marker/legacyguard/ordinary-entry/digest checks run
+-+before probes and seal (three read-only observations) and refuse without replay.
+-+Production reader synthetic positive/negative12-case regression is additional;
+-+its localNode22 result is not Windows/installed lifecycle acceptance. Prior25
+-+frozen v2 files/dependencies are preserved or separately diffed, never rewritten
+-+in v2. Public transfer classification of new source files must be parent-reviewed
+-+before publication. Native successor provenance/eligibility binding stays a
+-+separate parent-owned source revision; historical f3eb metadata is not a cure.
+-diff --git a/required-root-lifecycle.mjs b/required-root-lifecycle.mjs
+-new file mode 100644
+-index 0000000..14d5d51
+---- /dev/null
+-+++ b/required-root-lifecycle.mjs
+-@@ -0,0 +1,63 @@
+-+// Read-only QA gate for the created slot's exact OpenClaw root dependency.
+-+// npm11.17 allow-scripts null entries are advisory, not proof of blocked scripts.
+-+// Marker closure follows pinned scripts/install.ps1 Test-NpmLifecycleCompleted;
+-+// no lifecycle execution, config change, blanket permission or automatic replay.
+-+import assert from 'node:assert/strict';
+-+import fs from 'node:fs';
+-+import path from 'node:path';
+-+import { createHash } from 'node:crypto';
+-+import { fileURLToPath } from 'node:url';
+-+
+-+function ordinaryDirectory(p) {
+-+  const s = fs.lstatSync(p);
+-+  assert(s.isDirectory() && !s.isSymbolicLink(), 'qa_lifecycle_directory_not_ordinary');
+-+}
+-+function ordinaryFile(p) {
+-+  const s = fs.lstatSync(p);
+-+  assert(s.isFile() && !s.isSymbolicLink(), 'qa_lifecycle_leaf_not_ordinary');
+-+  return p;
+-+}
+-+function markerAbsent(p) {
+-+  try { fs.lstatSync(p); }
+-+  catch (e) {
+-+    if (e?.code === 'ENOENT') return true;
+-+    throw new Error('qa_lifecycle_marker_unreadable');
+-+  }
+-+  return false; // A regular file, directory or dangling symlink all mean present.
+-+}
+-+
+-+export function assertRequiredRootLifecycle(slot) {
+-+  const root = path.resolve(slot);
+-+  ordinaryDirectory(root);
+-+  const declared = JSON.parse(fs.readFileSync(ordinaryFile(path.join(root, 'package.json')), 'utf8'));
+-+  assert(declared.private === true && declared.name === 'forone-kanon-issue344-node-slot', 'qa_lifecycle_slot_identity_mismatch');
+-+  assert(declared.dependencies?.openclaw === 'file:artifacts/openclaw.tgz', 'qa_lifecycle_root_dependency_mismatch');
+-+  const bindings = JSON.parse(fs.readFileSync(ordinaryFile(path.join(root, 'release-bindings.json')), 'utf8'));
+-+  assert(/^[a-f0-9]{64}$/.test(bindings.openclawTarSha256), 'qa_lifecycle_root_digest_missing');
+-+  ordinaryDirectory(path.join(root, 'artifacts'));
+-+  const tar = ordinaryFile(path.join(root, 'artifacts', 'openclaw.tgz'));
+-+  assert.equal(createHash('sha256').update(fs.readFileSync(tar)).digest('hex'), bindings.openclawTarSha256, 'qa_lifecycle_root_digest_mismatch');
+-+  const modules = path.join(root, 'node_modules');
+-+  const pkg = path.join(modules, 'openclaw');
+-+  ordinaryDirectory(modules); ordinaryDirectory(pkg); ordinaryDirectory(path.join(pkg, 'dist'));
+-+  const installed = JSON.parse(fs.readFileSync(ordinaryFile(path.join(pkg, 'package.json')), 'utf8'));
+-+  assert(installed.name === 'openclaw', 'qa_lifecycle_installed_identity_mismatch');
+-+  ordinaryFile(path.join(pkg, 'dist', 'entry.js'));
+-+  assert(markerAbsent(path.join(pkg, '.openclaw-lifecycle-pending')), 'qa_lifecycle_required_root_pending');
+-+  assert(markerAbsent(path.join(pkg, 'dist', 'openclaw-install-guard')), 'qa_lifecycle_legacy_guard_present');
+-+  return {
+-+    schemaVersion: 1,
+-+    requiredRootLifecycleCompleted: true,
+-+    requiredRootIdentity: 'openclaw:file:artifacts/openclaw.tgz',
+-+    requiredRootTarSha256: bindings.openclawTarSha256,
+-+    ordinaryEntryVerified: true,
+-+    pendingMarkerAbsent: true,
+-+    legacyGuardAbsent: true,
+-+    packageLifecycleExecutions: 0,
+-+    dependencyLifecycleTraceClaimed: false,
+-+  };
+-+}
+-+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+-+  assert(process.platform === 'win32' && process.arch === 'x64' && process.version === 'v24.19.0', 'actual_windows_node_required');
+-+  console.log(JSON.stringify(assertRequiredRootLifecycle(process.argv[2])));
+-+}
+-diff --git a/test-required-root-lifecycle.mjs b/test-required-root-lifecycle.mjs
+-new file mode 100644
+-index 0000000..7d175b2
+---- /dev/null
+-+++ b/test-required-root-lifecycle.mjs
+-@@ -0,0 +1,48 @@
+-+// Actual production read-only gate on own synthetic leaves; never npm/scripts.
+-+import assert from 'node:assert/strict';
+-+import fs from 'node:fs';
+-+import os from 'node:os';
+-+import path from 'node:path';
+-+import { createHash } from 'node:crypto';
+-+import { assertRequiredRootLifecycle } from './required-root-lifecycle.mjs';
+-+
+-+const lease = fs.mkdtempSync(path.join(os.tmpdir(), 'issue344-lifecycle-gate-'));
+-+let passed = 0;
+-+function fixture(label) {
+-+  const root = path.join(lease, label);
+-+  fs.mkdirSync(path.join(root, 'node_modules', 'openclaw', 'dist'), { recursive: true });
+-+  fs.mkdirSync(path.join(root, 'artifacts'));
+-+  fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ private: true, name: 'forone-kanon-issue344-node-slot', dependencies: { openclaw: 'file:artifacts/openclaw.tgz' } }));
+-+  const tar = Buffer.from('owned synthetic lifecycle gate input only');
+-+  fs.writeFileSync(path.join(root, 'artifacts', 'openclaw.tgz'), tar);
+-+  fs.writeFileSync(path.join(root, 'release-bindings.json'), JSON.stringify({ openclawTarSha256: createHash('sha256').update(tar).digest('hex') }));
+-+  fs.writeFileSync(path.join(root, 'node_modules', 'openclaw', 'package.json'), JSON.stringify({ name: 'openclaw' }));
+-+  fs.writeFileSync(path.join(root, 'node_modules', 'openclaw', 'dist', 'entry.js'), '// synthetic fixture, never executed\n');
+-+  return root;
+-+}
+-+function caseOnce(label, run) { run(fixture(label)); passed++; }
+-+try {
+-+  caseOnce('positive', r => { const w = assertRequiredRootLifecycle(r); assert.equal(w.requiredRootLifecycleCompleted, true); assert.equal(w.packageLifecycleExecutions, 0); });
+-+  caseOnce('pending-file', r => { fs.writeFileSync(path.join(r, 'node_modules/openclaw/.openclaw-lifecycle-pending'), ''); assert.throws(() => assertRequiredRootLifecycle(r), /required_root_pending/); });
+-+  caseOnce('legacy-file', r => { fs.writeFileSync(path.join(r, 'node_modules/openclaw/dist/openclaw-install-guard'), ''); assert.throws(() => assertRequiredRootLifecycle(r), /legacy_guard_present/); });
+-+  caseOnce('pending-directory', r => { fs.mkdirSync(path.join(r, 'node_modules/openclaw/.openclaw-lifecycle-pending')); assert.throws(() => assertRequiredRootLifecycle(r), /required_root_pending/); });
+-+  caseOnce('dangling-pending-symlink', r => { fs.symlinkSync(path.join(r, 'does-not-exist'), path.join(r, 'node_modules/openclaw/.openclaw-lifecycle-pending'), 'file'); assert.throws(() => assertRequiredRootLifecycle(r), /required_root_pending/); });
+-+  caseOnce('entry-missing', r => { fs.unlinkSync(path.join(r, 'node_modules/openclaw/dist/entry.js')); assert.throws(() => assertRequiredRootLifecycle(r)); });
+-+  caseOnce('installed-name', r => { fs.writeFileSync(path.join(r, 'node_modules/openclaw/package.json'), '{"name":"not-openclaw"}'); assert.throws(() => assertRequiredRootLifecycle(r), /installed_identity_mismatch/); });
+-+  caseOnce('entry-symlink', r => { const e = path.join(r, 'node_modules/openclaw/dist/entry.js'); fs.renameSync(e, e+'.own'); fs.symlinkSync(e+'.own', e, 'file'); assert.throws(() => assertRequiredRootLifecycle(r), /leaf_not_ordinary/); });
+-+  caseOnce('declared-root-wildcard', r => { fs.writeFileSync(path.join(r, 'package.json'), JSON.stringify({ private:true, name:'forone-kanon-issue344-node-slot', dependencies:{openclaw:'*'} })); assert.throws(() => assertRequiredRootLifecycle(r), /root_dependency_mismatch/); });
+-+  caseOnce('tar-digest-change', r => { fs.appendFileSync(path.join(r, 'artifacts/openclaw.tgz'), 'changed'); assert.throws(() => assertRequiredRootLifecycle(r), /root_digest_mismatch/); });
+-+  caseOnce('marker-unreadable-not-absent', r => {
+-+    const original = fs.lstatSync;
+-+    const marker = path.join(r, 'node_modules', 'openclaw', '.openclaw-lifecycle-pending');
+-+    try {
+-+      fs.lstatSync = function(p, ...args) { if (p === marker) { const error = new Error('owned fake metadata denial'); error.code = 'EACCES'; throw error; } return original.call(this, p, ...args); };
+-+      assert.throws(() => assertRequiredRootLifecycle(r), /marker_unreadable/);
+-+    } finally { fs.lstatSync = original; }
+-+  });
+-+  caseOnce('one-owned-relocation', r => { const after=r+'-relocated'; fs.renameSync(r,after); assert.equal(assertRequiredRootLifecycle(after).requiredRootLifecycleCompleted,true); });
+-+  assert.equal(passed, 12);
+-+  console.log(JSON.stringify({ schemaVersion:1, passed, failed:0, productionGate:true, actualNode:process.version,
+-+    actualPlatform:process.platform, npmInstalls:0, packageLifecycleExecutions:0, liveOrTaskEffects:0,
+-+    fixtureScope:'new own synthetic leaves only; not package install or Windows acceptance' }));
+-+} finally { fs.rmSync(lease, { recursive:true, force:false }); }

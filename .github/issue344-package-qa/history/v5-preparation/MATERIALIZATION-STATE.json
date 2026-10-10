@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "status": "QA5_SOURCE_PREPARATION_ONLY_ACTUAL_LICENSE_REPACK_BINDINGS_PENDING",
+  "predecessorManifestSha256": "b85b60d3d5c97f5db0197f563738f98c61234305c8086aebd381d539b7fc4915",
+  "runtimeSourceCommit": "a80258ee1ff1e1b38ca87eb571f4552c3b853c54",
+  "packageAssemblySourceCommit": "86116d1e2b960ac5fd986d95b3cbad4f5ccc8f07",
+  "licenseSourceCommit": "86116d1e2b960ac5fd986d95b3cbad4f5ccc8f07",
+  "sourceSdkTarSha256": null,
+  "sourceSdkTarBytes": null,
+  "nativeTarSha256": null,
+  "nativeTarBytes": null,
+  "sourceSdkBuildReceiptSha256": null,
+  "expectedSourceSdkRegularFiles": 23,
+  "expectedNativeRegularFiles": 5,
+  "newLocalSourceChecks": null,
+  "finalSourceManifestFrozen": false,
+  "WindowsExecuted": false,
+  "publicTransferExecuted": false,
+  "deploymentReady": false,
+  "liveActivation": false
+}

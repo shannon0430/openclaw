@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "status": "preparation_only_pending_final_source_package_evidence",
+  "predecessorManifestSha256": "19b27eed263e170963c51a219c2466209cf119682c69136609d4e6f0ab6ed72f",
+  "predecessorIndependentReviewSha256": "1d114915a753a54c2488c1ac8c18db0153e44061d7f36c134196c4c627e77f32",
+  "copiedAndRehashedPredecessorFiles": 32,
+  "pendingActualValues": [
+    "openclawTarSha256",
+    "openclawTarBytes",
+    "completePackageVerificationReceiptSha256"
+  ],
+  "sourcePortableChecksRun": false,
+  "finalManifestFrozen": false,
+  "publicTransferExecuted": false,
+  "WindowsExecuted": false,
+  "deploymentReady": false,
+  "liveActivation": false,
+  "finalOpenclawSourceCommit": "6449366519a551bd3c2658771091f5cbb8de48aa",
+  "sourceDigestRebakeReceiptSha256": "e4843cca1d24ada6b5daa94d5beca2dedee55a0a6e7e11fe1bae727aaf2ab672",
+  "lifecycleOwnerFinalGitBlobReadbackComplete": true
+}

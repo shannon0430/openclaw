@@ -48,17 +48,23 @@ try {
     if ($env:GITHUB_OUTPUT) { [IO.File]::AppendAllText($env:GITHUB_OUTPUT,"evidence=$evidence`nowned_root=$base`n",$utf8) }
     # Child/native fixtures must use our new C:\ temporary lease, not runner D:\ temp.
     $env:TEMP=$base; $env:TMP=$base; $env:npm_config_cache=Join-Path $base 'npm-cache'
+    $lifecycleNegatives=Run-Node 'required-root-lifecycle-source-negatives' @((Join-Path $proposal 'test-required-root-lifecycle.mjs'))
+    if ($lifecycleNegatives.passed -ne 12 -or $lifecycleNegatives.failed -ne 0 -or -not $lifecycleNegatives.productionGate -or $lifecycleNegatives.npmInstalls -ne 0 -or $lifecycleNegatives.packageLifecycleExecutions -ne 0) { throw 'required_lifecycle_source_gate_not_passed' }
     $readonlyGates=Run-51 'actual-51-readonly-package-primitives' @('-File',(Join-Path $proposal 'Test-Issue344HelperGates.ps1'),'-ProposalRoot',$proposal)
     $created=Run-Node 'create-owned-slot' @((Join-Path $proposal 'dependencies/artifact-assembly-v1/create-slot-inputs.mjs'),(Join-Path $InputsRoot 'slot-inputs.json'),$slotA)
     if (-not $created.newOwnedQaRootCreated -or $created.installStarted) { throw 'new_slot_not_proven' }
     Push-Location -LiteralPath $slotA
     try {
-        # Normal package lifecycle. No ignore-scripts, copied deps or slot overlay.
+        # Normal npm11.17 lifecycle; null allow-scripts warnings are advisory.
+        # Do not change wildcard/dependency permissions, ignore scripts or replay.
+        # Installed required-root marker closure is measured before any probes.
         $npmOutput=& $npm install --omit=dev --include=optional --no-audit --no-fund 2>&1
         $npmExit=$LASTEXITCODE
         [IO.File]::WriteAllText((Join-Path $evidence 'normal-npm-install.log'),($npmOutput -join "`n")+"`n",$utf8)
         if ($npmExit -ne 0) { throw 'normal_npm_install_failed' }
     } finally { Pop-Location }
+    $lifecycleBefore=Run-Node 'required-root-lifecycle-before-probes' @((Join-Path $proposal 'required-root-lifecycle.mjs'),$slotA)
+    if (-not $lifecycleBefore.requiredRootLifecycleCompleted) { throw 'required_root_lifecycle_not_complete' }
     $before=Public-Probes 'before-relocation' $slotA
     $matrix=Run-Node 'production-eight-negatives' @((Join-Path $proposal 'dependencies/artifact-assembly-v1/package-qa-matrix.mjs'),$slotA)
     if ($matrix.negatives -ne 8 -or $matrix.positive -ne 1 -or -not $matrix.originalLeavesRestored -or -not $matrix.freshProcessEachCheck) { throw 'exact_production_negative_matrix_required' }
@@ -77,13 +83,17 @@ try {
     if ($gate.directoryIdentityFormat -ne 'volumeHex8:fileIndexHex16' -or $identityBefore -cnotmatch '^[a-f0-9]{8}:[a-f0-9]{16}$' -or $identityBefore -cne $identityAfter) { throw 'physical_root_identity_changed' }
     if ((Get-FileHash -LiteralPath (Join-Path $slotB 'release-bindings.json') -Algorithm SHA256).Hash -ne $bindingsBefore) { throw 'relocation_binding_changed' }
     Write-NewJson (Join-Path $evidence 'relocation-confirmed.json') @{schema=1;physicalRelocations=1;identityBefore=$identityBefore;identityAfter=$identityAfter;bindingUnchanged=$true}
+    $lifecycleAfter=Run-Node 'required-root-lifecycle-after-relocation' @((Join-Path $proposal 'required-root-lifecycle.mjs'),$slotB)
+    if (-not $lifecycleAfter.requiredRootLifecycleCompleted -or $lifecycleAfter.requiredRootTarSha256 -cne $lifecycleBefore.requiredRootTarSha256) { throw 'required_root_lifecycle_relocation_mismatch' }
     $after=Public-Probes 'after-relocation' $slotB
+    $lifecycleBeforeSeal=Run-Node 'required-root-lifecycle-before-seal' @((Join-Path $proposal 'required-root-lifecycle.mjs'),$slotB)
+    if (-not $lifecycleBeforeSeal.requiredRootLifecycleCompleted -or $lifecycleBeforeSeal.requiredRootTarSha256 -cne $lifecycleAfter.requiredRootTarSha256) { throw 'required_root_lifecycle_not_complete_before_seal' }
     $inventory=Join-Path $evidence 'candidate-inventory.json'
     $seal=Run-Node 'emit-compatible-seal' @((Join-Path $proposal 'dependencies/artifact-assembly-v2/seal-package-qa-slot.mjs'),$slotB,$inventory)
     if ($seal.sdkCopies -ne 1 -or $seal.nativeCopies -ne 1 -or $seal.reparseAccepted -or $seal.activationAccepted) { throw 'seal_closure_not_proven' }
     $consumer=Run-51 'actual-51-production-seal-consumer' @('-File',(Join-Path $proposal 'Test-Issue344CandidateSeal.ps1'),'-ProposalRoot',$proposal,'-Slot',$slotB,'-Inventory',$inventory)
     if (-not $consumer.productionSealConsumerVerified -or $consumer.activationAccepted -or $consumer.taskActionsInvoked -ne 0) { throw 'actual_production_seal_consumer_required' }
-    Write-NewJson (Join-Path $evidence 'package-qa-result.json') @{schema=1;status='owned_windows_package_qa_passed_not_live_acceptance';node=(& $node --version).Trim();npm=(& $npm --version).Trim();readOnlyPackageFixtureGates=$readonlyGates;helperSemanticSourceGatesExecuted=$false;deploymentReady=$false;normalInstallExit=0;publicBefore=$before;productionNegativeMatrix=$matrix;physicalRelocations=1;publicAfter=$after;sealEmitter=$seal;actual51SealConsumer=$consumer;liveActivation=$false;realPlatformInput=$false;excelAcceptance=$false;taskActionsInvoked=0}
+    Write-NewJson (Join-Path $evidence 'package-qa-result.json') @{schema=1;status='owned_windows_package_qa_passed_not_live_acceptance';node=(& $node --version).Trim();npm=(& $npm --version).Trim();readOnlyPackageFixtureGates=$readonlyGates;helperSemanticSourceGatesExecuted=$false;deploymentReady=$false;normalInstallExit=0;npmLifecyclePolicy='npm11_17_advisory_standard_install_unmodified';requiredRootLifecycleReadbacks=3;requiredRootLifecycleBefore=$lifecycleBefore;requiredRootLifecycleAfter=$lifecycleAfter;requiredRootLifecycleBeforeSeal=$lifecycleBeforeSeal;lifecycleSourceNegatives=$lifecycleNegatives;publicBefore=$before;productionNegativeMatrix=$matrix;physicalRelocations=1;publicAfter=$after;sealEmitter=$seal;actual51SealConsumer=$consumer;liveActivation=$false;realPlatformInput=$false;excelAcceptance=$false;taskActionsInvoked=0}
     if ($env:GITHUB_OUTPUT) { [IO.File]::AppendAllText($env:GITHUB_OUTPUT,"candidate_slot=$slotB`n",$utf8) }
 } catch {
     if (-not (Test-Path -LiteralPath (Join-Path $evidence 'package-qa-failed.json'))) { Write-NewJson (Join-Path $evidence 'package-qa-failed.json') @{schema=1;status='failed_or_outcome_unknown';passed=$false;liveActivation=$false;automaticReplayAllowed=$false;ownedRootRetained=$true} }

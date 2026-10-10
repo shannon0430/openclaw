@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "status": "PASS_SOURCE_ONLY_PACKAGE_WINDOWS_PENDING",
+  "manifestSha256": "19b27eed263e170963c51a219c2466209cf119682c69136609d4e6f0ab6ed72f",
+  "incrementalPatchSha256": "f6753799211d5bd7a8e37e930119f198a428e8c767f9091a4670de341126395c",
+  "predecessorManifestSha256": "6bfba602d1c2a4cf4c38d57701a155dc9c7d33fd8fb6cbec1f424460e3b2429d",
+  "priorIndependentSourceReviewSha256": "248020bd3b162057eff33d7cb68870987e26b531a95cf7edbedc46684911cf39",
+  "actualLocalChecksSha256": "df8a05519c2dac54d4ffb61459d74cdb8c752324ff6bed122a6cd81aab41d10f",
+  "exact33FileClosure": true,
+  "exactV2PatchApplyResultBytes": true,
+  "onlyChangedPriorFiles": [
+    "Invoke-Issue344PackageQa.ps1",
+    "README.md"
+  ],
+  "requiredRootLifecycleReaderSha256": "9b5dfc50242fca3afd821486454b748baafc1d627c2a12aa2fe68aabad97fb19",
+  "requiredRootLifecycleTestsSha256": "5ff2ec922885f4947cff07f1695a3e23baa19a225ccbce82171ab5dbde812541",
+  "workflowUnchangedSha256": "ac43eab855f8f9bbcd77cf768b78d55bc42ae229f84547be30b906ed9085e188",
+  "sourceOwnerThreeFilesExactEb377AndF3ebGitBlobsVerified": true,
+  "sourceReviewFindings": [
+    "One normal npm11.17 install command unchanged; no --ignore-scripts, configuration mutation, wildcard permission, copied dependencies, postinstall replay or new auto-healing",
+    "Three read-only checks run before first probes, after the single relocation and before final inventory/seal; same tar digest retained",
+    "Exact declared slot root dependency, tar digest, installed name and ordinary directory/entry gates precede absence checks",
+    "lstat refuses present marker regardless of file/directory/dangling symlink; unknown metadata errors are not converted to absent",
+    "Required closure matches owning source marker/legacyguard/entry definition, with ordinary-path strengthening; this is not proof of every dependency lifecycle execution",
+    "12 actual-production-reader synthetic regressions include positive, marker types, legacy guard, missing/symlink entry, wrong names/spec, changed tar, unreadable marker, owned relocation; own fixtures removed",
+    "Prior workflow, eligibility/closed projections, generic extraction/C# body, native7/51parser5/seal consumer, eight production negatives and public5+5 relocation checks unchanged",
+    "New source/docs contain generic licensed QA/source identifiers only; no scoped Dell hostname/principal/task/action/observation/preimage or secret payload introduced",
+    "Historical f3eb/601ade inputs explicitly do not accept new native successor; parent must separately rebind final DLL/SDK/full package/receipts before changed-source QA or LIVE"
+  ],
+  "actualChecks": {
+    "node": "v24.19.0",
+    "platform": "darwin",
+    "lifecycleProductionReaderCases": 12,
+    "transferProductionSeams": 23,
+    "nodeSyntaxFiles": 13,
+    "portablePS7_5_3ParserFiles": 5,
+    "actionlintExit": 0,
+    "npmInstalls": 0,
+    "packageLifecycleExecutions": 0,
+    "nativePInvokeCalls": 0,
+    "taskOrLiveEffects": 0
+  },
+  "limits": [
+    "Windows Node24.19/npm11.17 normal install and marker closure unrun by reviewer",
+    "PowerShell5.1/native7 actual source fixture remains mandatory; portable parser is not native acceptance",
+    "Ordinary-path metadata gates are not atomic no-beneath filesystem confinement; fixtures are unique owned disposable roots",
+    "Marker absence proves required source closure, not a full per-dependency script trace",
+    "Pending warning text alone is not treated as blocked lifecycle; no advisory-policy change introduced",
+    "Canonical native/all/GUI zero-skips and deployed Excel success remain separate LIVE acceptance gates",
+    "Public transfer of newly integrated source bytes requires parent exact artifact classification/rebinding; this review performs no publication"
+  ],
+  "sourceRepoChanged": false,
+  "ciDispatched": false,
+  "assetsPublished": false,
+  "deploymentReady": false
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "status": "materialized_actual_QA4_source_proofs_only_windows_and_transfer_unperformed",
+  "finalOpenclawSourceCommit": "6449366519a551bd3c2658771091f5cbb8de48aa",
+  "finalOpenclawTarSha256": "33e795deacd98c9ec1727492e2dfd2cf7a7367f3feb8e4912da6c06d63a75ac2",
+  "finalOpenclawTarBytes": 95897600,
+  "completePackageVerificationReceiptSha256": "841ec0c303050676e1e3975ea58013b40652551cb0d41229f449be90d67cb673",
+  "sourceDigestRebakeReceiptSha256": "e4843cca1d24ada6b5daa94d5beca2dedee55a0a6e7e11fe1bae727aaf2ab672",
+  "sourceSdkBuildReceiptSha256": "b3a5bcb18580c82c8ad73ef2781dd9194920197df9d3abdf73a73a4e52e7856b",
+  "focusedNativeReceiptSha256": "ff6c33317626eb861eb2dbadbee348781700c25f9629ab1ffc2dd2e8940cf43f",
+  "officialAddonProvenanceReceiptSha256": "dfa6c621a96b6f5fc8b705658323cf9f84a8aa5bbba2243ff69162d51980fef6",
+  "lifecycleOwnerFinalGitBlobsReverified": true,
+  "sourcePortableChecksReceiptSha256": "8ace809bb205c70e679549e6a509bae1d472a90001e6a0c9d173761bcd407252",
+  "predecessorSourceFilesChanged": [
+    "INPUT-TEMPLATE.json",
+    "LIFECYCLE-OWNER-SOURCE.json",
+    "README.md",
+    "test-transfer-core.mjs",
+    "transfer-core.mjs"
+  ],
+  "predecessorSourceFilesUnchanged": [
+    "Invoke-Issue344PackageQa.ps1",
+    "LIFECYCLE-SOURCE-NOTES.md",
+    "SOURCE-DEPENDENCIES.json",
+    "SOURCE-GATES.json",
+    "Test-Issue344CandidateSeal.ps1",
+    "Test-Issue344HelperGates.ps1",
+    "Upload-Issue344QaPrereleaseInputs.mjs",
+    "dependencies/artifact-assembly-v1/ASSEMBLY-PROPOSAL-MANIFEST.json",
+    "dependencies/artifact-assembly-v1/create-slot-inputs.mjs",
+    "dependencies/artifact-assembly-v1/package-qa-matrix.mjs",
+    "dependencies/artifact-assembly-v1/package-qa-probe.mjs",
+    "dependencies/artifact-assembly-v1/sdk-wire-qa.mjs",
+    "dependencies/artifact-assembly-v2/ASSEMBLY-SEAL-MANIFEST.json",
+    "dependencies/artifact-assembly-v2/seal-package-qa-slot.mjs",
+    "dependencies/generic-slot-primitives-v1/EXTRACTION-PROVENANCE.json",
+    "dependencies/generic-slot-primitives-v1/GenericSlotMetadata.psm1",
+    "dependencies/generic-slot-primitives-v1/Test-KanonNativeHandles.ps1",
+    "fetch-release-inputs.mjs",
+    "issue344-package-qa.yml",
+    "prepare-public-inputs.mjs",
+    "required-root-lifecycle.mjs",
+    "test-required-root-lifecycle.mjs",
+    "verify-proposal.mjs"
+  ],
+  "historicalProofFilesMovedByteIdentical": [
+    {
+      "from": "LOCAL-LIFECYCLE-REGRESSION.json",
+      "to": "history/v3/LOCAL-LIFECYCLE-REGRESSION.json",
+      "sha256": "92e6525b43de5be0339682564a6cb02ada4985c66a9f9c1dc6b45bca7a555263"
+    },
+    {
+      "from": "LOCAL-SOURCE-CHECKS-v3.json",
+      "to": "history/v3/LOCAL-SOURCE-CHECKS-v3.json",
+      "sha256": "e22cc2d272a90dd953d1b9f1f282fe51029d45a81b01e300353ff6917dde294c"
+    },
+    {
+      "from": "LOCAL-SOURCE-CHECKS.json",
+      "to": "history/v3/LOCAL-SOURCE-CHECKS.json",
+      "sha256": "17d0255fe9d8e01bdd3e151eec281dc0c5876ef8c2184dd5ceed4e1539e90321"
+    },
+    {
+      "from": "v2-to-v3.patch",
+      "to": "history/v3/v2-to-v3.patch",
+      "sha256": "f6753799211d5bd7a8e37e930119f198a428e8c767f9091a4670de341126395c"
+    }
+  ],
+  "noEarlierLocalResultCountedAsNewEvidence": true,
+  "WindowsExecuted": false,
+  "publicTransferExecuted": false,
+  "independentSourceReviewPending": true,
+  "actualPublicByteReviewPending": true,
+  "liveActivation": false,
+  "deploymentReady": false
+}

@@ -1,18 +1,39 @@
 {
   "schemaVersion": 1,
-  "status": "example_only_missing_final_evidence_refused",
-  "finalOpenclawSourceCommit": null,
-  "cuaSourceCommit": "891efae2cc01a38260a303b0329785e5c4d7b03c",
-  "finalDllSha256": "601adefd44cc982dd4a1ff2e80dae8b056b971f830521d7e6acbb7dde8420f94",
+  "status": "example_only_missing_parent_input_paths_review_and_eligibility_refused",
+  "finalOpenclawSourceCommit": "6449366519a551bd3c2658771091f5cbb8de48aa",
+  "cuaSourceCommit": "a80258ee1ff1e1b38ca87eb571f4552c3b853c54",
+  "finalDllSha256": "34bbf44ff85ffbd08a0c0a33fc47a97ece9490bc648878f9900a2de8be9e5bd4",
   "officialAddonSha256": "93f220e8a5cbf25aff23321f20a868368a204f1026b8dce45c5a4f84290de09f",
   "proposalManifestSha256": null,
   "publicSourceLicenseOnlyOwnerReviewed": false,
-  "openclawTar": {"path": null, "sha256": null},
-  "sourceSdkTar": {"path": null, "sha256": null},
-  "nativeTar": {"path": null, "sha256": null},
-  "nativeQaReceipt": {"path": null, "sha256": null},
-  "officialAddonProvenanceReceipt": {"path": null, "sha256": null},
-  "sourceSdkBuildReceipt": {"path": null, "sha256": null},
-  "sourceRebakeReceipt": {"path": null, "sha256": null},
+  "openclawTar": {
+    "path": null,
+    "sha256": "33e795deacd98c9ec1727492e2dfd2cf7a7367f3feb8e4912da6c06d63a75ac2"
+  },
+  "sourceSdkTar": {
+    "path": null,
+    "sha256": "b61b60cdd8fb74d2ba84cf3476d9f465b96a2b0b09c4cc3bb447cba347ae4c2c"
+  },
+  "nativeTar": {
+    "path": null,
+    "sha256": "41470d79c509fe809e85d50fa0074500008babfd43c6affc7d1da8cf3c8c275a"
+  },
+  "nativeQaReceipt": {
+    "path": null,
+    "sha256": "ff6c33317626eb861eb2dbadbee348781700c25f9629ab1ffc2dd2e8940cf43f"
+  },
+  "officialAddonProvenanceReceipt": {
+    "path": null,
+    "sha256": "dfa6c621a96b6f5fc8b705658323cf9f84a8aa5bbba2243ff69162d51980fef6"
+  },
+  "sourceSdkBuildReceipt": {
+    "path": null,
+    "sha256": "477f0d573778f6310cf2e7f651a0a3f52e89c9dfc06314b1d1608d7d1e7d50db"
+  },
+  "sourceRebakeReceipt": {
+    "path": null,
+    "sha256": "841ec0c303050676e1e3975ea58013b40652551cb0d41229f449be90d67cb673"
+  },
   "eligibility": null
 }
