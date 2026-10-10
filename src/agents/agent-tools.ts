@@ -61,6 +61,8 @@ import { applySwarmCollectorToolContract } from "./openclaw-tools.swarm.js";
 import { resolveSandboxFileIdentity } from "./sandbox/file-mutation-identity.js";
 import { createEmbeddedMessageInvocationPolicy } from "./scheduled-message-invocation.js";
 import { resolveScheduledToolCallerContext } from "./scheduled-tool-policy.js";
+import { hasScopedComputerPermission } from "./scoped-computer-policy.js";
+import { isScopedPairedComputerTransport } from "./scoped-paired-computer.js";
 import {
   resolveSessionPermissionCoreToolPolicy,
   projectEffectiveExecPolicy,
@@ -382,6 +384,11 @@ export function createOpenClawCodingToolsInternal(
   });
   const cronCreatorAuthorityResolver = bindActiveCronCreatorAuthorityResolver(options?.runId);
   const cronManagementGrant = bindCronManagementGrant(options?.runId);
+  const computerTransport =
+    options?.computerTransport === null
+      ? null
+      : (options?.computerTransport ??
+        resolveSessionPlacementComputer(options?.operationalRunInstance));
   const { sessionPortalTarget, ownerOnlyCoreToolDenylist, ownerOnlyCoreToolPolicy } =
     prepareSessionPortalToolAccess({
       sessionKey: executionSessionKey,
@@ -390,6 +397,10 @@ export function createOpenClawCodingToolsInternal(
       senderIsOwner: options?.senderIsOwner,
       sandboxed: Boolean(sandbox),
       hasAutomationGrant: Boolean(cronCreatorAuthorityResolver || cronManagementGrant),
+      hasScopedComputerGrant:
+        !sandbox &&
+        isScopedPairedComputerTransport(computerTransport) &&
+        hasScopedComputerPermission(capabilityProfile),
     });
   const pluginToolAllowlist = appendRuntimePluginToolGrant(
     capabilityProfile.policy.explicitToolAllowlist,
@@ -580,11 +591,7 @@ export function createOpenClawCodingToolsInternal(
             replyToMode: options?.replyToMode,
             hasRepliedRef: options?.hasRepliedRef,
             computerContextEpoch: options?.computerContextEpoch,
-            computerTransport:
-              options?.computerTransport === null
-                ? null
-                : (options?.computerTransport ??
-                  resolveSessionPlacementComputer(options?.operationalRunInstance)),
+            computerTransport,
             pairedNodeComputerUse: options?.pairedNodeComputerUse,
             registerRunCleanup: options?.registerRunCleanup,
             sourceReplyDeliveryMode: options?.sourceReplyDeliveryMode,
