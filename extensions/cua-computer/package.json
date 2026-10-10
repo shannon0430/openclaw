@@ -35,7 +35,7 @@
     },
     "win32-x64-msvc": {
       "files": {
-        "cua_driver_sdk.dll": "601adefd44cc982dd4a1ff2e80dae8b056b971f830521d7e6acbb7dde8420f94",
+        "cua_driver_sdk.dll": "34bbf44ff85ffbd08a0c0a33fc47a97ece9490bc648878f9900a2de8be9e5bd4",
         "cua_driver_node_runtime.node": "93f220e8a5cbf25aff23321f20a868368a204f1026b8dce45c5a4f84290de09f"
       }
     }
