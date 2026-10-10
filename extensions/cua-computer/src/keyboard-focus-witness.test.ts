@@ -163,6 +163,10 @@ describe("native keyboard focus diagnostic allowlist", () => {
       { insertedEventCount: 0 },
       { uiaHasKeyboardFocus: null },
       { uiaFocusedElementEqualsTarget: false },
+      // The same closed boolean admits either proven native ownership path;
+      // a mismatched/unknown process-boundary proof never becomes success.
+      { uiaProcessMatchesTarget: false },
+      { uiaProcessMatchesTarget: null },
       { nativeFocusStable: false },
       { nativeElementCorrelation: "unavailable" },
       { providerFailureCode: 0 },

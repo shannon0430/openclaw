@@ -30,6 +30,12 @@ const NativeKeyboardFocusWitnessSchema = z.strictObject({
   elementReferenceKind: z.enum(["token", "index_snapshot"]),
   uiaHasKeyboardFocus: z.boolean().nullable(),
   uiaFocusedElementEqualsTarget: z.boolean().nullable(),
+  // Native target-boundary ownership, not necessarily literal frame-PID
+  // equality. A windowless Document may use a separately owned native child
+  // only after the native driver proves and refreshes its exact UIA/Win32 host
+  // mapping. Bare PID inequality, a process family, or a common ancestor is
+  // not such proof. The adapter transports this admission fact; it neither
+  // recreates the native proof nor confirms application input consumption.
   uiaProcessMatchesTarget: z.boolean().nullable(),
   nativeForegroundRelation: z.enum(["exact", "other", "unavailable"]),
   nativeForegroundStable: z.boolean().nullable(),
