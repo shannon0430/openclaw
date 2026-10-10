@@ -20,6 +20,29 @@ const artifactMocks = vi.hoisted(() => ({
   registerDoctor: vi.fn(),
 }));
 
+const registrationImageMocks = vi.hoisted(() => ({
+  encode: vi.fn(async () => {
+    throw new Error("Unexpected image rendering in plugin registration test");
+  }),
+}));
+
+vi.mock("./src/commands.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./src/commands.js")>();
+  return {
+    ...actual,
+    // Exercise the real provider registration, not the host's renderer/temp
+    // filesystem after these tests override process.platform. Rendering is
+    // outside this contract and must not occur during registration.
+    createCuaComputerProvider: (
+      options: Parameters<typeof actual.createCuaComputerProvider>[0] = {},
+    ) =>
+      actual.createCuaComputerProvider({
+        ...options,
+        imageProcessor: { encode: registrationImageMocks.encode },
+      }),
+  };
+});
+
 vi.mock("./api.js", () => ({
   registerCuaDriverDoctorChecks: artifactMocks.registerDoctor,
 }));
@@ -52,6 +75,7 @@ describe("cua-computer plugin registration", () => {
   beforeEach(() => {
     artifactMocks.verify.mockReset().mockReturnValue({ ok: true, applicable: false });
     artifactMocks.registerDoctor.mockReset();
+    registrationImageMocks.encode.mockClear();
   });
 
   afterEach(() => {
@@ -106,6 +130,7 @@ describe("cua-computer plugin registration", () => {
     expect(commands.map((command) => command.command)).toEqual(["screen.snapshot", "computer.act"]);
     expect(artifactMocks.verify).toHaveBeenCalledOnce();
     expect(artifactMocks.registerDoctor).toHaveBeenCalledOnce();
+    expect(registrationImageMocks.encode).not.toHaveBeenCalled();
   });
 
   it("registers the screen and dangerous computer node-host commands", () => {

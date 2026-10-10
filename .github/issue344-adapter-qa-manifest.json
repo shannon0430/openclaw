@@ -3,7 +3,7 @@
   "baseCommit": "eb377ac59e6c9fd6c7705028034812becf00271b",
   "reviewStatus": "approved_for_isolated_source_qa",
   "expectedWitnessTestCount": 30,
-  "adapterPatchSha256": "6ba0b71b9743e3282cfefff946277e1960b181aec3b7ad0b77189253d6a9682f",
+  "adapterPatchSha256": "74156a4c569f1c7aa848d58c63c062c769f7b56b6861a478ee6f0a571cfa13bc",
   "nativeWireCompatibility": "statically reviewed marker metadata only; successor native runtime QA pending",
   "files": [
     {
@@ -17,6 +17,11 @@
     {
       "path": "extensions/cua-computer/src/keyboard-focus-witness.test.ts",
       "sha256": "aa998d8861ebd6fc325f17d9870af1d0c4cbc9b15a23ff99f98e92d68b584773"
+    },
+    {
+      "path": "extensions/cua-computer/index.test.ts",
+      "sha256": "a3f5fb41c00d446383477b3a4a6685bb618de42f8088331982b951da42df7f29"
     }
-  ]
+  ],
+  "registrationFixtureCorrectionSha256": "0f0122da8c42a53b855fc87b0a23e65b5b8c4956fb9f5870d88b4201bd88b004"
 }

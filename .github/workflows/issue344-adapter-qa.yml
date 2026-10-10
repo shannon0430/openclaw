@@ -95,7 +95,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "test_execution_guard_failed" }
       - name: Check formatting of changed production and boundary tests
         run: |
-          pnpm format:check extensions/cua-computer/src/window-actions.ts extensions/cua-computer/src/keyboard-focus-witness.ts extensions/cua-computer/src/keyboard-focus-witness.test.ts 2>&1 | Tee-Object -FilePath .artifacts/issue344-adapter-qa/source-format.log
+          pnpm format:check extensions/cua-computer/src/window-actions.ts extensions/cua-computer/src/keyboard-focus-witness.ts extensions/cua-computer/src/keyboard-focus-witness.test.ts extensions/cua-computer/index.test.ts 2>&1 | Tee-Object -FilePath .artifacts/issue344-adapter-qa/source-format.log
           if ($LASTEXITCODE -ne 0) { throw "changed_source_format_failed" }
       - name: Typecheck production plugin boundary
         run: |
