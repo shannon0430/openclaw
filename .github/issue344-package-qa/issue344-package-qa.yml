@@ -1,0 +1,98 @@
+name: Issue344 complete source package QA (no live activation)
+on:
+  push:
+    branches: [source/issue344-package-qa-20261010]
+    paths:
+      - .github/workflows/issue344-package-qa.yml
+      - .github/issue344-package-qa/**
+  workflow_dispatch:
+    inputs:
+      release_id:
+        description: Exact parent-owned internal QA prerelease ID
+        required: true
+        type: string
+      manifest_asset_id:
+        description: Exact uploaded transfer manifest asset ID
+        required: true
+        type: string
+      transfer_manifest_sha256:
+        description: SHA256 of materialized transfer manifest (no placeholders)
+        required: true
+        type: string
+      proposal_manifest_sha256:
+        description: Independently reviewed source proposal manifest SHA256
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: issue344-package-qa-${{ inputs.release_id }}
+  cancel-in-progress: false
+jobs:
+  exact-windows-package:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - name: Read exact reviewed source only
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: .github/issue344-package-qa
+      - name: Exact live Node toolchain
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24.19.0
+          check-latest: false
+      - name: Verify reviewed proposal and actual workflow Git blob
+        shell: pwsh
+        env:
+          ISSUE344_PROPOSAL_MANIFEST_SHA256: ${{ inputs.proposal_manifest_sha256 }}
+        run: |
+          git config core.autocrlf false
+          git config core.eol lf
+          git checkout-index --force --all
+          if ($LASTEXITCODE -ne 0) { throw 'exact_lf_source_checkout_failed' }
+          node .github/issue344-package-qa/verify-proposal.mjs
+          if ($LASTEXITCODE -ne 0) { throw 'reviewed_source_not_verified' }
+      - name: One read-only pinned QA prerelease acquisition (no scope fallback)
+        id: transfer
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE344_RELEASE_ID: ${{ inputs.release_id }}
+          ISSUE344_MANIFEST_ASSET_ID: ${{ inputs.manifest_asset_id }}
+          ISSUE344_TRANSFER_MANIFEST_SHA256: ${{ inputs.transfer_manifest_sha256 }}
+          ISSUE344_PROPOSAL_MANIFEST_SHA256: ${{ inputs.proposal_manifest_sha256 }}
+        run: |
+          $dest=Join-Path $env:RUNNER_TEMP ('issue344-inputs-'+[Guid]::NewGuid().ToString('N'))
+          node .github/issue344-package-qa/fetch-release-inputs.mjs $dest
+          if ($LASTEXITCODE -ne 0) { throw 'pinned_transfer_failed_no_install' }
+          "inputs=$dest" >> $env:GITHUB_OUTPUT
+      - name: Required public verifier, ABI, relocation and Windows5.1 read-only owned primitives (no helper semantics)
+        id: qa
+        shell: pwsh
+        env:
+          ISSUE344_INPUTS: ${{ steps.transfer.outputs.inputs }}
+        run: |
+          & .github/issue344-package-qa/Invoke-Issue344PackageQa.ps1 -InputsRoot $env:ISSUE344_INPUTS
+      - name: Upload bounded evidence even on refusal (not acceptance)
+        if: always() && steps.qa.outputs.evidence != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: issue344-package-qa-evidence
+          path: ${{ steps.qa.outputs.evidence }}
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 7
+      - name: Upload exact complete owned candidate only after all gates
+        if: success()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: issue344-owned-expanded-source-package
+          path: ${{ steps.qa.outputs.candidate_slot }}
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 7

@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { verifyProposal } from './transfer-core.mjs';
+const root=path.dirname(fileURLToPath(import.meta.url));
+verifyProposal(root,process.env.ISSUE344_PROPOSAL_MANIFEST_SHA256);
+assert(process.platform==='win32' && process.arch==='x64' && process.version==='v24.19.0','actual_windows_node_required');
+assert(process.env.GITHUB_EVENT_NAME==='workflow_dispatch','exact_manual_dispatch_required');
+assert(process.env.GITHUB_REPOSITORY==='shannon0430/openclaw','exact_fork_required');
+assert(process.env.GITHUB_REF==='refs/heads/source/issue344-package-qa-20261010','exact_source_qa_branch_required');
+assert(/^[a-f0-9]{40}$/.test(process.env.GITHUB_SHA),'exact_checkout_required');
+// Do not verify just a mirror: bind the actual executed workflow Git object.
+const git=spawnSync('git',['show',process.env.GITHUB_SHA+':.github/workflows/issue344-package-qa.yml'],{encoding:null,maxBuffer:1048576});
+assert.equal(git.status,0,'workflow_blob_unavailable');
+assert.deepEqual(git.stdout,fs.readFileSync(path.join(root,'issue344-package-qa.yml')),'actual_workflow_differs_from_reviewed_mirror');
+const gates=JSON.parse(fs.readFileSync(path.join(root,'SOURCE-GATES.json'),'utf8'));
+assert(gates.status==='frozen_reviewed_source_gates' && gates.liveActivation===false && gates.tests.length===1 && gates.scope==='package_only_readonly_metadata_native_fixture_no_helper_semantics' && gates.helperSemanticSourceGatesExecuted===false,'helper_source_not_frozen');
+console.log(JSON.stringify({proposalAndActualWorkflowVerified:true,sourceGatesFrozen:true,platform:process.platform,node:process.version,executionAcceptance:false}));

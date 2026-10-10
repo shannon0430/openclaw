@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "status": "frozen_reviewed_source_gates",
+  "scope": "package_only_readonly_metadata_native_fixture_no_helper_semantics",
+  "liveActivation": false,
+  "deploymentReady": false,
+  "helperSemanticSourceGatesExecuted": false,
+  "frozenHelperManifestSha256": "111694556981e80e0958c58454ad2748e1c4e15fcb211d9f4c84cfbaca0bdc51",
+  "windowsOperationsModule": "dependencies/generic-slot-primitives-v1/GenericSlotMetadata.psm1",
+  "directoryIdentityFormat": "volumeHex8:fileIndexHex16",
+  "parserFiles": [
+    "Invoke-Issue344PackageQa.ps1",
+    "Test-Issue344CandidateSeal.ps1",
+    "Test-Issue344HelperGates.ps1",
+    "dependencies/generic-slot-primitives-v1/GenericSlotMetadata.psm1",
+    "dependencies/generic-slot-primitives-v1/Test-KanonNativeHandles.ps1"
+  ],
+  "expectedParserFiles": 5,
+  "tests": [
+    {
+      "label": "owned-native-directory-exclusive-lock-primitives-only",
+      "path": "dependencies/generic-slot-primitives-v1/Test-KanonNativeHandles.ps1",
+      "expectedPassed": 7,
+      "nativeFileSymlinkRequired": true,
+      "expectedFlags": {
+        "ownedNativeHandlesOnly": true,
+        "fileSymlinkCaseExecuted": true,
+        "runtimeOrTaskMutations": 0
+      }
+    }
+  ],
+  "fullScopedHelperIncluded": false
+}

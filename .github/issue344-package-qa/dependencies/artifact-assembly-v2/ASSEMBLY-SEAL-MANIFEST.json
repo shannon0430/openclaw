@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "status": "frozen_source_only_successor",
+  "requiresFrozenAssemblyV1ManifestSha256": "215904c5686a81b770ffdce326aa2bb8b7c24371706424f10a7462263645d44f",
+  "replacement": "artifact-assembly-v1/seal-package-qa-slot.mjs only",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "57b09e68d42ac75621ff5b1acb722c80b74408c656db6caaf40a85a67a5b5771",
+      "bytes": 1505
+    },
+    {
+      "path": "REVIEW.json",
+      "sha256": "08c5ef93d86de1bca1b309473a7a55f22da72a759466cf039abfb65e11888a99",
+      "bytes": 1113
+    },
+    {
+      "path": "seal-package-qa-slot.mjs",
+      "sha256": "f153142120aae11ea5e8f0dbfcadc4d4ef94280903d54e30c4341437b5398f05",
+      "bytes": 3906
+    }
+  ]
+}

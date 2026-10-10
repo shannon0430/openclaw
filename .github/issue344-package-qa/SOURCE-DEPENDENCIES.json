@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "frozenDependencies": [
+    {
+      "folder": "artifact-assembly-v1",
+      "manifest": "ASSEMBLY-PROPOSAL-MANIFEST.json",
+      "manifestSha256": "215904c5686a81b770ffdce326aa2bb8b7c24371706424f10a7462263645d44f",
+      "selectedFiles": [
+        {
+          "path": "package-qa-probe.mjs",
+          "sha256": "02a57175950a7f61e751f8c76f8a7646388ce36fafeeac8d6d6ba7a168c19c15",
+          "bytes": 11892
+        },
+        {
+          "path": "create-slot-inputs.mjs",
+          "sha256": "b0d41d373048991d72ccc84e3c18667e1adfcab95b13ca227bf9d3289d558306",
+          "bytes": 3394
+        },
+        {
+          "path": "package-qa-matrix.mjs",
+          "sha256": "a80ae91221dd00a4df953c22882c29ee6b71c6a3f5988c0ce9b2ef530e20e6dd",
+          "bytes": 5592
+        },
+        {
+          "path": "sdk-wire-qa.mjs",
+          "sha256": "f9b0966f31d791bfe876799fc1004a9f603d504c95c16b3d8549d483934cde85",
+          "bytes": 3535
+        }
+      ]
+    },
+    {
+      "folder": "artifact-assembly-v2",
+      "manifest": "ASSEMBLY-SEAL-MANIFEST.json",
+      "manifestSha256": "f72281b39632e4f8a510c082dce5a05cf446f313f81dcb8543270c295bcb4e0b",
+      "selectedFiles": [
+        {
+          "path": "seal-package-qa-slot.mjs",
+          "sha256": "f153142120aae11ea5e8f0dbfcadc4d4ef94280903d54e30c4341437b5398f05",
+          "bytes": 3906
+        }
+      ]
+    }
+  ],
+  "copiedSourceOnly": true,
+  "newActuator": false,
+  "actualWindowsExecutedHere": false,
+  "declaredSourceExtraction": {
+    "folder": "generic-slot-primitives-v1",
+    "provenance": "EXTRACTION-PROVENANCE.json",
+    "originalWholeModuleSha256": "640f6ba3f2334f2340d5951f68c7d4ac6cf32e942132b686b69cd4088608ee4d",
+    "originalHelperManifestSha256": "111694556981e80e0958c58454ad2748e1c4e15fcb211d9f4c84cfbaca0bdc51",
+    "fullScopedModuleIncluded": false
+  }
+}

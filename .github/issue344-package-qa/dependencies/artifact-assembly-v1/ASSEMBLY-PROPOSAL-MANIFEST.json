@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "status": "frozen_source_only_proposal",
+  "sourceOpenclawPreRebake": "eb55b69dd1750fc458fdb9605a4bf986bfc7782e",
+  "sourceCuaCandidate": "891efae2cc01a38260a303b0329785e5c4d7b03c",
+  "finalDllSha256": "601adefd44cc982dd4a1ff2e80dae8b056b971f830521d7e6acbb7dde8420f94",
+  "officialAddonSha256": "93f220e8a5cbf25aff23321f20a868368a204f1026b8dce45c5a4f84290de09f",
+  "liveActivation": false,
+  "nativeInputByChild": false,
+  "windowsPackageQaByChild": false,
+  "files": [
+    {
+      "path": "KNOWN-NATIVE-INPUTS.json",
+      "sha256": "35b9a3a7a98b1e99a5b53ab7a288ba1fdbba7098fd2a670d4e579b5f5f05ecfa",
+      "bytes": 1040
+    },
+    {
+      "path": "PIPELINE.md",
+      "sha256": "aaed2e1a8477d5b5e681ea63ef9b217fcb4101816e577dd0f12ab0dec94b8564",
+      "bytes": 18710
+    },
+    {
+      "path": "PURPOSE.md",
+      "sha256": "c667fffafecf9bda8f1bec00b486a087f86d7f644dd1b6705d7ed21606c7380b",
+      "bytes": 335
+    },
+    {
+      "path": "REVIEW.md",
+      "sha256": "b1243cf78584bb22641ec279d0a10809656e48c21a254cdfb115c7b06baa4e4a",
+      "bytes": 4019
+    },
+    {
+      "path": "SOURCE-RECEIPT.json",
+      "sha256": "d02f98f772828a2864f9c8feb13801381989c4170732790508e46782a727a3af",
+      "bytes": 3364
+    },
+    {
+      "path": "VALIDATION-RECEIPT.json",
+      "sha256": "2f441c09a0ec1fe4a95ea44444833bd712b7ee932c4f0c49b0f2e27675d70898",
+      "bytes": 1804
+    },
+    {
+      "path": "create-slot-inputs.mjs",
+      "sha256": "b0d41d373048991d72ccc84e3c18667e1adfcab95b13ca227bf9d3289d558306",
+      "bytes": 3394
+    },
+    {
+      "path": "package-qa-matrix.mjs",
+      "sha256": "a80ae91221dd00a4df953c22882c29ee6b71c6a3f5988c0ce9b2ef530e20e6dd",
+      "bytes": 5592
+    },
+    {
+      "path": "package-qa-probe.mjs",
+      "sha256": "02a57175950a7f61e751f8c76f8a7646388ce36fafeeac8d6d6ba7a168c19c15",
+      "bytes": 11892
+    },
+    {
+      "path": "portable-test-output.txt",
+      "sha256": "3000d2855cc32f2f613f8400a40dd1362d678564b935eaf1a644d216fa81ec7b",
+      "bytes": 436
+    },
+    {
+      "path": "prepare-digest-rebake.mjs",
+      "sha256": "b2f8f78526d9ed41444ca65d62b3fb41e4d62a481a1916dca7be91b724c623ae",
+      "bytes": 3263
+    },
+    {
+      "path": "sdk-wire-qa.mjs",
+      "sha256": "f9b0966f31d791bfe876799fc1004a9f603d504c95c16b3d8549d483934cde85",
+      "bytes": 3535
+    },
+    {
+      "path": "seal-package-qa-slot.mjs",
+      "sha256": "d0307f2d6af98253ed86a5cf30d9f6e7c07dac76fe80336c4fdaa5250a49a202",
+      "bytes": 3890
+    },
+    {
+      "path": "source-reference/cua/libs/cua-driver/scripts/build-node-runtime.mjs",
+      "sha256": "db02ec1345edbf6090f0093ddae3bd41d624d2984af58bcdce3a66cfcad373dc",
+      "bytes": 8072
+    },
+    {
+      "path": "source-reference/cua/libs/cua-driver/scripts/build-npm-packages.mjs",
+      "sha256": "d44f1cb38b3b45d3513d2863cc9667eb309d31deff5a7a66aefd28fee8f87e3f",
+      "bytes": 5049
+    },
+    {
+      "path": "source-reference/cua/libs/cua-driver/typescript/package.json",
+      "sha256": "e8fef4d6e1965b7c89ede6f701d8471041dbf08d0118f7d84835897bd3d5e9e2",
+      "bytes": 1803
+    },
+    {
+      "path": "source-reference/cua/libs/cua-driver/typescript/src/native/node-runtime.ts",
+      "sha256": "1a6af54641eae5ada3249fa142f788edb31f36f4afbb6fd28d84b519a6fe9b65",
+      "bytes": 1413
+    },
+    {
+      "path": "source-reference/cua/libs/cua-driver/typescript/tsconfig.json",
+      "sha256": "affed3849c65579e5a130f302753aa5c191f81e024ce4fbd4d6ed3eeca74978b",
+      "bytes": 339
+    },
+    {
+      "path": "source-reference/openclaw/extensions/cua-computer/api.ts",
+      "sha256": "b9aaf847561a5651b825f257bf5c1a0fed4bfdb59d17dfc1141edb1cc9f124d2",
+      "bytes": 95
+    },
+    {
+      "path": "source-reference/openclaw/extensions/cua-computer/index.ts",
+      "sha256": "ffa988c848cc06a505eb19967e7b8543509836ebf230e7d5e611239431f53439",
+      "bytes": 2015
+    },
+    {
+      "path": "source-reference/openclaw/extensions/cua-computer/package.json",
+      "sha256": "ca943fed7139a3a969706d0116bdf2ce8167105b31420882304142b8661a46c1",
+      "bytes": 1639
+    },
+    {
+      "path": "source-reference/openclaw/extensions/cua-computer/src/doctor.ts",
+      "sha256": "5ff138b9af31155be722e394959318c40a73d147354002d591ad8fe9f3d3aa79",
+      "bytes": 1630
+    },
+    {
+      "path": "source-reference/openclaw/extensions/cua-computer/src/driver-artifact-verification.ts",
+      "sha256": "30c7257039dbe656e928fa63026a982d95d3c45f4272dfe674766990a606791c",
+      "bytes": 8382
+    },
+    {
+      "path": "source-reference/openclaw/extensions/cua-computer/src/driver-artifacts.ts",
+      "sha256": "2d833a4f08a7e57837704739cd1fb71e9d3fdc380809a6412c9beca843537f57",
+      "bytes": 2604
+    },
+    {
+      "path": "source-reference/openclaw/scripts/package-manifest.mjs",
+      "sha256": "0e69fbb601cab6b52b58cb094407ca8df4827a55aeaed9f75741dfdc2dd30b1b",
+      "bytes": 4740
+    },
+    {
+      "path": "source-reference/openclaw/scripts/package-openclaw-for-docker.mts",
+      "sha256": "b78c4cd043060275b40060c74d438e6ba4e7f1cdd2a9596f3b63b422fb22cd71",
+      "bytes": 39039
+    },
+    {
+      "path": "test-proposal-refusals.mjs",
+      "sha256": "8708fad9a4f4da0b4fd8aa8135454434a98e7cc083b0370ab1a66573934cfb06",
+      "bytes": 2579
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "status": "source_checks_only_not_windows_acceptance",
+  "node": "v24.19.0",
+  "syntaxFiles": [
+    {
+      "path": "Upload-Issue344QaPrereleaseInputs.mjs",
+      "sha256": "354ac118bf48b92b536dfa3be346df5d7bfdd18b29af8e7e974066d52fceb620",
+      "syntaxExit": 0
+    },
+    {
+      "path": "dependencies/artifact-assembly-v1/create-slot-inputs.mjs",
+      "sha256": "b0d41d373048991d72ccc84e3c18667e1adfcab95b13ca227bf9d3289d558306",
+      "syntaxExit": 0
+    },
+    {
+      "path": "dependencies/artifact-assembly-v1/package-qa-matrix.mjs",
+      "sha256": "a80ae91221dd00a4df953c22882c29ee6b71c6a3f5988c0ce9b2ef530e20e6dd",
+      "syntaxExit": 0
+    },
+    {
+      "path": "dependencies/artifact-assembly-v1/package-qa-probe.mjs",
+      "sha256": "02a57175950a7f61e751f8c76f8a7646388ce36fafeeac8d6d6ba7a168c19c15",
+      "syntaxExit": 0
+    },
+    {
+      "path": "dependencies/artifact-assembly-v1/sdk-wire-qa.mjs",
+      "sha256": "f9b0966f31d791bfe876799fc1004a9f603d504c95c16b3d8549d483934cde85",
+      "syntaxExit": 0
+    },
+    {
+      "path": "dependencies/artifact-assembly-v2/seal-package-qa-slot.mjs",
+      "sha256": "f153142120aae11ea5e8f0dbfcadc4d4ef94280903d54e30c4341437b5398f05",
+      "syntaxExit": 0
+    },
+    {
+      "path": "fetch-release-inputs.mjs",
+      "sha256": "e2bc84916b555965f786ecf81cf185bcb9c24bfe55994e8ae7276d67999c9d92",
+      "syntaxExit": 0
+    },
+    {
+      "path": "prepare-public-inputs.mjs",
+      "sha256": "519562fc0e3926dd820f9c7b4f84ce265fe63feb474dabc587ced8147befd97a",
+      "syntaxExit": 0
+    },
+    {
+      "path": "test-transfer-core.mjs",
+      "sha256": "4f11fc27c562d06c342788299cf134f5c4cc15dfcc17d8f6a808dbf13cefe19c",
+      "syntaxExit": 0
+    },
+    {
+      "path": "transfer-core.mjs",
+      "sha256": "61f8c1253e3221faff6b27508e90fdd145730e5227274e105986063792bb28d4",
+      "syntaxExit": 0
+    },
+    {
+      "path": "verify-proposal.mjs",
+      "sha256": "ab44cd79088808cb5d7bf1a4e0ceecb6f0b38b29c1208d9ae769767c6e8ffd38",
+      "syntaxExit": 0
+    }
+  ],
+  "actualInertSeamTests": {
+    "schemaVersion": 1,
+    "passed": 23,
+    "failed": 0,
+    "cases": [
+      "materialized_source_contract_only",
+      "pending_inputs",
+      "missing_commit",
+      "zero_digest",
+      "duplicate_asset",
+      "missing_asset",
+      "arbitrary_asset_name",
+      "draft_not_public_qa_prerelease",
+      "native_pending",
+      "owned_fixture_missing",
+      "partial_build",
+      "fake_package_pass",
+      "oversized_asset",
+      "sanitizer_preserves_unrun_false_and_omits_localpath",
+      "sanitizer_refuses_secret_field",
+      "projection_only_generic_source_proof_and_original_hash",
+      "projection_refuses_path_in_allowed_field",
+      "frozen_tar_binding_drift_refused",
+      "other_valid_source_commit_refused",
+      "private_extra_eligibility_top_field_refused",
+      "private_extra_eligibility_nested_field_refused",
+      "pending_canonical_activation_not_a_disposable_qa_block",
+      "public_projection_extra_private_field_refused"
+    ],
+    "scope": "actual production manifest/sanitizer seams using inert synthetic records; no upload/download/Windows/package/native execution"
+  },
+  "portableParser": {
+    "Windows51Executed": false,
+    "runtime": "7.5.3",
+    "files": [
+      {
+        "errors": 0,
+        "file": "Invoke-Issue344PackageQa.ps1"
+      },
+      {
+        "errors": 0,
+        "file": "Test-Issue344CandidateSeal.ps1"
+      },
+      {
+        "errors": 0,
+        "file": "Test-Issue344HelperGates.ps1"
+      },
+      {
+        "errors": 0,
+        "file": "dependencies/generic-slot-primitives-v1/GenericSlotMetadata.psm1"
+      },
+      {
+        "errors": 0,
+        "file": "dependencies/generic-slot-primitives-v1/Test-KanonNativeHandles.ps1"
+      }
+    ]
+  },
+  "portableSameCSharpCompile": {
+    "runtime": "7.5.3",
+    "PInvokeCalls": 0,
+    "Windows51Executed": false,
+    "originalCSharpBodyCompiled": true,
+    "taskOrProcessOperations": 0
+  },
+  "workflowSha256": "ac43eab855f8f9bbcd77cf768b78d55bc42ae229f84547be30b906ed9085e188",
+  "actionlintExit": 0,
+  "actualImmutableReceiptProjectionSeam": [
+    {
+      "kind": "nativeQaReceipt",
+      "originalSha256": "40c0ce05a118bf893a96ec6891d4fba61f093d5670d2c017478ec2f7f52ead82",
+      "projectionBytes": 1647,
+      "explicitAllowlist": true,
+      "statusFieldsUnchanged": true
+    },
+    {
+      "kind": "officialAddonProvenanceReceipt",
+      "originalSha256": "6293a94de97363275140da7f3f326ba9c38aa8f00d595efbd394826c39028099",
+      "projectionBytes": 1419,
+      "explicitAllowlist": true,
+      "statusFieldsUnchanged": true
+    },
+    {
+      "kind": "sourceSdkBuildReceipt",
+      "originalSha256": "e15e7999d6bc670c02d21bd71717ddc991674d3a5c842ff88644bbcebf27f386",
+      "projectionBytes": 1424,
+      "explicitAllowlist": true,
+      "statusFieldsUnchanged": true
+    },
+    {
+      "kind": "sourceRebakeReceipt",
+      "originalSha256": "d875590854904b9e26d4553f0f5dac2e9532e16af2f06ea3af6f857fa34299cf",
+      "projectionBytes": 1541,
+      "explicitAllowlist": true,
+      "statusFieldsUnchanged": true
+    }
+  ],
+  "Windows51Executed": false,
+  "nativeFixtureExecuted": false,
+  "packageInstallationExecuted": false,
+  "releaseOrGitWrites": 0,
+  "CiDispatches": 0,
+  "helperSemanticSourceGatesExecuted": false
+}

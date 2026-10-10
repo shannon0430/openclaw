@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "status": "frozen_source_only_review_candidate",
+  "scope": "public_source_license_only_package_QA_and_generic_readonly_primitives",
+  "liveActivation": false,
+  "deploymentReady": false,
+  "helperSemanticAcceptance": false,
+  "files": [
+    {
+      "path": "INPUT-TEMPLATE.json",
+      "bytes": 856,
+      "sha256": "12d6ede9197ce9083a630a2794b88564e12267196478994c4443dca9a44d34eb"
+    },
+    {
+      "path": "Invoke-Issue344PackageQa.ps1",
+      "bytes": 8490,
+      "sha256": "805901b4dab2ca02aa573b39b2f9a346d7a0b01e74d84cab2e26b02fcc667855"
+    },
+    {
+      "path": "LOCAL-SOURCE-CHECKS.json",
+      "bytes": 5321,
+      "sha256": "17d0255fe9d8e01bdd3e151eec281dc0c5876ef8c2184dd5ceed4e1539e90321"
+    },
+    {
+      "path": "README.md",
+      "bytes": 10393,
+      "sha256": "ecd082a8b13257408f840f99fcb2d64a953268134408200421318a697c1e7768"
+    },
+    {
+      "path": "SOURCE-DEPENDENCIES.json",
+      "bytes": 1851,
+      "sha256": "626459d5bab689a6364d71f55ffbc6f0ec849ff68c49a5d8bc0b25d81b3ba54d"
+    },
+    {
+      "path": "SOURCE-GATES.json",
+      "bytes": 1248,
+      "sha256": "647d894ee0becf5c70ed6be2ac2f238ec163fcc9b3073b3344786027218598eb"
+    },
+    {
+      "path": "Test-Issue344CandidateSeal.ps1",
+      "bytes": 1468,
+      "sha256": "912d83886b18d7458c0614404bbc63b8b601952750b8e96c760c90cb6856184e"
+    },
+    {
+      "path": "Test-Issue344HelperGates.ps1",
+      "bytes": 2570,
+      "sha256": "221874224a692fe5884d1f536397d150e22144e3d66f17cf79da015f8d84ebe7"
+    },
+    {
+      "path": "Upload-Issue344QaPrereleaseInputs.mjs",
+      "bytes": 7900,
+      "sha256": "354ac118bf48b92b536dfa3be346df5d7bfdd18b29af8e7e974066d52fceb620"
+    },
+    {
+      "path": "dependencies/artifact-assembly-v1/ASSEMBLY-PROPOSAL-MANIFEST.json",
+      "bytes": 5262,
+      "sha256": "215904c5686a81b770ffdce326aa2bb8b7c24371706424f10a7462263645d44f"
+    },
+    {
+      "path": "dependencies/artifact-assembly-v1/create-slot-inputs.mjs",
+      "bytes": 3394,
+      "sha256": "b0d41d373048991d72ccc84e3c18667e1adfcab95b13ca227bf9d3289d558306"
+    },
+    {
+      "path": "dependencies/artifact-assembly-v1/package-qa-matrix.mjs",
+      "bytes": 5592,
+      "sha256": "a80ae91221dd00a4df953c22882c29ee6b71c6a3f5988c0ce9b2ef530e20e6dd"
+    },
+    {
+      "path": "dependencies/artifact-assembly-v1/package-qa-probe.mjs",
+      "bytes": 11892,
+      "sha256": "02a57175950a7f61e751f8c76f8a7646388ce36fafeeac8d6d6ba7a168c19c15"
+    },
+    {
+      "path": "dependencies/artifact-assembly-v1/sdk-wire-qa.mjs",
+      "bytes": 3535,
+      "sha256": "f9b0966f31d791bfe876799fc1004a9f603d504c95c16b3d8549d483934cde85"
+    },
+    {
+      "path": "dependencies/artifact-assembly-v2/ASSEMBLY-SEAL-MANIFEST.json",
+      "bytes": 718,
+      "sha256": "f72281b39632e4f8a510c082dce5a05cf446f313f81dcb8543270c295bcb4e0b"
+    },
+    {
+      "path": "dependencies/artifact-assembly-v2/seal-package-qa-slot.mjs",
+      "bytes": 3906,
+      "sha256": "f153142120aae11ea5e8f0dbfcadc4d4ef94280903d54e30c4341437b5398f05"
+    },
+    {
+      "path": "dependencies/generic-slot-primitives-v1/EXTRACTION-PROVENANCE.json",
+      "bytes": 2616,
+      "sha256": "3695bb9d1231a65ecdcc8a06b33ae63925316a39c31d010c0959ad1fcbbdf9b1"
+    },
+    {
+      "path": "dependencies/generic-slot-primitives-v1/GenericSlotMetadata.psm1",
+      "bytes": 8923,
+      "sha256": "be0b46846180c2d6e9ecca86b0739ed62227a99b69e2e621bfeeff9c1ddeaafd"
+    },
+    {
+      "path": "dependencies/generic-slot-primitives-v1/Test-KanonNativeHandles.ps1",
+      "bytes": 3729,
+      "sha256": "e28c15ffad2ad8ac1a8e782e5cbffb359624540b62afaed02e25274173d3b513"
+    },
+    {
+      "path": "fetch-release-inputs.mjs",
+      "bytes": 8196,
+      "sha256": "e2bc84916b555965f786ecf81cf185bcb9c24bfe55994e8ae7276d67999c9d92"
+    },
+    {
+      "path": "issue344-package-qa.yml",
+      "bytes": 4029,
+      "sha256": "ac43eab855f8f9bbcd77cf768b78d55bc42ae229f84547be30b906ed9085e188"
+    },
+    {
+      "path": "prepare-public-inputs.mjs",
+      "bytes": 3405,
+      "sha256": "519562fc0e3926dd820f9c7b4f84ce265fe63feb474dabc587ced8147befd97a"
+    },
+    {
+      "path": "test-transfer-core.mjs",
+      "bytes": 5764,
+      "sha256": "4f11fc27c562d06c342788299cf134f5c4cc15dfcc17d8f6a808dbf13cefe19c"
+    },
+    {
+      "path": "transfer-core.mjs",
+      "bytes": 12740,
+      "sha256": "61f8c1253e3221faff6b27508e90fdd145730e5227274e105986063792bb28d4"
+    },
+    {
+      "path": "verify-proposal.mjs",
+      "bytes": 1804,
+      "sha256": "ab44cd79088808cb5d7bf1a4e0ceecb6f0b38b29c1208d9ae769767c6e8ffd38"
+    }
+  ],
+  "selectedTransfer": "explicit_parent_selected_public_internal_QA_prerelease_not_latest_not_official_not_production",
+  "requiredSourceInputs": {
+    "openclawSourceCommit": "f3eb17ededbc2d7f10d5c9630ccad05b77431d55",
+    "openclawTarSha256": "5894d14f4dbd4a9e259d79e9c5b3a89520c79b91a272dda978163266a8d14048",
+    "openclawTarBytes": 95907840,
+    "sourceSdkTarSha256": "d7f98ec0a225681383e02cfa67126893059dce94aa88587a08701205308f3b11",
+    "nativeTarSha256": "c67d99918be009f4ed21429608b3b3383c9868c7661fb9d25cb465f16e0d46ef",
+    "nativeDllSha256": "601adefd44cc982dd4a1ff2e80dae8b056b971f830521d7e6acbb7dde8420f94",
+    "officialAddonSha256": "93f220e8a5cbf25aff23321f20a868368a204f1026b8dce45c5a4f84290de09f",
+    "eligibilityReceipt": "not_materialized_here_refuse_missing_focused668_plus2_and_complete_source_proofs_canonical_activation_separate"
+  },
+  "requiredWindowsCounts": {
+    "publicProbesBefore": 5,
+    "publicProductionNegatives": 8,
+    "physicalRelocations": 1,
+    "publicProbesAfter": 5,
+    "actual51ParserFiles": 5,
+    "ownedNativePrimitivesIncludingFileSymlink": 7,
+    "actual51ProductionSealConsumer": 1,
+    "helperSemanticCases": 0
+  },
+  "localChecks": {
+    "nodeSyntaxFiles": 11,
+    "inertActualSeamsPassed": 23,
+    "portableParserFiles": 5,
+    "sameCSharpBodyCompile": true,
+    "PInvokeCalls": 0,
+    "actionlintExit": 0
+  },
+  "actualWindowsRun": false,
+  "actualTransferRun": false,
+  "supersedesSourceCandidateManifestSha256": "6d281742c0fc21ccf88c135959c593d1b59bb71e22561ebcebe31197680b07c8",
+  "revisionScope": [
+    "closed generic eligibility and public projection schemas; immutable original proof hashes",
+    "exact focused668+2 and fullpackage admit disposableQA; canonicalall remains separate pendinglivegate",
+    "precise branchpush registration guardedmanualjob; no defaultbranch write"
+  ],
+  "canonicalActivationMetadata": {
+    "runId": 38042245292,
+    "dispatchHeadSha": "27bbeaa4940c801da76645df952815b28143f011",
+    "certifiedSourceRef": "891efae2cc01a38260a303b0329785e5c4d7b03c",
+    "liveAcceptance": "pending_separate_gate_not_package_QA_green"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "scope": "explicit_AST_extent_subset_readonly_metadata_seal_not_deployed_helper",
+  "originalWholeModuleSha256": "640f6ba3f2334f2340d5951f68c7d4ac6cf32e942132b686b69cd4088608ee4d",
+  "originalHelperManifestSha256": "111694556981e80e0958c58454ad2748e1c4e15fcb211d9f4c84cfbaca0bdc51",
+  "extraction": "PowerShell7.5.3 actual FunctionDefinitionAst Extent.Text; one exact occurrence each",
+  "functionSlices": [
+    {
+      "name": "Get-KanonTextHash",
+      "startLine": 6,
+      "endLine": 10,
+      "utf8Sha256": "8e6fc3e326844d67b30b751bba082122aea8cc183399e7d981eee2a47b30990a",
+      "bytes": 270
+    },
+    {
+      "name": "Get-KanonFileHash",
+      "startLine": 11,
+      "endLine": 14,
+      "utf8Sha256": "fb1102f61e599a732a80e72fadada96d5da2639ece980e8da66eefd6c29826ba",
+      "bytes": 160
+    },
+    {
+      "name": "Assert-KanonOrdinaryPath",
+      "startLine": 15,
+      "endLine": 30,
+      "utf8Sha256": "cbed8a4db007de24cf6297b3a49ec8471ae905d73402d0e2ad43a4de1b61cda9",
+      "bytes": 864
+    },
+    {
+      "name": "Get-KanonAclHash",
+      "startLine": 31,
+      "endLine": 36,
+      "utf8Sha256": "9b70487c4aba17ef589c01f3cba8f944e42dc609ae9186cdde594f5b5d78ba95",
+      "bytes": 364
+    },
+    {
+      "name": "Initialize-KanonDirectoryIdentityReader",
+      "startLine": 37,
+      "endLine": 100,
+      "utf8Sha256": "9a0154668280896a646284629d996bcf94c35a089dcfe1d19750bf4f899156fc",
+      "bytes": 3803
+    },
+    {
+      "name": "Get-KanonDirectoryIdentity",
+      "startLine": 118,
+      "endLine": 125,
+      "utf8Sha256": "29a478c02192fbdf9a64302bdb720b9dd8a1e5ade2231f6b4f9b07405f3eec44",
+      "bytes": 350
+    },
+    {
+      "name": "Test-KanonCandidateSeal",
+      "startLine": 198,
+      "endLine": 236,
+      "utf8Sha256": "5fe7b9e3c3eb0daf1fd2101410cd0d85753b8fd37adf456f95e5c9c1e7f5d8ba",
+      "bytes": 2779
+    }
+  ],
+  "outputModule": {
+    "path": "GenericSlotMetadata.psm1",
+    "sha256": "be0b46846180c2d6e9ecca86b0739ed62227a99b69e2e621bfeeff9c1ddeaafd"
+  },
+  "unchangedCSharpBody": true,
+  "includedFunctions": 7,
+  "excludedTaskProcessActionContextWitnessPhaseIdentityCode": true,
+  "nativeFixture": {
+    "originalSha256": "6ab0e638cb0b1e3f49968e207b3bbe0188ea83e5e762232edf4e8967399ed53a",
+    "outputSha256": "e28c15ffad2ad8ac1a8e782e5cbffb359624540b62afaed02e25274173d3b513",
+    "onlyChange": "'WindowsSlotOperations.psm1' -> 'GenericSlotMetadata.psm1' import leaf; all assertions/native operations unchanged",
+    "mandatoryCases": 7,
+    "Windows51ExecutedHere": false
+  },
+  "liveActivation": false,
+  "helperSemanticAcceptance": false
+}

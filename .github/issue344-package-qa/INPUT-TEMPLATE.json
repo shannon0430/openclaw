@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "status": "example_only_missing_final_evidence_refused",
+  "finalOpenclawSourceCommit": null,
+  "cuaSourceCommit": "891efae2cc01a38260a303b0329785e5c4d7b03c",
+  "finalDllSha256": "601adefd44cc982dd4a1ff2e80dae8b056b971f830521d7e6acbb7dde8420f94",
+  "officialAddonSha256": "93f220e8a5cbf25aff23321f20a868368a204f1026b8dce45c5a4f84290de09f",
+  "proposalManifestSha256": null,
+  "publicSourceLicenseOnlyOwnerReviewed": false,
+  "openclawTar": {"path": null, "sha256": null},
+  "sourceSdkTar": {"path": null, "sha256": null},
+  "nativeTar": {"path": null, "sha256": null},
+  "nativeQaReceipt": {"path": null, "sha256": null},
+  "officialAddonProvenanceReceipt": {"path": null, "sha256": null},
+  "sourceSdkBuildReceipt": {"path": null, "sha256": null},
+  "sourceRebakeReceipt": {"path": null, "sha256": null},
+  "eligibility": null
+}
