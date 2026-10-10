@@ -30,6 +30,7 @@ import {
   verifyGeneration,
   type CuaFrameState,
 } from "./frame.js";
+import { keyboardFocusWitnessDetails } from "./keyboard-focus-witness.js";
 import { handleRecordingAct } from "./recording-actions.js";
 
 const CUA_WIRE_ACTION_NAMES = COMPUTER_USE_V2_ACTION_NAMES.slice(1, 14);
@@ -206,7 +207,13 @@ async function handleTargetedAct(
   }
 
   const result = await callWindowTool(driver, state, tool, args, signal);
-  return JSON.stringify(actionEnvelope(result));
+  const witnessDetails = keyboardFocusWitnessDetails(result, {
+    platform,
+    action: params.action,
+    deliveryMode: params.deliveryMode,
+    ...(element ? { element } : {}),
+  });
+  return JSON.stringify(actionEnvelope(result, witnessDetails));
 }
 
 export type { CuaComputerActParams } from "./action-targets.js";

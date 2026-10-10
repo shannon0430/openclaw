@@ -1,0 +1,122 @@
+name: Issue344 exact OpenClaw9.6 adapter QA
+
+on:
+  push:
+    branches: [source/issue344-adapter-qa-20261010]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: issue344-adapter-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  adapter:
+    if: github.repository == 'shannon0430/openclaw' && github.ref == 'refs/heads/source/issue344-adapter-qa-20261010'
+    runs-on: windows-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Select exact LF checkout bytes
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+          git config --global core.longpaths true
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1; exact base CI pin
+        with:
+          fetch-depth: 16
+          persist-credentials: false
+      - name: Verify exact reviewed source and bounded scope
+        run: |
+          git config core.autocrlf false
+          git config core.eol lf
+          git checkout-index --force --all
+          if ($LASTEXITCODE -ne 0) { throw "source_rematerialization_failed" }
+          New-Item -ItemType Directory -Path .artifacts/issue344-adapter-qa -Force | Out-Null
+          @'
+          const fs = require('node:fs');
+          const cp = require('node:child_process');
+          const crypto = require('node:crypto');
+          const m = JSON.parse(fs.readFileSync('.github/issue344-adapter-qa-manifest.json', 'utf8'));
+          if (m.schemaVersion !== 1 || m.baseCommit !== 'eb377ac59e6c9fd6c7705028034812becf00271b' || m.reviewStatus !== 'approved_for_isolated_source_qa') throw Error('manifest_not_final_reviewed');
+          cp.execFileSync('git', ['merge-base', '--is-ancestor', m.baseCommit, 'HEAD']);
+          const head=cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          if(head!==process.env.GITHUB_SHA)throw Error('checkout_head_mismatch');
+          if (!Array.isArray(m.files) || !m.files.length || m.expectedWitnessTestCount!==30) throw Error('manifest_scope_invalid');
+          if(new Set(m.files.map(x=>x.path)).size!==m.files.length)throw Error('duplicate_manifest_file');
+          for (const x of m.files) {
+            if (!/^extensions\/cua-computer\/(?:src\/[A-Za-z0-9_.-]+\.ts|index\.test\.ts)$/.test(x.path) || !/^[a-f0-9]{64}$/.test(x.sha256)) throw Error('manifest_file_invalid');
+            const actual = crypto.createHash('sha256').update(fs.readFileSync(x.path)).digest('hex');
+            if (actual !== x.sha256) throw Error(`source_hash_mismatch:${x.path}:${actual}`);
+          }
+          const changed = cp.execFileSync('git', ['diff', '--name-only', m.baseCommit, 'HEAD'], {encoding:'utf8'}).trim().split('\n').filter(Boolean).sort();
+          const allowed=[...m.files.map(x=>x.path),'.github/workflows/issue344-adapter-qa.yml','.github/issue344-adapter-qa-manifest.json'].sort();
+          if (JSON.stringify(changed) !== JSON.stringify(allowed)) throw Error('changed_scope_mismatch');
+          fs.writeFileSync('.artifacts/issue344-adapter-qa/source-provenance.json', JSON.stringify({head,base:m.baseCommit,files:m.files,changed,scope:'source tests and build only; no live OS input or activation'},null,2));
+          '@ | node
+          if ($LASTEXITCODE -ne 0) { throw "source_provenance_failed" }
+      - name: Restore exact repository toolchain and locked dependencies
+        uses: ./.github/actions/setup-node-env
+        with:
+          node-version: "24.19.0"
+          install-bun: "false"
+          install-deps: "true"
+          frozen-lockfile: "true"
+          cache-mode: "off"
+      - name: Verify exact live Node and source package manager
+        run: |
+          @'
+          const fs=require('node:fs');const cp=require('node:child_process');
+          const p=JSON.parse(fs.readFileSync('package.json','utf8'));
+          if(process.versions.node!=='24.19.0'||!p.packageManager.startsWith('pnpm@12.4.0+'))throw Error('toolchain_mismatch');
+          const pnpm=cp.execFileSync('pnpm.cmd',['--version'],{encoding:'utf8',shell:true}).trim();
+          if(pnpm!=='12.4.0')throw Error('pnpm_version_mismatch');
+          fs.writeFileSync('.artifacts/issue344-adapter-qa/toolchain.json',JSON.stringify({node:process.version,pnpm,packageManager:p.packageManager,platform:process.platform,arch:process.arch},null,2));
+          '@ | node
+          if ($LASTEXITCODE -ne 0) { throw "toolchain_verification_failed" }
+      - name: Exercise real registered provider and result projection contracts
+        run: |
+          $testReport = Join-Path $PWD '.artifacts/issue344-adapter-qa/tests.json'
+          pnpm test extensions/cua-computer/src/keyboard-focus-witness.test.ts extensions/cua-computer/src/driver-result.test.ts extensions/cua-computer/index.test.ts extensions/cua-computer/src/actions.test.ts -- --reporter=json ("--outputFile=" + $testReport)
+          if ($LASTEXITCODE -ne 0) { throw "adapter_contract_tests_failed" }
+      - name: Require all new boundary assertions to execute
+        run: |
+          @'
+          const fs=require('node:fs');
+          const m=JSON.parse(fs.readFileSync('.github/issue344-adapter-qa-manifest.json','utf8'));
+          const r=JSON.parse(fs.readFileSync('.artifacts/issue344-adapter-qa/tests.json','utf8'));
+          const witness=(r.testResults??[]).filter(x=>String(x.name).replaceAll('\\','/').endsWith('/extensions/cua-computer/src/keyboard-focus-witness.test.ts'));
+          if(r.success!==true||r.numFailedTests!==0||witness.length!==1||witness[0].assertionResults?.length!==m.expectedWitnessTestCount||witness[0].assertionResults.some(x=>x.status!=='passed'))throw Error('witness_assertions_missing_or_failed');
+          fs.writeFileSync('.artifacts/issue344-adapter-qa/test-verification.json',JSON.stringify({newWitnessTestsPassed:witness[0].assertionResults.length,totalSelectedTestsPassed:r.numPassedTests,failed:r.numFailedTests,scope:'registered provider/resolver/result boundary with injected fake native transport, not Windows GUI effects'},null,2));
+          '@ | node
+          if ($LASTEXITCODE -ne 0) { throw "test_execution_guard_failed" }
+      - name: Check formatting of changed production and boundary tests
+        run: |
+          pnpm format:check extensions/cua-computer/src/window-actions.ts extensions/cua-computer/src/keyboard-focus-witness.ts extensions/cua-computer/src/keyboard-focus-witness.test.ts 2>&1 | Tee-Object -FilePath .artifacts/issue344-adapter-qa/source-format.log
+          if ($LASTEXITCODE -ne 0) { throw "changed_source_format_failed" }
+      - name: Typecheck production plugin boundary
+        run: |
+          pnpm tsgo:extensions 2>&1 | Tee-Object -FilePath .artifacts/issue344-adapter-qa/production-types.log
+          if ($LASTEXITCODE -ne 0) { throw "extension_production_types_failed" }
+      - name: Typecheck repository plugin tests
+        run: |
+          pnpm tsgo:extensions:test 2>&1 | Tee-Object -FilePath .artifacts/issue344-adapter-qa/test-types.log
+          if ($LASTEXITCODE -ne 0) { throw "extension_test_types_failed" }
+      - name: Regenerate runtime plugin artifacts through repository owner
+        run: |
+          pnpm build qaRuntime 2>&1 | Tee-Object -FilePath .artifacts/issue344-adapter-qa/runtime-build.log
+          if ($LASTEXITCODE -ne 0) { throw "runtime_build_failed" }
+      - name: Retain bounded source QA evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7; exact base CI pin
+        with:
+          name: issue344-adapter-source-qa-${{ github.sha }}
+          path: |
+            .artifacts/issue344-adapter-qa
+            .github/issue344-adapter-qa-manifest.json
+            dist/extensions/cua-computer
+          if-no-files-found: error
+          retention-days: 7
