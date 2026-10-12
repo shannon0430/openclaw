@@ -1,4 +1,7 @@
+import { registerComputerUseProvider } from "openclaw/plugin-sdk/computer-use";
+import type { OpenClawPluginNodeHostCommand } from "openclaw/plugin-sdk/plugin-entry";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createCuaComputerProvider } from "./commands.js";
 import { execution } from "./commands.test-helpers.js";
 import {
   CUA_DRIVER_CONTRACT_FIXTURES,
@@ -45,6 +48,8 @@ const mocks = vi.hoisted(() => ({
   scroll: vi.fn(async () => ({})),
   startSession: vi.fn(async () => ({})),
   shutdown: vi.fn(async () => {}),
+  destroy: vi.fn(),
+  isDriverError: vi.fn((_error: unknown) => false),
   typeText: vi.fn(async () => ({})),
 }));
 
@@ -54,7 +59,7 @@ const sdk = {
   ClickButton: { Left: 0, Right: 1, Middle: 2 },
   CuaDriver: { create: mocks.create, createConfigured: mocks.createConfigured },
   EscalationReason: { Other: "other" },
-  DriverError: { Tool: { instanceOf: mocks.isToolError } },
+  DriverError: { instanceOf: mocks.isDriverError, Tool: { instanceOf: mocks.isToolError } },
   InputDeliveryMode: { Foreground: 1 },
   ScrollBy: { Line: 0 },
   ScrollDirection: { Up: 0, Down: 1, Left: 2, Right: 3 },
@@ -81,9 +86,11 @@ describe("CUA Driver direct session", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.isToolError.mockReturnValue(false);
+    mocks.isDriverError.mockReturnValue(false);
     mocks.createConfigured.mockReturnValue({
       isAvailable: mocks.isAvailable,
       shutdown: mocks.shutdown,
+      uniffiDestroy: mocks.destroy,
     });
     mocks.createTrustedSession.mockReturnValue({
       callTool: mocks.callTool,
@@ -284,6 +291,164 @@ describe("CUA Driver direct session", () => {
       await driver.dispose();
     }
   });
+
+  it.each(["session_start", "operation"] as const)(
+    "reports the native %s failure through standard window discovery without exposing inner content",
+    async (phase) => {
+      const { DriverError } = await import("@trycua/cua-driver");
+      const failure = DriverError.Tool.new({
+        tool: "fixture-private-tool",
+        message: "fixture-sensitive-message",
+        errorCode: "session_unavailable",
+      });
+      mocks.isDriverError.mockImplementation((error) => DriverError.instanceOf(error));
+      mocks.isToolError.mockImplementation((error) => DriverError.Tool.instanceOf(error));
+      (phase === "session_start" ? mocks.startSession : mocks.callTool).mockRejectedValueOnce(
+        failure,
+      );
+      const computer = await execution(createCuaDriver({ loadSdk: () => sdk as never }));
+      try {
+        const result = await computer
+          .act('{"action":"list_windows"}')
+          .catch((error: unknown) => error);
+        expect(result).toMatchObject({
+          message: `COMPUTER_DRIVER_ERROR: phase=${phase} nativeKind=Tool nativeCode=session_unavailable`,
+          cause: failure,
+        });
+        expect(String(result)).not.toContain("fixture-private");
+        expect(String(result)).not.toContain("fixture-sensitive");
+        expect(mocks.callTool).toHaveBeenCalledTimes(phase === "session_start" ? 0 : 1);
+      } finally {
+        await computer.close("completion");
+      }
+    },
+  );
+
+  it("does not copy arbitrary SDK error codes into a public failure", async () => {
+    const { DriverError } = await import("@trycua/cua-driver");
+    const failure = DriverError.Tool.new({
+      tool: "fixture-private-tool",
+      message: "fixture-sensitive-message",
+      errorCode: "fixture-sensitive-code",
+    });
+    mocks.isDriverError.mockImplementation((error) => DriverError.instanceOf(error));
+    mocks.isToolError.mockImplementation((error) => DriverError.Tool.instanceOf(error));
+    mocks.callTool.mockRejectedValueOnce(failure);
+    const computer = await execution(createCuaDriver({ loadSdk: () => sdk as never }));
+    try {
+      await expect(computer.act('{"action":"list_windows"}')).rejects.toThrow(
+        "COMPUTER_DRIVER_ERROR: phase=operation nativeKind=Tool nativeCode=unclassified",
+      );
+    } finally {
+      await computer.close("completion");
+    }
+  });
+
+  it.each([null, undefined, "fixture-non-sdk-rejection"])(
+    "preserves non-SDK rejection identity (%s) through standard window discovery",
+    async (failure) => {
+      const { DriverError } = await import("@trycua/cua-driver");
+      mocks.isDriverError.mockImplementation((error) => DriverError.instanceOf(error));
+      mocks.callTool.mockRejectedValueOnce(failure);
+      const computer = await execution(createCuaDriver({ loadSdk: () => sdk as never }));
+      try {
+        await expect(computer.act('{"action":"list_windows"}')).rejects.toBe(failure);
+        expect(mocks.isDriverError).not.toHaveBeenCalled();
+      } finally {
+        await computer.close("completion");
+      }
+    },
+  );
+
+  it("distinguishes a retained physical-close failure from a new action through the registered command", async () => {
+    const { DriverError } = await import("@trycua/cua-driver");
+    const failure = DriverError.Tool.new({
+      tool: "fixture-private-tool",
+      message: "fixture-sensitive-message",
+      errorCode: "session_unavailable",
+    });
+    mocks.isDriverError.mockImplementation((error) => DriverError.instanceOf(error));
+    mocks.isToolError.mockImplementation((error) => DriverError.Tool.instanceOf(error));
+    const commands: OpenClawPluginNodeHostCommand[] = [];
+    registerComputerUseProvider(
+      { registerNodeHostCommand: (command) => commands.push(command) },
+      createCuaComputerProvider({
+        platform: "win32",
+        env: {},
+        driver: createCuaDriver({ loadSdk: () => sdk as never }),
+      }),
+    );
+    const command = commands.find((entry) => entry.command === "computer.act")!;
+    const firstId = "00000000-0000-4000-8000-000000000001";
+    mocks.callTool.mockResolvedValueOnce(cuaToolResult(CUA_DRIVER_CONTRACT_FIXTURES.listWindows));
+    await command.handle(JSON.stringify({ action: "list_windows", executionId: firstId }));
+    mocks.endSession.mockRejectedValueOnce(failure);
+    const closeError = await command
+      .handle(
+        JSON.stringify({
+          action: "__close_execution",
+          executionId: firstId,
+          reason: "completion",
+        }),
+      )
+      .catch((error: unknown) => error);
+    expect(closeError).toMatchObject({
+      message:
+        "COMPUTER_DRIVER_ERROR: phase=session_end nativeKind=Tool nativeCode=session_unavailable",
+      cause: failure,
+    });
+    await expect(
+      command.handle(
+        JSON.stringify({
+          action: "list_windows",
+          executionId: "00000000-0000-4000-8000-000000000002",
+        }),
+      ),
+    ).rejects.toBe(closeError);
+    expect(command.hasActiveWork?.()).toBe(true);
+    expect(mocks.startSession).toHaveBeenCalledOnce();
+    expect(mocks.callTool).toHaveBeenCalledOnce();
+    expect(mocks.endSession).toHaveBeenCalledOnce();
+    expect(mocks.close).toHaveBeenCalledOnce();
+    expect(mocks.shutdown).toHaveBeenCalledOnce();
+  });
+
+  it.each([
+    ["session_end", "endSession"],
+    ["session_close", "close"],
+    ["shutdown", "shutdown"],
+    ["destroy", "destroy"],
+  ] as const)(
+    "retains the native %s cleanup phase and still settles later cleanup",
+    async (phase, method) => {
+      const { DriverError } = await import("@trycua/cua-driver");
+      const failure = DriverError.Tool.new({
+        tool: "fixture-private-tool",
+        message: "fixture-sensitive-message",
+        errorCode: "session_unavailable",
+      });
+      if (!(failure instanceof Error)) {
+        throw new Error("SDK fixture must extend Error");
+      }
+      const nativeError: Error = failure;
+      mocks.isDriverError.mockImplementation((error) => DriverError.instanceOf(error));
+      mocks.isToolError.mockImplementation((error) => DriverError.Tool.instanceOf(error));
+      const computer = await execution(createCuaDriver({ loadSdk: () => sdk as never }));
+      mocks.callTool.mockResolvedValueOnce(cuaToolResult(CUA_DRIVER_CONTRACT_FIXTURES.listWindows));
+      await computer.act('{"action":"list_windows"}');
+      mocks[method].mockImplementationOnce(() => {
+        throw nativeError;
+      });
+      await expect(computer.close("completion")).rejects.toThrow(
+        `COMPUTER_DRIVER_ERROR: phase=${phase} nativeKind=Tool nativeCode=session_unavailable`,
+      );
+      await expect(computer.close("completion")).rejects.toThrow(`phase=${phase}`);
+      expect(mocks.endSession).toHaveBeenCalledOnce();
+      expect(mocks.close).toHaveBeenCalledOnce();
+      expect(mocks.shutdown).toHaveBeenCalledOnce();
+      expect(mocks.destroy).toHaveBeenCalledOnce();
+    },
+  );
 
   it("keeps a missing native desktop library behind command availability", async () => {
     const loadSdk = vi.fn(() => {

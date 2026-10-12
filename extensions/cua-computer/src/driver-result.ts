@@ -19,6 +19,7 @@ import {
   issueElementRef,
   issueObservation,
   issueWindowRef,
+  resolveWindowRef,
   type CuaFrameState,
 } from "./frame.js";
 
@@ -305,6 +306,7 @@ export function projectWindows(
   return {
     windows: bounded.items.map((window) => ({
       windowRef: issueWindowRef(state, { pid: window.pid!, windowId: window.window_id }),
+      pid: window.pid,
       ...(window.app_name ? { appName: window.app_name } : {}),
       ...(window.title ? { title: window.title } : {}),
       bounds: window.bounds,
@@ -384,6 +386,13 @@ export function windowObservation(
   options: { fromZoom?: boolean } = {},
 ): ComputerActResult {
   const structured = projectedToolDetails(result, options.fromZoom ? "zoom" : "get_window_state");
+  const window = resolveWindowRef(state, windowRef);
+  if (
+    (structured.pid !== undefined && structured.pid !== null && structured.pid !== window.pid) ||
+    (structured.window_id !== undefined && structured.window_id !== window.windowId)
+  ) {
+    throw new Error("COMPUTER_DRIVER_ERROR: window observation target does not match windowRef");
+  }
   const observation = issueObservation(state, windowRef, options);
   const snapshotId =
     typeof structured.snapshot_id === "string" ? structured.snapshot_id : undefined;
@@ -416,6 +425,8 @@ export function windowObservation(
     ];
   });
   const details: Record<string, unknown> = {
+    windowRef,
+    pid: window.pid,
     coordinateSpace: "image-pixels",
     ...(typeof structured.total_element_count === "number"
       ? { totalElementCount: structured.total_element_count }
