@@ -77,6 +77,27 @@ function asyncOptions(signal?: AbortSignal) {
   return signal ? { signal } : undefined;
 }
 
+// SDK Tool errors carry arbitrary strings, including application content. Keep
+// only known lifecycle codes in the public diagnostic; retain the original error
+// as the private cause rather than copying its message, tool, or arguments.
+const DRIVER_LIFECYCLE_CODES = new Set([
+  "invalid_capture_scope",
+  "session_policy_conflict",
+  "session_unavailable",
+  "session_ended",
+  "session_required",
+  "session_not_started",
+  "transport_lease_required",
+]);
+
+type DriverPhase =
+  | "session_start"
+  | "operation"
+  | "session_end"
+  | "session_close"
+  | "shutdown"
+  | "destroy";
+
 class DirectCuaDriverSession {
   private readonly runtime: CuaDriverLike;
   private readonly session: CuaDriverSessionLike;
@@ -119,11 +140,11 @@ class DirectCuaDriverSession {
       throw new Error("COMPUTER_DRIVER_UNAVAILABLE: cua-computer is stopping");
     }
     if (!this.startPromise) {
-      const start = this.session
-        .startSession({ session: this.publicSession }, asyncOptions(signal))
-        .then(() => {
-          this.started = true;
-        });
+      const start = this.nativeOperation("session_start", () =>
+        this.session.startSession({ session: this.publicSession }, asyncOptions(signal)),
+      ).then(() => {
+        this.started = true;
+      });
       this.startPromise = start;
       try {
         await start;
@@ -143,7 +164,33 @@ class DirectCuaDriverSession {
     operation: () => Promise<T>,
   ): Promise<T> {
     await this.ensureSessionStarted(signal);
-    return await operation();
+    return await this.nativeOperation("operation", operation);
+  }
+
+  private async nativeOperation<T>(
+    phase: DriverPhase,
+    operation: () => T | Promise<T>,
+  ): Promise<T> {
+    try {
+      return await operation();
+    } catch (error) {
+      if (
+        error === null ||
+        (typeof error !== "object" && typeof error !== "function") ||
+        !this.sdk.DriverError.instanceOf(error)
+      ) {
+        throw error;
+      }
+      const nativeCode = this.sdk.DriverError.Tool.instanceOf(error)
+        ? DRIVER_LIFECYCLE_CODES.has(error.inner.errorCode)
+          ? error.inner.errorCode
+          : "unclassified"
+        : undefined;
+      throw new Error(
+        `COMPUTER_DRIVER_ERROR: phase=${phase} nativeKind=${error.tag}${nativeCode ? ` nativeCode=${nativeCode}` : ""}`,
+        { cause: error },
+      );
+    }
   }
 
   isAvailable(): boolean {
@@ -165,10 +212,8 @@ class DirectCuaDriverSession {
     );
   }
   async getSessionState(signal?: AbortSignal) {
-    await this.ensureSessionStarted(signal);
-    return await this.session.getSessionState(
-      { session: this.publicSession },
-      asyncOptions(signal),
+    return await this.invoke(signal, () =>
+      this.session.getSessionState({ session: this.publicSession }, asyncOptions(signal)),
     );
   }
   async getDesktopState(signal?: AbortSignal) {
@@ -263,23 +308,27 @@ class DirectCuaDriverSession {
     }
     if (this.started) {
       try {
-        await this.session.endSession({ session: this.publicSession });
+        await this.nativeOperation("session_end", () =>
+          this.session.endSession({ session: this.publicSession }),
+        );
       } catch (error) {
         failure ??= error;
       }
     }
     try {
-      this.session.close();
+      await this.nativeOperation("session_close", () => this.session.close());
     } catch (error) {
       failure ??= error;
     }
     try {
-      await this.runtime.shutdown();
+      await this.nativeOperation("shutdown", () => this.runtime.shutdown());
     } catch (error) {
       failure ??= error;
     }
     try {
-      (this.runtime as CuaDriverLike & { uniffiDestroy?: () => void }).uniffiDestroy?.();
+      await this.nativeOperation("destroy", () =>
+        (this.runtime as CuaDriverLike & { uniffiDestroy?: () => void }).uniffiDestroy?.(),
+      );
     } catch (error) {
       failure ??= error;
     }

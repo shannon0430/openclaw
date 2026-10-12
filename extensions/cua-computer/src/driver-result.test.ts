@@ -5,6 +5,7 @@ import {
 } from "./cua-driver-contract.test-fixtures.js";
 import type { CuaToolResult } from "./driver-client.js";
 import { browserObservation, windowObservation } from "./driver-result.js";
+import { issueWindowRef } from "./frame.js";
 
 const observations = [
   { kind: "window", mimeType: "image/png", fields: CUA_DRIVER_CONTRACT_FIXTURES.windowState },
@@ -20,7 +21,7 @@ function project(kind: (typeof observations)[number]["kind"], result: CuaToolRes
         targetId: CUA_DRIVER_CONTRACT_FIXTURES.browserSnapshot.target_id,
         tabId: CUA_DRIVER_CONTRACT_FIXTURES.browserSnapshot.tab_id,
       })
-    : windowObservation(result, state, "test-window");
+    : windowObservation(result, state, issueWindowRef(state, { pid: 4242, windowId: 99 }));
 }
 
 describe.each(observations)("CUA $kind observation images", ({ kind, mimeType, fields }) => {
