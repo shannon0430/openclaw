@@ -4,7 +4,7 @@ import {
   cuaToolResult,
 } from "./cua-driver-contract.test-fixtures.js";
 import type { CuaToolResult } from "./driver-client.js";
-import { browserObservation, windowObservation } from "./driver-result.js";
+import { actionEnvelope, browserObservation, windowObservation } from "./driver-result.js";
 import { issueWindowRef } from "./frame.js";
 
 const observations = [
@@ -37,4 +37,148 @@ describe.each(observations)("CUA $kind observation images", ({ kind, mimeType, f
     result.images = [{ mimeType, dataBase64: "invalid base64!" }];
     expect(() => project(kind, result)).toThrow("COMPUTER_DRIVER_ERROR");
   });
+});
+
+describe("CUA native action verification scope", () => {
+  it("keeps confirmed control readback distinct from application commit and persistence", () => {
+    const native = cuaToolResult(
+      {},
+      {
+        action: {
+          ...CUA_DRIVER_CONTRACT_FIXTURES.confirmedBackgroundAction,
+          evidence: [
+            {
+              kind: 0,
+              target: "fixture-private-native-control",
+              value: "fixture-private-native-value",
+            },
+          ],
+        } as unknown as CuaToolResult["action"],
+      },
+    );
+
+    const result = actionEnvelope(native);
+
+    expect(result).toEqual({
+      ok: true,
+      effect: "confirmed",
+      details: {
+        route: "accessibility",
+        deliveryMode: "background",
+        deliveredCount: 1,
+        evidence: ["value_readback"],
+        nativeActionVerification: {
+          scope: "native_action",
+          valueReadbackScope: "control_property",
+        },
+        applicationOutcome: { commit: "not_evaluated", persistence: "not_evaluated" },
+      },
+    });
+    expect(JSON.stringify(result)).not.toContain("fixture-private-native");
+  });
+
+  it("does not call a confirmed window change a control-property readback", () => {
+    const result = actionEnvelope(
+      cuaToolResult(
+        {},
+        {
+          action: {
+            ...CUA_DRIVER_CONTRACT_FIXTURES.confirmedBackgroundAction,
+            evidence: [{ kind: 1 }],
+          } as unknown as CuaToolResult["action"],
+        },
+      ),
+    );
+
+    expect(result.effect).toBe("confirmed");
+    expect(result.details).toMatchObject({ evidence: ["window_change"] });
+    expect(result.details?.nativeActionVerification).toEqual({ scope: "native_action" });
+    expect(result.details?.applicationOutcome).toEqual({
+      commit: "not_evaluated",
+      persistence: "not_evaluated",
+    });
+  });
+
+  it.each([
+    { nativeEffect: 1, effect: "unverifiable", partial: true },
+    { nativeEffect: 2, effect: "unverifiable", partial: false },
+    { nativeEffect: 3, effect: "suspected_noop", partial: false },
+  ])(
+    "does not promote native effect $nativeEffect to an application verdict",
+    ({ nativeEffect, effect, partial }) => {
+      const result = actionEnvelope(
+        cuaToolResult(
+          {},
+          {
+            action: {
+              effect: nativeEffect,
+              route: 1,
+              delivery: { mode: 0, deliveredCount: 0 },
+            } as unknown as CuaToolResult["action"],
+          },
+        ),
+      );
+
+      expect(result).toMatchObject({
+        ok: true,
+        effect,
+        details: { route: "synthetic_events", deliveryMode: "background", deliveredCount: 0 },
+      });
+      expect(result.details?.nativeActionVerification).toEqual({ scope: "native_action" });
+      expect(result.details?.applicationOutcome).toEqual({
+        commit: "not_evaluated",
+        persistence: "not_evaluated",
+      });
+      expect(result.details).not.toHaveProperty("evidence");
+      if (partial) {
+        expect(result.details).toHaveProperty("partial", true);
+      } else {
+        expect(result.details).not.toHaveProperty("partial");
+      }
+    },
+  );
+
+  it("does not invent native certainty when action metadata is absent", () => {
+    expect(actionEnvelope(cuaToolResult({}))).toEqual({
+      ok: true,
+      details: { applicationOutcome: { commit: "not_evaluated", persistence: "not_evaluated" } },
+    });
+  });
+
+  it.each([true, false])(
+    "keeps reserved verification fields honest with native metadata=%s",
+    (hasNativeAction) => {
+      const result = actionEnvelope(
+        cuaToolResult(
+          {},
+          {
+            action: hasNativeAction
+              ? (CUA_DRIVER_CONTRACT_FIXTURES.confirmedBackgroundAction as unknown as CuaToolResult["action"])
+              : undefined,
+          },
+        ),
+        {
+          coordinateSpace: "image-pixels",
+          nativeActionVerification: { scope: "application", valueReadbackScope: "persisted_cell" },
+          applicationOutcome: { commit: "confirmed", persistence: "confirmed" },
+        },
+      );
+
+      expect(result.details).toHaveProperty("coordinateSpace", "image-pixels");
+      if (hasNativeAction) {
+        expect(result.details?.nativeActionVerification).toEqual({
+          scope: "native_action",
+          valueReadbackScope: "control_property",
+        });
+        expect(result.effect).toBe("confirmed");
+      } else {
+        expect(result.details).not.toHaveProperty("nativeActionVerification");
+        expect(result).not.toHaveProperty("effect");
+      }
+      expect(result.details?.applicationOutcome).toEqual({
+        commit: "not_evaluated",
+        persistence: "not_evaluated",
+      });
+    },
+  );
 });

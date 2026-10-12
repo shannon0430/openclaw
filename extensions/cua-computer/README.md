@@ -20,6 +20,14 @@ effect proof; it does not by itself mean delivery failed. If the returned screen
 and the diagnostic disagree, preserve both facts and inspect the same action's
 outcome before any further input. Do not blindly repeat a commit or text insertion.
 
+Action-envelope results expose `details.nativeActionVerification.scope` as
+`native_action` when native action metadata exists; value-readback evidence adds
+`valueReadbackScope: "control_property"`. `details.applicationOutcome.commit` and
+`.persistence` are `not_evaluated`: this provider has not evaluated application
+commit or saved-artifact state, not declared either one failed. These annotations
+reach model-visible result JSON and do not replace independent same-job
+readback/save/reopen verification.
+
 The optional `mode` (`insert_text` or `keystrokes`) is forwarded only for
 `browser_type`. Normal desktop `type`, including Excel, does not forward it or
 select a native typing implementation with it. Diagnose desktop edits from the

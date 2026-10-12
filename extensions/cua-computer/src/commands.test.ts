@@ -336,6 +336,11 @@ describe("cua-computer provider", () => {
           deliveryMode: "background",
           deliveredCount: 1,
           evidence: ["value_readback"],
+          nativeActionVerification: {
+            scope: "native_action",
+            valueReadbackScope: "control_property",
+          },
+          applicationOutcome: { commit: "not_evaluated", persistence: "not_evaluated" },
         },
       });
       expect(callTool).toHaveBeenLastCalledWith(
@@ -350,6 +355,7 @@ describe("cua-computer provider", () => {
         },
         undefined,
       );
+      expect(callTool).toHaveBeenCalledTimes(3);
     },
   );
 
@@ -661,7 +667,10 @@ describe("cua-computer provider", () => {
 
       expect(launched).toMatchObject({
         ok: true,
-        details: { app: [{ name: app.name, running: true }] },
+        details: {
+          app: [{ name: app.name, running: true }],
+          applicationOutcome: { commit: "not_evaluated", persistence: "not_evaluated" },
+        },
       });
       expect(callTool).toHaveBeenLastCalledWith("launch_app", expected, undefined);
     } finally {
@@ -740,12 +749,31 @@ describe("cua-computer provider", () => {
         delete actionInput.x;
         delete actionInput.y;
       }
-      await computer.act(JSON.stringify(actionInput));
-      expect(callTool).toHaveBeenCalledWith(
+      const callsBefore = callTool.mock.calls.length;
+      const acted = JSON.parse(await computer.act(JSON.stringify(actionInput)));
+      expect(callTool).toHaveBeenCalledTimes(callsBefore + 1);
+      expect(callTool).toHaveBeenLastCalledWith(
         tool,
         expect.objectContaining({ pid: 4242, window_id: 99, ...expected }),
         undefined,
       );
+      if (action === "type" || action === "key") {
+        expect(acted).toMatchObject({
+          ok: true,
+          effect: "confirmed",
+          details: {
+            route: "accessibility",
+            deliveryMode: "background",
+            deliveredCount: 1,
+            evidence: ["value_readback"],
+            nativeActionVerification: {
+              scope: "native_action",
+              valueReadbackScope: "control_property",
+            },
+            applicationOutcome: { commit: "not_evaluated", persistence: "not_evaluated" },
+          },
+        });
+      }
     }
   });
 

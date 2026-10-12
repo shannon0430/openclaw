@@ -328,13 +328,12 @@ export async function handleWindowAct(
         signal,
       );
       const structured = projectedToolDetails(result, "launch_app");
-      return JSON.stringify({
-        ...actionEnvelope(result),
-        details: {
+      return JSON.stringify(
+        actionEnvelope(result, {
           app: projectApps(state, [structured]).apps,
           ...projectWindows(state, nativeWindows(structured.windows)),
-        },
-      });
+        }),
+      );
     }
     case "kill_app": {
       verifyGeneration(state, driver.generation);

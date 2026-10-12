@@ -214,11 +214,29 @@ export function actionEnvelope(
   const effect = driverEffect(result);
   const escalation = driverEscalation(result);
   const driverDetails = driverActionDetails(result);
+  const projectedDetails: Record<string, unknown> = {
+    ...driverDetails,
+    ...details,
+    applicationOutcome: {
+      commit: "not_evaluated",
+      persistence: "not_evaluated",
+    },
+  };
+  // Only native action metadata may supply this verification scope.
+  delete projectedDetails.nativeActionVerification;
+  if (result.action) {
+    projectedDetails.nativeActionVerification = {
+      scope: "native_action",
+      ...(result.action.evidence?.some(({ kind }) => kind === VALUE_READBACK_EVIDENCE)
+        ? { valueReadbackScope: "control_property" }
+        : {}),
+    };
+  }
   return {
     ok: true,
     ...(effect ? { effect } : {}),
     ...(escalation ? { escalation } : {}),
-    ...(driverDetails || details ? { details: { ...driverDetails, ...details } } : {}),
+    details: projectedDetails,
   };
 }
 

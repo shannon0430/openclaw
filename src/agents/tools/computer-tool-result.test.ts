@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { getImageMetadata } from "../../media/image-ops.js";
 import { createSolidPngBuffer } from "../../plugin-sdk/test-helpers/image-fixtures.js";
-import { projectScreenshotResult } from "./computer-tool-result.js";
+import { parseComputerActResult } from "../../plugins/computer-use-contract.js";
+import { projectComputerActResult, projectScreenshotResult } from "./computer-tool-result.js";
 
 describe("computer screenshot dimensions", () => {
   it.each([
@@ -40,6 +41,47 @@ describe("computer screenshot dimensions", () => {
         type: "text",
         text: expect.stringContaining(`screenshot ${deliveredWidth}x${deliveredHeight}`),
       });
+    },
+  );
+});
+
+describe("computer action verification scope", () => {
+  it.each(["confirmed", "unverifiable"] as const)(
+    "keeps %s native action scope separate from a successful follow-up observation",
+    async (effect) => {
+      const details = {
+        route: "accessibility",
+        nativeActionVerification: {
+          scope: "native_action",
+          ...(effect === "confirmed" ? { valueReadbackScope: "control_property" } : {}),
+        },
+        applicationOutcome: { commit: "not_evaluated", persistence: "not_evaluated" },
+        ...(effect === "confirmed" ? { evidence: ["value_readback"] } : {}),
+      };
+      const producer = parseComputerActResult({ ok: true, effect, details });
+      const followUp = parseComputerActResult({
+        ok: true,
+        details: { observedValue: "" },
+      });
+      const { result } = await projectComputerActResult({
+        result: followUp,
+        precedingAction: { action: "type", result: producer },
+        target: { host: "node", nodeId: "desktop-node", screenIndex: 0 },
+        action: "get_window_state",
+        referenceWidth: 1200,
+      });
+      const texts = result.content.flatMap((block) =>
+        block.type === "text" ? [JSON.parse(block.text) as Record<string, unknown>] : [],
+      );
+      expect(texts).toEqual([
+        { action: "type", ok: true, effect, details },
+        { action: "get_window_state", ok: true, details: { observedValue: "" } },
+      ]);
+      expect(result.details).toMatchObject({
+        result: producer,
+        followUpObservation: followUp,
+      });
+      expect(followUp).not.toHaveProperty("effect");
     },
   );
 });
