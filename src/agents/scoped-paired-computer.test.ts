@@ -1,5 +1,10 @@
+import { Value } from "typebox/value";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NodeInvokeParamsSchema } from "../../packages/gateway-protocol/src/schema/nodes.js";
+import { registerComputerUseProvider } from "../plugins/computer-use-registration.js";
+import type { OpenClawPluginNodeHostCommand } from "../plugins/types.node-host.js";
 import { createDeferredCore } from "../shared/deferred.js";
+import { createAgentCleanupScope, runAgentCleanupStep } from "./run-cleanup-timeout.js";
 import {
   isScopedPairedComputerTransport,
   prepareScopedPairedComputerTransport,
@@ -54,14 +59,167 @@ function createHarness() {
   return { node, registry, context, caller, options };
 }
 
+function connectProvider(closeError?: Error) {
+  const commands = new Map<string, OpenClawPluginNodeHostCommand>();
+  const events: Array<{ action: string; executionId: string }> = [];
+  const close = vi.fn(async (executionId: string) => {
+    events.push({ action: "close", executionId });
+    if (closeError) {
+      throw closeError;
+    }
+  });
+  const openExecution = vi.fn(async ({ executionId }: { executionId: string }) => {
+    events.push({ action: "open", executionId });
+    return {
+      snapshot: async () => JSON.stringify({ ok: true }),
+      act: async () => {
+        events.push({ action: "act", executionId });
+        return JSON.stringify({ ok: true });
+      },
+      close: async () => await close(executionId),
+    };
+  });
+  registerComputerUseProvider(
+    { registerNodeHostCommand: (command) => commands.set(command.command, command) },
+    {
+      id: "fixture",
+      label: "Fixture",
+      isAvailable: () => true,
+      capabilities: () => ({
+        contractVersion: 2,
+        provider: { id: "fixture", label: "Fixture", generation: "generation-1" },
+        actions: ["type"],
+        targets: ["screen"],
+        deliveryModes: ["foreground"],
+        observations: [],
+        features: { recording: false, agentCursor: false, multiDisplay: false },
+      }),
+      openExecution,
+    },
+  );
+  const dispatch = async ({ command, params }: { command: string; params: unknown }) => {
+    const registered = commands.get(command);
+    if (!registered) {
+      throw new Error(`Unexpected computer command: ${command}`);
+    }
+    return { payload: JSON.parse(await registered.handle(JSON.stringify(params))) as unknown };
+  };
+  mocks.callGateway.mockImplementation(async (_method, _options, params, request) => {
+    expect(Value.Check(NodeInvokeParamsSchema, params)).toBe(true);
+    request.dispatchAuthority.assertCurrent();
+    return await dispatch(params);
+  });
+  mocks.closeRequest.mockImplementation(async (request) => {
+    expect(Value.Check(NodeInvokeParamsSchema, request.params)).toBe(true);
+    request.assertDispatchCurrent();
+    return await dispatch(request.params);
+  });
+  return { openExecution, close, events };
+}
+
 beforeEach(() => {
   vi.resetAllMocks();
   mocks.pairingCurrent.mockReturnValue(true);
-  mocks.callGateway.mockResolvedValue({ payload: { ok: true } });
-  mocks.closeRequest.mockResolvedValue({ payload: { ok: true } });
+  mocks.callGateway.mockImplementation(async (_method, _options, params) => {
+    expect(Value.Check(NodeInvokeParamsSchema, params)).toBe(true);
+    return { payload: { ok: true } };
+  });
+  mocks.closeRequest.mockImplementation(async (request) => {
+    expect(Value.Check(NodeInvokeParamsSchema, request.params)).toBe(true);
+    return { payload: { ok: true } };
+  });
 });
 
 describe("scoped paired computer preparation", () => {
+  it("closes the exact provider execution between independent scoped acquisitions without foreign eviction", async () => {
+    const h = createHarness();
+    const provider = connectProvider();
+    const first = (await prepareScopedPairedComputerTransport(h.options))!;
+    const firstId = "00000000-0000-4000-8000-000000000001";
+    const secondId = "00000000-0000-4000-8000-000000000002";
+    const input = (executionId: string) => ({
+      nodeId: h.node.nodeId,
+      command: "computer.act" as const,
+      commandParams: { action: "type", text: "fixture", executionId },
+    });
+    const close = (executionId: string) => ({
+      ...input(executionId),
+      commandParams: { action: "__close_execution", executionId, reason: "completion" },
+    });
+    await first.invoke(input(firstId));
+
+    const second = (await prepareScopedPairedComputerTransport(h.options))!;
+    await expect(second.invoke(close(firstId))).rejects.toThrow("unowned execution");
+    await expect(second.invoke(input(secondId))).rejects.toThrow("COMPUTER_HOST_BUSY");
+    await second.invoke(close(secondId));
+    expect(provider.close).not.toHaveBeenCalled();
+    expect(provider.openExecution).toHaveBeenCalledOnce();
+
+    await first.invoke(close(firstId));
+    await first.invoke(close(firstId));
+    await expect(first.invoke(input(firstId))).rejects.toThrow("execution is closed");
+    // A new independent binding never reuses the failed acquisition.
+    const next = (await prepareScopedPairedComputerTransport(h.options))!;
+    await next.invoke(input(secondId));
+    await next.invoke(close(secondId));
+    expect(provider.events).toEqual([
+      { action: "open", executionId: firstId },
+      { action: "act", executionId: firstId },
+      { action: "close", executionId: firstId },
+      { action: "open", executionId: secondId },
+      { action: "act", executionId: secondId },
+      { action: "close", executionId: secondId },
+    ]);
+  });
+
+  it("records uncertain exact provider teardown without retrying or granting another execution", async () => {
+    const h = createHarness();
+    const failure = new Error("native exact execution close failed");
+    const provider = connectProvider(failure);
+    const transport = (await prepareScopedPairedComputerTransport(h.options))!;
+    const executionId = "00000000-0000-4000-8000-000000000001";
+    await transport.invoke({
+      nodeId: h.node.nodeId,
+      command: "computer.act",
+      commandParams: { action: "type", text: "fixture", executionId },
+    });
+    const scope = createAgentCleanupScope();
+    const log = { warn: vi.fn() };
+    const close = {
+      nodeId: h.node.nodeId,
+      command: "computer.act" as const,
+      commandParams: { action: "__close_execution", executionId, reason: "completion" },
+    };
+    await scope.run(async () => {
+      await runAgentCleanupStep({
+        runId: "run",
+        sessionId: "session",
+        step: "codex-dynamic-tool-cleanup",
+        log,
+        cleanup: async () => {
+          await transport.invoke(close);
+        },
+      });
+    });
+    expect(scope.outcome).toBe("uncertain");
+    expect(log.warn).toHaveBeenCalledWith(expect.stringContaining(failure.message));
+    await expect(transport.invoke(close)).rejects.toBe(failure);
+    expect(provider.close).toHaveBeenCalledExactlyOnceWith(executionId);
+    const next = (await prepareScopedPairedComputerTransport(h.options))!;
+    await expect(
+      next.invoke({
+        nodeId: h.node.nodeId,
+        command: "computer.act",
+        commandParams: {
+          action: "type",
+          text: "must not acquire",
+          executionId: "00000000-0000-4000-8000-000000000002",
+        },
+      }),
+    ).rejects.toBe(failure);
+    expect(provider.openExecution).toHaveBeenCalledOnce();
+  });
+
   it("issues only a host-bound singleton and never accepts a copied transport as provenance", async () => {
     const h = createHarness();
     const transport = await prepareScopedPairedComputerTransport(h.options);
@@ -83,6 +241,35 @@ describe("scoped paired computer preparation", () => {
       expect.objectContaining({ nodeId: h.node.nodeId, command: "screen.snapshot" }),
       expect.objectContaining({ requireAgentRuntimeIdentity: true }),
     );
+  });
+
+  it("gives independent unkeyed screenshots valid RPC keys and preserves an explicit action key", async () => {
+    const h = createHarness();
+    const transport = (await prepareScopedPairedComputerTransport(h.options))!;
+    const screenshot = {
+      nodeId: h.node.nodeId,
+      command: "screen.snapshot" as const,
+      commandParams: { executionId: "owned-execution", screenIndex: 0, format: "jpeg" },
+    };
+    await transport.invoke(screenshot);
+    await transport.invoke(screenshot);
+    const actionKey = "computer.act:v1:original-call";
+    const action = {
+      nodeId: h.node.nodeId,
+      command: "computer.act" as const,
+      commandParams: { executionId: "owned-execution", action: "key", keys: "Return" },
+      idempotencyKey: actionKey,
+    };
+    await transport.invoke(action);
+    await transport.invoke(action);
+    const requests = mocks.callGateway.mock.calls.map((call) => call[2]);
+    expect(requests).toHaveLength(4);
+    expect(requests[0].idempotencyKey).not.toBe(requests[1].idempotencyKey);
+    expect(requests.slice(2).map((request) => request.idempotencyKey)).toEqual([
+      actionKey,
+      actionKey,
+    ]);
+    expect(new Set(requests.map((request) => request.idempotencyKey)).size).toBe(3);
   });
 
   it.each([0, 2])("does not qualify %i eligible desktops", async (count) => {

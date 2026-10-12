@@ -294,6 +294,8 @@ describe("cua-computer provider", () => {
       };
       const windowRef = listed.details.windows[0]!.windowRef;
       expect(windowRef).toMatch(/^cua:v2:window:/);
+      expect(listed.details.windows[0]).toMatchObject({ pid: 4242 });
+      expect(listed.details.windows[0]).not.toHaveProperty("window_id");
 
       const observed = JSON.parse(
         await computer.act(
@@ -309,7 +311,9 @@ describe("cua-computer provider", () => {
       expect(Boolean(observed.observation.base64)).toBe(includeScreenshot !== false);
       const { observationId } = observed.observation;
       const elementRef = observed.observation.elements[0]!.elementRef;
-      expect(observed).toMatchObject({ details: { coordinateSpace: "image-pixels" } });
+      expect(observed).toMatchObject({
+        details: { windowRef, pid: 4242, coordinateSpace: "image-pixels" },
+      });
       expect(observationId).toMatch(/^cua:v2:observation:/);
       expect(elementRef).toMatch(/^cua:v2:element:/);
 
@@ -332,6 +336,11 @@ describe("cua-computer provider", () => {
           deliveryMode: "background",
           deliveredCount: 1,
           evidence: ["value_readback"],
+          nativeActionVerification: {
+            scope: "native_action",
+            valueReadbackScope: "control_property",
+          },
+          applicationOutcome: { commit: "not_evaluated", persistence: "not_evaluated" },
         },
       });
       expect(callTool).toHaveBeenLastCalledWith(
@@ -346,8 +355,110 @@ describe("cua-computer provider", () => {
         },
         undefined,
       );
+      expect(callTool).toHaveBeenCalledTimes(3);
     },
   );
+
+  it("projects each native owner PID without inferring it from a shared title", async () => {
+    const { session, callTool } = driver();
+    const window = CUA_DRIVER_CONTRACT_FIXTURES.listWindows.windows[0];
+    callTool.mockImplementation(async (name, args) =>
+      name === "list_windows"
+        ? cuaToolResult({
+            windows: [
+              window,
+              { ...window, pid: 4343 },
+              { ...window, pid: null },
+              { ...window, pid: undefined },
+              { ...window, pid: 0 },
+            ],
+          })
+        : cuaToolResult({ ...CUA_DRIVER_CONTRACT_FIXTURES.windowState, pid: args.pid }),
+    );
+    const computer = await execution(session, "win32");
+    try {
+      const listed = JSON.parse(await computer.act('{"action":"list_windows"}')) as {
+        details: { windows: Array<{ windowRef: string; pid: number }> };
+      };
+      expect(listed.details.windows).toHaveLength(2);
+      expect(listed.details.windows.map(({ pid }) => pid)).toEqual([4242, 4343]);
+      const [first, second] = listed.details.windows;
+      expect(first!.windowRef).not.toBe(second!.windowRef);
+      for (const target of listed.details.windows) {
+        const observed = JSON.parse(
+          await computer.act(
+            JSON.stringify({ action: "get_window_state", windowRef: target.windowRef }),
+          ),
+        );
+        expect(observed.details).toMatchObject({ windowRef: target.windowRef, pid: target.pid });
+        expect(observed.details).not.toHaveProperty("window_id");
+        expect(callTool).toHaveBeenLastCalledWith(
+          "get_window_state",
+          expect.objectContaining({ pid: target.pid, window_id: window.window_id }),
+          undefined,
+        );
+      }
+      const callsBeforeRawIds = callTool.mock.calls.length;
+      for (const rawTarget of [{ pid: 4242 }, { window_id: 99 }]) {
+        await expect(
+          computer.act(
+            JSON.stringify({
+              action: "get_window_state",
+              windowRef: first!.windowRef,
+              ...rawTarget,
+            }),
+          ),
+        ).rejects.toThrow("COMPUTER_INVALID_REQUEST");
+      }
+      expect(callTool).toHaveBeenCalledTimes(callsBeforeRawIds);
+    } finally {
+      await computer.close("completion");
+    }
+  });
+
+  it.each([{ pid: 4343 }, { window_id: 100 }])(
+    "rejects an observation whose native target differs from its retained windowRef: %j",
+    async (mismatch) => {
+      const { session, callTool } = driver();
+      callTool.mockImplementation(async (name) =>
+        cuaToolResult(
+          name === "list_windows"
+            ? CUA_DRIVER_CONTRACT_FIXTURES.listWindows
+            : { ...CUA_DRIVER_CONTRACT_FIXTURES.windowState, ...mismatch },
+        ),
+      );
+      const computer = await execution(session);
+      try {
+        const windowRef = await listWindow(computer);
+        await expect(
+          computer.act(JSON.stringify({ action: "get_window_state", windowRef })),
+        ).rejects.toThrow(
+          "COMPUTER_DRIVER_ERROR: window observation target does not match windowRef",
+        );
+      } finally {
+        await computer.close("completion");
+      }
+    },
+  );
+
+  it("keeps retained target metadata for capture payloads without native identity fields", async () => {
+    const { session, callTool } = driver();
+    callTool.mockImplementation(async (name) =>
+      cuaToolResult(
+        name === "list_windows" ? CUA_DRIVER_CONTRACT_FIXTURES.listWindows : { elements: [] },
+      ),
+    );
+    const computer = await execution(session);
+    try {
+      const windowRef = await listWindow(computer);
+      const observed = JSON.parse(
+        await computer.act(JSON.stringify({ action: "get_window_state", windowRef })),
+      );
+      expect(observed.details).toMatchObject({ windowRef, pid: 4242 });
+    } finally {
+      await computer.close("completion");
+    }
+  });
 
   it("rejects forged window, observation, and element refs before native resolution", async () => {
     const { session, callTool } = windowDriver();
@@ -556,7 +667,10 @@ describe("cua-computer provider", () => {
 
       expect(launched).toMatchObject({
         ok: true,
-        details: { app: [{ name: app.name, running: true }] },
+        details: {
+          app: [{ name: app.name, running: true }],
+          applicationOutcome: { commit: "not_evaluated", persistence: "not_evaluated" },
+        },
       });
       expect(callTool).toHaveBeenLastCalledWith("launch_app", expected, undefined);
     } finally {
@@ -635,12 +749,31 @@ describe("cua-computer provider", () => {
         delete actionInput.x;
         delete actionInput.y;
       }
-      await computer.act(JSON.stringify(actionInput));
-      expect(callTool).toHaveBeenCalledWith(
+      const callsBefore = callTool.mock.calls.length;
+      const acted = JSON.parse(await computer.act(JSON.stringify(actionInput)));
+      expect(callTool).toHaveBeenCalledTimes(callsBefore + 1);
+      expect(callTool).toHaveBeenLastCalledWith(
         tool,
         expect.objectContaining({ pid: 4242, window_id: 99, ...expected }),
         undefined,
       );
+      if (action === "type" || action === "key") {
+        expect(acted).toMatchObject({
+          ok: true,
+          effect: "confirmed",
+          details: {
+            route: "accessibility",
+            deliveryMode: "background",
+            deliveredCount: 1,
+            evidence: ["value_readback"],
+            nativeActionVerification: {
+              scope: "native_action",
+              valueReadbackScope: "control_property",
+            },
+            applicationOutcome: { commit: "not_evaluated", persistence: "not_evaluated" },
+          },
+        });
+      }
     }
   });
 

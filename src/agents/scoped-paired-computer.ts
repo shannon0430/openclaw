@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import {
   isPairedDeviceNodeBindingCurrent,
   type PairedDeviceNodeBinding,
@@ -203,7 +204,7 @@ export async function prepareScopedPairedComputerTransport(
           command: request.command,
           params: request.commandParams,
           timeoutMs: request.timeoutMs,
-          idempotencyKey: request.idempotencyKey,
+          idempotencyKey: request.idempotencyKey ?? crypto.randomUUID(),
         },
         {
           requireAgentRuntimeIdentity: true,

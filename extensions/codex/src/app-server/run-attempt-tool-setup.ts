@@ -313,7 +313,7 @@ export async function prepareCodexAttemptTools(runtime: CodexAttemptRuntime) {
           const errors = settled.flatMap((result) =>
             result.status === "rejected" ? [result.reason] : [],
           );
-          if (params.oneShotCliRun && errors.length) {
+          if (errors.length) {
             throw new AggregateError(errors, "Codex tool cleanup failed");
           }
         },
