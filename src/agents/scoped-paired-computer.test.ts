@@ -1,4 +1,6 @@
+import { Value } from "typebox/value";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NodeInvokeParamsSchema } from "../../packages/gateway-protocol/src/schema/nodes.js";
 import { registerComputerUseProvider } from "../plugins/computer-use-registration.js";
 import type { OpenClawPluginNodeHostCommand } from "../plugins/types.node-host.js";
 import { createDeferredCore } from "../shared/deferred.js";
@@ -103,10 +105,12 @@ function connectProvider(closeError?: Error) {
     return { payload: JSON.parse(await registered.handle(JSON.stringify(params))) as unknown };
   };
   mocks.callGateway.mockImplementation(async (_method, _options, params, request) => {
+    expect(Value.Check(NodeInvokeParamsSchema, params)).toBe(true);
     request.dispatchAuthority.assertCurrent();
     return await dispatch(params);
   });
   mocks.closeRequest.mockImplementation(async (request) => {
+    expect(Value.Check(NodeInvokeParamsSchema, request.params)).toBe(true);
     request.assertDispatchCurrent();
     return await dispatch(request.params);
   });
@@ -116,8 +120,14 @@ function connectProvider(closeError?: Error) {
 beforeEach(() => {
   vi.resetAllMocks();
   mocks.pairingCurrent.mockReturnValue(true);
-  mocks.callGateway.mockResolvedValue({ payload: { ok: true } });
-  mocks.closeRequest.mockResolvedValue({ payload: { ok: true } });
+  mocks.callGateway.mockImplementation(async (_method, _options, params) => {
+    expect(Value.Check(NodeInvokeParamsSchema, params)).toBe(true);
+    return { payload: { ok: true } };
+  });
+  mocks.closeRequest.mockImplementation(async (request) => {
+    expect(Value.Check(NodeInvokeParamsSchema, request.params)).toBe(true);
+    return { payload: { ok: true } };
+  });
 });
 
 describe("scoped paired computer preparation", () => {
@@ -231,6 +241,35 @@ describe("scoped paired computer preparation", () => {
       expect.objectContaining({ nodeId: h.node.nodeId, command: "screen.snapshot" }),
       expect.objectContaining({ requireAgentRuntimeIdentity: true }),
     );
+  });
+
+  it("gives independent unkeyed screenshots valid RPC keys and preserves an explicit action key", async () => {
+    const h = createHarness();
+    const transport = (await prepareScopedPairedComputerTransport(h.options))!;
+    const screenshot = {
+      nodeId: h.node.nodeId,
+      command: "screen.snapshot" as const,
+      commandParams: { executionId: "owned-execution", screenIndex: 0, format: "jpeg" },
+    };
+    await transport.invoke(screenshot);
+    await transport.invoke(screenshot);
+    const actionKey = "computer.act:v1:original-call";
+    const action = {
+      nodeId: h.node.nodeId,
+      command: "computer.act" as const,
+      commandParams: { executionId: "owned-execution", action: "key", keys: "Return" },
+      idempotencyKey: actionKey,
+    };
+    await transport.invoke(action);
+    await transport.invoke(action);
+    const requests = mocks.callGateway.mock.calls.map((call) => call[2]);
+    expect(requests).toHaveLength(4);
+    expect(requests[0].idempotencyKey).not.toBe(requests[1].idempotencyKey);
+    expect(requests.slice(2).map((request) => request.idempotencyKey)).toEqual([
+      actionKey,
+      actionKey,
+    ]);
+    expect(new Set(requests.map((request) => request.idempotencyKey)).size).toBe(3);
   });
 
   it.each([0, 2])("does not qualify %i eligible desktops", async (count) => {
