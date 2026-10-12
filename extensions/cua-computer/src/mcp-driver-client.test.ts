@@ -207,7 +207,10 @@ describe.runIf(process.platform !== "win32")("CUA MCP proxy transport", () => {
     if (error) {
       await expect(result).rejects.toThrow(error);
     } else {
-      expect(JSON.parse(await result)).toEqual({ ok: true });
+      expect(JSON.parse(await result)).toEqual({
+        ok: true,
+        details: { applicationOutcome: { commit: "not_evaluated", persistence: "not_evaluated" } },
+      });
     }
   });
 
