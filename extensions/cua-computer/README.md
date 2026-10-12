@@ -20,6 +20,12 @@ effect proof; it does not by itself mean delivery failed. If the returned screen
 and the diagnostic disagree, preserve both facts and inspect the same action's
 outcome before any further input. Do not blindly repeat a commit or text insertion.
 
+The optional `mode` (`insert_text` or `keystrokes`) is forwarded only for
+`browser_type`. Normal desktop `type`, including Excel, does not forward it or
+select a native typing implementation with it. Diagnose desktop edits from the
+observed edit state, exact target, call/result, and application effects; different
+`mode` arguments alone are not evidence of a typing-mode change.
+
 ## Get started
 
 On macOS, choose **CUA** under **Settings → This Mac → Capabilities** in the
