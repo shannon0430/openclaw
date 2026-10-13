@@ -148,6 +148,44 @@ describe("CUA native action verification scope", () => {
     });
   });
 
+  it.each(["target_destroyed", "target_retained", "fixture-private-detail"])(
+    "projects only finite native lifecycle evidence without upgrading the application effect (%s)",
+    (detail) => {
+      const native = cuaToolResult(
+        {},
+        {
+          action: {
+            effect: 2,
+            route: 2,
+            delivery: { mode: 1, deliveredCount: 2 },
+            evidence: [{ kind: 1 }],
+          } as unknown as CuaToolResult["action"],
+        },
+      );
+      native.rawJson = JSON.stringify({
+        nativeActionLifecycle: { targetTransition: detail },
+        structuredContent: { effect: "unverifiable" },
+      });
+      const result = actionEnvelope(native, {
+        nativeActionVerification: { targetTransition: "forged" },
+      });
+      expect(result).toMatchObject({
+        ok: true,
+        effect: "unverifiable",
+        details: {
+          deliveredCount: 2,
+          applicationOutcome: { commit: "not_evaluated", persistence: "not_evaluated" },
+        },
+      });
+      expect(result.details?.nativeActionVerification).toEqual({
+        scope: "native_action",
+        ...(detail.startsWith("target_") ? { targetTransition: detail } : {}),
+      });
+      expect(JSON.stringify(result)).not.toContain("fixture-private-detail");
+      expect(JSON.stringify(result)).not.toContain("forged");
+    },
+  );
+
   it.each([true, false])(
     "keeps reserved verification fields honest with native metadata=%s",
     (hasNativeAction) => {
