@@ -153,9 +153,10 @@ class NativeDriverFailure extends Error {
     generation: string,
     subphase: string,
     cause: unknown,
+    readonly actionCompletion?: string,
   ) {
     super(
-      `COMPUTER_DRIVER_ERROR: phase=${phase} nativeKind=${nativeKind}${nativeCode ? ` nativeCode=${nativeCode}` : ""} subphase=${subphase} driverGeneration=${generation}`,
+      `COMPUTER_DRIVER_ERROR: phase=${phase} nativeKind=${nativeKind}${nativeCode ? ` nativeCode=${nativeCode}` : ""} subphase=${subphase} driverGeneration=${generation}${actionCompletion ? ` actionCompletion=${actionCompletion}` : ""}`,
       { cause },
     );
   }
@@ -262,7 +263,19 @@ class DirectCuaDriverSession {
           ? error.inner.errorCode
           : "unclassified"
         : undefined;
-      throw new NativeDriverFailure(phase, error.tag, nativeCode, this.generation, subphase, error);
+      const actionCompletion =
+        error.tag === "ActionInterrupted"
+          ? ["not_started", "completed", "unknown"][error.inner.completion]
+          : undefined;
+      throw new NativeDriverFailure(
+        phase,
+        error.tag,
+        nativeCode,
+        this.generation,
+        subphase,
+        error,
+        actionCompletion,
+      );
     }
   }
 
@@ -405,7 +418,12 @@ class DirectCuaDriverSession {
     this.disposed = true;
     let failure: unknown;
     const cleanup: string[] = [];
-    const cleanupFailures: { phase: DriverPhase; nativeKind: string; nativeCode?: string }[] = [];
+    const cleanupFailures: {
+      phase: DriverPhase;
+      nativeKind: string;
+      nativeCode?: string;
+      actionCompletion?: string;
+    }[] = [];
     const settle = async (phase: DriverPhase, operation: () => unknown | Promise<unknown>) => {
       try {
         await this.nativeOperation(phase, operation);
@@ -420,6 +438,9 @@ class DirectCuaDriverSession {
           nativeKind: error instanceof NativeDriverFailure ? error.nativeKind : "unclassified",
           ...(error instanceof NativeDriverFailure && error.nativeCode
             ? { nativeCode: error.nativeCode }
+            : {}),
+          ...(error instanceof NativeDriverFailure && error.actionCompletion
+            ? { actionCompletion: error.actionCompletion }
             : {}),
         });
       }

@@ -560,6 +560,33 @@ describe("CUA Driver direct session", () => {
     await driver.dispose();
   });
 
+  it.each([
+    [0, "not_started"],
+    [1, "completed"],
+    [2, "unknown"],
+  ] as const)(
+    "preserves native interruption completion=%s without inferring input count",
+    async (completion, expected) => {
+      const { DriverError, ActionCompletion } = await import("@trycua/cua-driver");
+      expect([
+        ActionCompletion.NotStarted,
+        ActionCompletion.Completed,
+        ActionCompletion.Unknown,
+      ]).toEqual([0, 1, 2]);
+      mocks.isDriverError.mockImplementation((error) => DriverError.instanceOf(error));
+      mocks.isToolError.mockImplementation((error) => DriverError.Tool.instanceOf(error));
+      const driver = createCuaDriver({ loadSdk: () => sdk as never });
+      mocks.callTool.mockRejectedValueOnce(
+        DriverError.ActionInterrupted.new({ completion, reason: "fixture-sensitive-reason" }),
+      );
+      const failure = await driver.callTool("list_windows", {}).catch((error: unknown) => error);
+      expect(String(failure)).toContain(`actionCompletion=${expected}`);
+      expect(String(failure)).not.toContain("fixture-sensitive-reason");
+      expect(String(failure)).not.toContain("deliveredCount");
+      await driver.dispose();
+    },
+  );
+
   it("keeps a missing native desktop library behind command availability", async () => {
     const loadSdk = vi.fn(() => {
       throw new Error("libX11.so.6: cannot open shared object file");
