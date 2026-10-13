@@ -158,7 +158,8 @@ export function inspectCuaDriverArtifacts(
     accepted = undefined;
   }
   if (!accepted) {
-    const fixHint = "Reinstall OpenClaw from a complete official package.";
+    const fixHint =
+      "Reinstall OpenClaw from the complete package matching this node's accepted driver manifest.";
     return failure(
       "COMPUTER_DRIVER_MANIFEST_INVALID",
       `the cua-computer artifact record for ${selected.key} is missing or invalid.`,
@@ -217,7 +218,7 @@ export function inspectCuaDriverArtifacts(
     try {
       stat = fs.lstatSync(pathname);
     } catch {
-      const fixHint = `Reinstall OpenClaw on this node host to restore ${platformPackage} ${accepted.version}.`;
+      const fixHint = `Reinstall OpenClaw on this node host to restore ${platformPackage} ${accepted.platformVersion}.`;
       return failure(
         "COMPUTER_DRIVER_PACKAGE_MISSING",
         `${platformPackage} is missing ${filename}.`,
@@ -236,7 +237,7 @@ export function inspectCuaDriverArtifacts(
     try {
       actualDigest = hashFile(pathname);
     } catch {
-      const fixHint = `Reinstall OpenClaw on this node host to restore ${platformPackage} ${accepted.version}.`;
+      const fixHint = `Reinstall OpenClaw on this node host to restore ${platformPackage} ${accepted.platformVersion}.`;
       return failure(
         "COMPUTER_DRIVER_PACKAGE_MISSING",
         `${platformPackage}/${filename} cannot be read.`,
@@ -248,7 +249,7 @@ export function inspectCuaDriverArtifacts(
         "Reinstall OpenClaw; do not run or replace the mismatched native package files.";
       return failure(
         "COMPUTER_DRIVER_DIGEST_MISMATCH",
-        `${platformPackage}/${filename} does not match the accepted ${accepted.version} digest.`,
+        `${platformPackage}/${filename} does not match the accepted ${accepted.platformVersion} digest.`,
         fixHint,
       );
     }

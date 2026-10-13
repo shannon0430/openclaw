@@ -237,3 +237,6 @@ extensions/discord/assets/embedded-app-sdk.mjs
 
 # Pinned Swift lint/format tools installed by scripts/install-swift-tools.sh
 .build/
+
+# Exact private Kanon CUA packages retained for repair reproducibility.
+!patches/kanon-cua-20261014/*.tgz
