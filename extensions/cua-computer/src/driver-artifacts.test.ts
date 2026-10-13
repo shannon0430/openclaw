@@ -16,6 +16,8 @@ function createArtifactFixture(
   options: {
     platformKey?: "linux-x64-gnu" | "win32-x64-msvc";
     sdkVersion?: string;
+    acceptedVersion?: string;
+    artifactVersion?: string;
     platformVersion?: string;
     omitPlatformPackage?: boolean;
     expectedDigest?: string;
@@ -24,7 +26,7 @@ function createArtifactFixture(
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-cua-artifacts-"));
   temporaryDirectories.push(root);
   const platformKey = options.platformKey ?? "linux-x64-gnu";
-  const acceptedVersion = "0.20.0";
+  const acceptedVersion = options.acceptedVersion ?? "0.20.0";
   const nativeFile = platformKey.startsWith("linux")
     ? "libcua_driver_sdk.so"
     : "cua_driver_sdk.dll";
@@ -39,7 +41,12 @@ function createArtifactFixture(
   fs.mkdirSync(platformDir);
   const pluginManifest = {
     dependencies: { "@trycua/cua-driver": acceptedVersion },
-    cuaDriverArtifacts: { [platformKey]: { files: { [nativeFile]: expectedDigest } } },
+    cuaDriverArtifacts: {
+      [platformKey]: {
+        ...(options.artifactVersion ? { version: options.artifactVersion } : {}),
+        files: { [nativeFile]: expectedDigest },
+      },
+    },
   };
   writeJson(sdkManifestPath, {
     name: "@trycua/cua-driver",
@@ -99,6 +106,31 @@ describe("CUA Driver artifact verification", () => {
     expect(result).toMatchObject({ ok: false, code: "COMPUTER_DRIVER_PACKAGE_MISSING" });
     expect(result.ok ? "" : result.diagnostic).toContain("Reinstall OpenClaw on this node host");
   });
+
+  it.each([undefined, "0.28.2"])(
+    "accepts an exact SDK prerelease with its declared platform pin (%s)",
+    (artifactVersion) => {
+      const fixture = createArtifactFixture({
+        platformKey: "win32-x64-msvc",
+        acceptedVersion: "0.28.2-kanon.20261014.1",
+        platformVersion: artifactVersion,
+        artifactVersion,
+      });
+      expect(
+        inspectCuaDriverArtifacts({ platform: "win32", arch: "x64", ...fixture }),
+      ).toMatchObject({ ok: true, applicable: true, version: "0.28.2-kanon.20261014.1" });
+    },
+  );
+
+  it.each(["^0.28.2", "0.28.2-", "0.28.2-kanon..1", "0.28.2-01", "file:fixture"])(
+    "rejects non-exact or invalid native pins (%s)",
+    (acceptedVersion) => {
+      const fixture = createArtifactFixture({ acceptedVersion });
+      expect(
+        inspectCuaDriverArtifacts({ platform: "linux", arch: "x64", linuxLibc: "gnu", ...fixture }),
+      ).toMatchObject({ ok: false, code: "COMPUTER_DRIVER_MANIFEST_INVALID" });
+    },
+  );
 
   it("refuses SDK and platform package version skew", () => {
     const fixture = createArtifactFixture({ platformVersion: "0.19.3" });

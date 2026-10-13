@@ -609,7 +609,9 @@ export function registerComputerUseProvider(
       await barrier;
     }
     if (execution && execution.id !== executionId) {
-      throw new Error("COMPUTER_HOST_BUSY: another provider execution owns this computer");
+      throw new Error(
+        `COMPUTER_HOST_BUSY: another provider execution owns this computer phase=execution_acquire delivery=not_started requestExecutionId=${executionId} ownerExecutionId=${execution.id}`,
+      );
     }
     if (!execution) {
       const opened = provider.openExecution(

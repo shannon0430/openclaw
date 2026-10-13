@@ -117,6 +117,27 @@ const MAX_DISCOVERY_ITEMS = 500;
 const MAX_BROWSER_ELEMENTS = 2_000;
 const PARTIAL_EFFECT = 1 as import("@trycua/cua-driver").ActionEffect;
 const VALUE_READBACK_EVIDENCE = 0 as import("@trycua/cua-driver").ActionEvidenceKind;
+const NativeLifecycleSchema = z.object({
+  nativeActionLifecycle: z.object({
+    targetTransition: z.enum(["target_destroyed", "target_retained"]),
+  }),
+});
+
+function nativeTargetTransition(
+  result: CuaToolResult,
+): "target_destroyed" | "target_retained" | undefined {
+  // The SDK's typed evidence intentionally discards private detail. Read only
+  // the finite native lifecycle envelope retained by its normal raw result.
+  if (!result.action || result.rawJson.length > 64_000) {
+    return undefined;
+  }
+  try {
+    const parsed = NativeLifecycleSchema.safeParse(JSON.parse(result.rawJson));
+    return parsed.success ? parsed.data.nativeActionLifecycle.targetTransition : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 export function platformActions(platform: NodeJS.Platform): ComputerUseV2ActionName[] {
   return CUA_COMMON_ACTION_NAMES.filter(
@@ -224,8 +245,10 @@ export function actionEnvelope(
   // Only native action metadata may supply this verification scope.
   delete projectedDetails.nativeActionVerification;
   if (result.action) {
+    const transition = nativeTargetTransition(result);
     projectedDetails.nativeActionVerification = {
       scope: "native_action",
+      ...(transition ? { targetTransition: transition } : {}),
       ...(result.action.evidence?.some(({ kind }) => kind === VALUE_READBACK_EVIDENCE)
         ? { valueReadbackScope: "control_property" }
         : {}),

@@ -11,6 +11,7 @@ type SupportedArtifactPlatform =
   | "win32-x64-msvc";
 
 type DriverArtifactRecord = {
+  version?: string;
   files: Record<string, string>;
 };
 
@@ -95,16 +96,25 @@ function isSha256(value: unknown): value is string {
   return typeof value === "string" && /^[a-f0-9]{64}$/u.test(value);
 }
 
+// Exact SemVer pins only: no ranges, build aliases, paths or tags. A native
+// platform can stay on the stock pin when an SDK patch changes another OS.
+const VERSION_NUMBER = "(?:0|[1-9]\\d*)";
+const PRERELEASE_PART = "(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)";
+const EXACT_VERSION = new RegExp(
+  `^${VERSION_NUMBER}\\.${VERSION_NUMBER}\\.${VERSION_NUMBER}(?:-${PRERELEASE_PART}(?:\\.${PRERELEASE_PART})*)?$`,
+  "u",
+);
+
 function loadArtifactRecord(
   manifestValue: unknown,
   key: SupportedArtifactPlatform,
-): { version: string; artifact: DriverArtifactRecord } | undefined {
+): { version: string; platformVersion: string; artifact: DriverArtifactRecord } | undefined {
   const value = manifestValue as CuaDriverManifest;
   const version = value.dependencies?.[DRIVER_PACKAGE];
   const artifact = value.cuaDriverArtifacts?.[key];
   if (
     typeof version !== "string" ||
-    !/^\d+\.\d+\.\d+$/u.test(version) ||
+    !EXACT_VERSION.test(version) ||
     !artifact ||
     !artifact.files ||
     Object.keys(artifact.files).length === 0 ||
@@ -114,7 +124,11 @@ function loadArtifactRecord(
   ) {
     return undefined;
   }
-  return { version, artifact };
+  const platformVersion = artifact.version ?? version;
+  if (typeof platformVersion !== "string" || !EXACT_VERSION.test(platformVersion)) {
+    return undefined;
+  }
+  return { version, platformVersion, artifact };
 }
 
 function hashFile(pathname: string): string {
@@ -183,13 +197,13 @@ export function inspectCuaDriverArtifacts(
     sdkIdentity.name !== DRIVER_PACKAGE ||
     platformIdentity.name !== platformPackage ||
     sdkIdentity.version !== accepted.version ||
-    platformIdentity.version !== accepted.version
+    platformIdentity.version !== accepted.platformVersion
   ) {
     const observed = `${sdkIdentity.name ?? "unknown"}@${sdkIdentity.version ?? "unknown"} + ${platformIdentity.name ?? "unknown"}@${platformIdentity.version ?? "unknown"}`;
-    const fixHint = `Reinstall or update OpenClaw on this node host so both CUA Driver packages resolve to ${accepted.version}.`;
+    const fixHint = `Reinstall or update OpenClaw on this node host so CUA Driver SDK resolves to ${accepted.version} and its platform package to ${accepted.platformVersion}.`;
     return failure(
       "COMPUTER_DRIVER_VERSION_MISMATCH",
-      `expected ${DRIVER_PACKAGE} and ${platformPackage} ${accepted.version}, resolved ${observed}.`,
+      `expected ${DRIVER_PACKAGE} ${accepted.version} and ${platformPackage} ${accepted.platformVersion}, resolved ${observed}.`,
       fixHint,
     );
   }

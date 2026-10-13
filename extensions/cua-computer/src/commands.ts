@@ -16,6 +16,7 @@ import {
   ClickButton,
   ScrollDirection,
   createCuaDriver,
+  driverFailureDiagnostic,
   type CuaDriverSession,
   type CuaToolResult,
 } from "./driver-client.js";
@@ -574,27 +575,41 @@ export function createCuaComputerProvider(
           }
           closing = true;
           closePromise = queue.run(async () => {
-            let failure: unknown;
-            try {
+            const failures: unknown[] = [];
+            const cleanup: string[] = [];
+            const diagnostics: { step: string; diagnostic: string }[] = [];
+            let driverDiagnostic: string | undefined;
+            const settle = async (step: string, operation: () => Promise<void>) => {
+              try {
+                await operation();
+                cleanup.push(`${step}=completed`);
+              } catch (error) {
+                failures.push(error);
+                cleanup.push(`${step}=failed`);
+                const diagnostic = driverFailureDiagnostic(error);
+                if (diagnostic) {
+                  diagnostics.push({ step, diagnostic });
+                  if (step === "driver" || !driverDiagnostic) {
+                    driverDiagnostic = diagnostic;
+                  }
+                }
+              }
+            };
+            await settle("recording", async () => {
               await closeRecordingExecution({
                 driver: executionDriver,
                 state: executionState.recording,
                 resources,
                 reason,
               });
-            } catch (error) {
-              failure = error;
-            }
-            await resources.dispose(reason !== "completion").catch((error: unknown) => {
-              failure ??= error;
             });
-            await executionDriver.dispose().catch((error: unknown) => {
-              failure ??= error;
-            });
-            if (failure) {
-              throw failure instanceof Error
-                ? failure
-                : new Error("CUA Computer cleanup failed", { cause: failure });
+            await settle("resources", async () => await resources.dispose(reason !== "completion"));
+            await settle("driver", async () => await executionDriver.dispose());
+            if (failures.length) {
+              throw new Error(
+                `${driverDiagnostic ?? "COMPUTER_DRIVER_ERROR: phase=execution_cleanup nativeKind=unclassified"} executionCleanup=[${cleanup.join(",")}] driverGeneration=${executionDriver.generation} executionFailures=${JSON.stringify(diagnostics)}`,
+                { cause: new AggregateError(failures, "CUA Computer cleanup failed") },
+              );
             }
           });
           return await closePromise;

@@ -550,7 +550,9 @@ describe("Computer Use provider registration", () => {
     ).resolves.toBe("act");
     await expect(
       computer.handle(JSON.stringify({ action: "stop_recording", executionId: secondId })),
-    ).rejects.toThrow("COMPUTER_HOST_BUSY");
+    ).rejects.toThrow(
+      `COMPUTER_HOST_BUSY: another provider execution owns this computer phase=execution_acquire delivery=not_started requestExecutionId=${secondId} ownerExecutionId=${firstId}`,
+    );
     expect(openExecution).toHaveBeenCalledOnce();
 
     await computer.handle(
