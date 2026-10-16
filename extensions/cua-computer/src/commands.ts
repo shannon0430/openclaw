@@ -22,6 +22,7 @@ import {
 } from "./driver-client.js";
 import { actionEnvelope, platformActions, projectedToolDetails } from "./driver-result.js";
 import { createLazyCuaExecutionResources } from "./execution-resources.js";
+import type { CuaExecutionState } from "./execution-state.js";
 import {
   adoptGeneration,
   issueFrame,
@@ -486,7 +487,7 @@ export function createCuaComputerProvider(
       }
       const executionDriver = options.driver ?? createDriver();
       const resources = createLazyCuaExecutionResources();
-      const executionState = { resources, recording: {} };
+      const executionState: CuaExecutionState = { resources, recording: {} };
       const queue = new PromiseQueue();
       const frameState: CuaFrameState = { generation: executionDriver.generation };
       let closing = false;
@@ -512,6 +513,7 @@ export function createCuaComputerProvider(
             const format = params.format ?? "jpeg";
             const maxWidth = params.maxWidth ?? (format === "png" ? 900 : 1_600);
             const quality = Math.min(1, Math.max(0.05, params.quality ?? 0.72));
+            await executionDriver.prepareForObservation?.(!executionState.recording.active);
             const desktop = await executionDriver.getDesktopState(signal);
             const geometry = desktopGeometry(desktop);
             // Windows and Linux report capture and input geometry in the same
@@ -559,12 +561,18 @@ export function createCuaComputerProvider(
         act: async (paramsJSON, signal) =>
           await queue.run(async () => {
             assertOpen();
+            const params = parseComputerActParamsJSON(paramsJSON);
+            if (params.action === "list_windows" || params.action === "list_apps") {
+              // Rotate before the handler binds its call generation. Existing
+              // window/element/frame references belong to the previous lease.
+              await executionDriver.prepareForObservation?.(!executionState.recording.active);
+            }
             return await handleWindowAct(
               platform,
               executionDriver,
               frameState,
               executionState,
-              parseComputerActParamsJSON(paramsJSON),
+              params,
               handleDesktopAct,
               signal,
             );

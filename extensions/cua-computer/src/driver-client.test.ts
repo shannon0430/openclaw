@@ -9,7 +9,7 @@ import {
 } from "./cua-driver-contract.test-fixtures.js";
 
 const mocks = vi.hoisted(() => ({
-  callTool: vi.fn(async () => ({})),
+  callTool: vi.fn<(name: string, argsJSON: string) => Promise<unknown>>(async () => ({})),
   click: vi.fn(async () => ({ effect: 0, route: 2 })),
   close: vi.fn(),
   create: vi.fn(),
@@ -22,7 +22,12 @@ const mocks = vi.hoisted(() => ({
     tag: "Coordinates",
     inner: { x, y },
   })),
-  createTrustedSession: vi.fn(),
+  createTrustedSession: vi.fn(
+    (
+      _runtime: unknown,
+      _options: { publicSession: string; ttlSeconds: bigint; idleTtlSeconds: bigint },
+    ) => ({}),
+  ),
   drag: vi.fn(async () => ({})),
   endSession: vi.fn(async () => ({})),
   escalateSession: vi.fn(async () => ({
@@ -82,9 +87,29 @@ const authorization = {
   maxIdleTtlSeconds: 300n,
 };
 
+function nativeSession() {
+  return {
+    callTool: mocks.callTool,
+    click: mocks.click,
+    close: mocks.close,
+    drag: mocks.drag,
+    endSession: mocks.endSession,
+    escalateSession: mocks.escalateSession,
+    getCursorPosition: mocks.getCursorPosition,
+    getDesktopState: mocks.getDesktopState,
+    getSessionState: mocks.getSessionState,
+    moveCursor: mocks.moveCursor,
+    pressKey: mocks.pressKey,
+    scroll: mocks.scroll,
+    startSession: mocks.startSession,
+    typeText: mocks.typeText,
+  };
+}
+
 describe("CUA Driver direct session", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.callTool.mockReset().mockResolvedValue({});
     mocks.isToolError.mockReturnValue(false);
     mocks.isDriverError.mockReturnValue(false);
     mocks.createConfigured.mockReturnValue({
@@ -92,22 +117,277 @@ describe("CUA Driver direct session", () => {
       shutdown: mocks.shutdown,
       uniffiDestroy: mocks.destroy,
     });
-    mocks.createTrustedSession.mockReturnValue({
-      callTool: mocks.callTool,
-      click: mocks.click,
-      close: mocks.close,
-      drag: mocks.drag,
-      endSession: mocks.endSession,
-      escalateSession: mocks.escalateSession,
-      getCursorPosition: mocks.getCursorPosition,
-      getDesktopState: mocks.getDesktopState,
-      getSessionState: mocks.getSessionState,
-      moveCursor: mocks.moveCursor,
-      pressKey: mocks.pressKey,
-      scroll: mocks.scroll,
-      startSession: mocks.startSession,
-      typeText: mocks.typeText,
+    mocks.createTrustedSession.mockReturnValue(nativeSession());
+  });
+
+  it("admits a second job after idle through the registered command without reusing old target authority", async () => {
+    let now = 0;
+    const nativeLeases = new Map<string, number>();
+    mocks.createTrustedSession.mockImplementation((_runtime, options) => {
+      nativeLeases.set(options.publicSession, now);
+      return nativeSession();
     });
+    mocks.callTool.mockImplementation(async (name, argsJSON) => {
+      const args = JSON.parse(argsJSON);
+      const last = nativeLeases.get(args.session);
+      if (last === undefined || now - last >= 300_000) {
+        return cuaToolResult(
+          {},
+          { isError: true, errorCode: "permission_denied", text: "authorization context expired" },
+        );
+      }
+      nativeLeases.set(args.session, now);
+      return cuaToolResult(
+        name === "list_windows"
+          ? CUA_DRIVER_CONTRACT_FIXTURES.listWindows
+          : name === "get_window_state"
+            ? CUA_DRIVER_CONTRACT_FIXTURES.windowState
+            : {},
+      );
+    });
+    const driver = createCuaDriver({ loadSdk: () => sdk as never, now: () => now });
+    const commands: OpenClawPluginNodeHostCommand[] = [];
+    registerComputerUseProvider(
+      { registerNodeHostCommand: (command) => commands.push(command) },
+      createCuaComputerProvider({ platform: "win32", env: {}, driver }),
+    );
+    const command = commands.find((entry) => entry.command === "computer.act")!;
+    const executionId = "00000000-0000-4000-8000-000000000003";
+    const act = async (params: Record<string, unknown>) =>
+      JSON.parse(await command.handle(JSON.stringify({ executionId, ...params })));
+    try {
+      const first = await act({ action: "list_windows" });
+      const firstRef = first.details.windows[0].windowRef;
+      await act({ action: "get_window_state", windowRef: firstRef, includeScreenshot: false });
+      await act({ action: "type", windowRef: firstRef, text: "first synthetic job" });
+      const firstGeneration = driver.generation;
+      now = 301_000;
+      const second = await act({ action: "list_windows" });
+      expect(driver.generation).not.toBe(firstGeneration);
+      const secondRef = second.details.windows[0].windowRef;
+      expect(secondRef).not.toBe(firstRef);
+      await expect(act({ action: "get_window_state", windowRef: firstRef })).rejects.toThrow(
+        "COMPUTER_STALE_OBSERVATION",
+      );
+      await act({ action: "get_window_state", windowRef: secondRef, includeScreenshot: false });
+      await act({ action: "type", windowRef: secondRef, text: "second synthetic job" });
+      expect(mocks.createTrustedSession).toHaveBeenCalledTimes(2);
+      expect(mocks.createTrustedSession.mock.calls[1]?.[1]).toMatchObject({
+        ttlSeconds: 3_299n,
+        idleTtlSeconds: 300n,
+      });
+      expect(mocks.close).toHaveBeenCalledOnce();
+      expect(mocks.callTool.mock.calls.filter(([name]) => name === "type_text")).toHaveLength(2);
+      expect(mocks.createConfigured).toHaveBeenCalledOnce();
+    } finally {
+      await command.handle(
+        JSON.stringify({ action: "__close_execution", executionId, reason: "completion" }),
+      );
+    }
+  });
+
+  it("does not dispatch or replay an input-first request after idle", async () => {
+    let now = 0;
+    const driver = createCuaDriver({ loadSdk: () => sdk as never, now: () => now });
+    const computer = await execution(driver, "win32");
+    mocks.callTool.mockResolvedValue(cuaToolResult(CUA_DRIVER_CONTRACT_FIXTURES.listWindows));
+    try {
+      const first = JSON.parse(await computer.act('{"action":"list_windows"}'));
+      now = 301_000;
+      await expect(
+        computer.act(
+          JSON.stringify({
+            action: "type",
+            windowRef: first.details.windows[0].windowRef,
+            text: "never replay",
+          }),
+        ),
+      ).rejects.toThrow("COMPUTER_STALE_OBSERVATION");
+      expect(mocks.callTool).toHaveBeenCalledOnce();
+      expect(mocks.createTrustedSession).toHaveBeenCalledOnce();
+    } finally {
+      await computer.close("completion");
+    }
+  });
+
+  it.each(["close", "start"])(
+    "revalidates the original absolute deadline after an awaited native %s",
+    async (phase) => {
+      let now = 0;
+      const driver = createCuaDriver({ loadSdk: () => sdk as never, now: () => now });
+      const computer = await execution(driver, "win32");
+      mocks.callTool.mockResolvedValue(cuaToolResult(CUA_DRIVER_CONTRACT_FIXTURES.listWindows));
+      try {
+        if (phase === "close") {
+          await computer.act('{"action":"list_windows"}');
+          now = 301_000;
+          mocks.close.mockImplementationOnce(() => {
+            now = 3_600_000;
+          });
+        } else {
+          mocks.startSession.mockImplementationOnce(async () => {
+            now = 3_600_000;
+            return {};
+          });
+        }
+        await expect(computer.act('{"action":"list_windows"}')).rejects.toThrow(
+          "execution authorization expired",
+        );
+        expect(mocks.createTrustedSession).toHaveBeenCalledOnce();
+        expect(mocks.callTool).toHaveBeenCalledTimes(phase === "close" ? 1 : 0);
+      } finally {
+        await computer.close("completion");
+      }
+    },
+  );
+
+  it("recomputes remaining TTL after a slow close without extending the original deadline", async () => {
+    let now = 0;
+    const driver = createCuaDriver({ loadSdk: () => sdk as never, now: () => now });
+    const computer = await execution(driver, "win32");
+    mocks.callTool.mockResolvedValue(cuaToolResult(CUA_DRIVER_CONTRACT_FIXTURES.listWindows));
+    try {
+      await computer.act('{"action":"list_windows"}');
+      now = 301_000;
+      mocks.close.mockImplementationOnce(() => {
+        now = 321_000;
+      });
+      await computer.act('{"action":"list_windows"}');
+      expect(mocks.createTrustedSession.mock.calls[1]?.[1]).toMatchObject({
+        ttlSeconds: 3_279n,
+        idleTtlSeconds: 300n,
+      });
+    } finally {
+      await computer.close("completion");
+    }
+  });
+
+  it("keeps the original absolute deadline across idle rotations", async () => {
+    let now = 0;
+    const driver = createCuaDriver({ loadSdk: () => sdk as never, now: () => now });
+    const computer = await execution(driver, "win32");
+    mocks.callTool.mockResolvedValue(cuaToolResult(CUA_DRIVER_CONTRACT_FIXTURES.listWindows));
+    try {
+      await computer.act('{"action":"list_windows"}');
+      now = 3_550_500;
+      await computer.act('{"action":"list_windows"}');
+      expect(mocks.createTrustedSession.mock.calls[1]?.[1]).toMatchObject({
+        ttlSeconds: 49n,
+        idleTtlSeconds: 49n,
+      });
+      now = 3_600_000;
+      await expect(computer.act('{"action":"list_windows"}')).rejects.toThrow(
+        "execution authorization expired",
+      );
+      expect(mocks.createTrustedSession).toHaveBeenCalledTimes(2);
+      expect(mocks.callTool).toHaveBeenCalledTimes(2);
+    } finally {
+      await computer.close("completion");
+    }
+  });
+
+  it.each(["permission_denied", "authorization_declined", "authorization_expired", "unknown"])(
+    "does not mint authority after a native %s failure",
+    async (failure) => {
+      let now = 0;
+      const driver = createCuaDriver({ loadSdk: () => sdk as never, now: () => now });
+      const computer = await execution(driver, "win32");
+      if (failure !== "unknown") {
+        mocks.callTool.mockResolvedValueOnce(
+          cuaToolResult(
+            {},
+            {
+              isError: true,
+              errorCode: failure,
+              text: "authorization context expired",
+            },
+          ),
+        );
+      } else {
+        mocks.callTool.mockRejectedValueOnce(new Error("unknown native outcome"));
+      }
+      try {
+        await expect(computer.act('{"action":"list_windows"}')).rejects.toThrow();
+        now = 301_000;
+        await expect(computer.act('{"action":"list_windows"}')).rejects.toThrow(
+          "session authorization expired",
+        );
+        expect(mocks.createTrustedSession).toHaveBeenCalledOnce();
+        expect(mocks.callTool).toHaveBeenCalledOnce();
+      } finally {
+        await computer.close("completion");
+      }
+    },
+  );
+
+  it.each(["target_unavailable", "foreground_unavailable"])(
+    "does not turn known %s resource diagnostics into an authority lockout",
+    async (errorCode) => {
+      const { DriverError } = await import("@trycua/cua-driver");
+      mocks.isDriverError.mockImplementation((error) => DriverError.instanceOf(error));
+      mocks.isToolError.mockImplementation((error) => DriverError.Tool.instanceOf(error));
+      let now = 0;
+      const driver = createCuaDriver({ loadSdk: () => sdk as never, now: () => now });
+      const computer = await execution(driver, "win32");
+      mocks.callTool.mockRejectedValueOnce(
+        DriverError.Tool.new({ tool: "list_windows", message: "resource changed", errorCode }),
+      );
+      try {
+        await expect(computer.act('{"action":"list_windows"}')).rejects.toThrow(
+          "COMPUTER_DRIVER_ERROR",
+        );
+        mocks.callTool.mockResolvedValue(cuaToolResult(CUA_DRIVER_CONTRACT_FIXTURES.listWindows));
+        await computer.act('{"action":"list_windows"}');
+        expect(mocks.createTrustedSession).toHaveBeenCalledOnce();
+        now = 301_000;
+        await computer.act('{"action":"list_windows"}');
+        expect(mocks.createTrustedSession).toHaveBeenCalledTimes(2);
+      } finally {
+        await computer.close("completion");
+      }
+    },
+  );
+
+  it("does not rotate a recording owner's session at an idle observation boundary", async () => {
+    let now = 0;
+    const driver = createCuaDriver({ loadSdk: () => sdk as never, now: () => now });
+    const computer = await execution(driver, "win32");
+    mocks.callTool.mockResolvedValueOnce(
+      cuaToolResult(CUA_DRIVER_CONTRACT_FIXTURES.recordingActive),
+    );
+    try {
+      await computer.act('{"action":"start_recording","recordVideo":false}');
+      now = 301_000;
+      await expect(computer.act('{"action":"list_windows"}')).rejects.toThrow(
+        "session authorization expired",
+      );
+      expect(mocks.createTrustedSession).toHaveBeenCalledOnce();
+      expect(mocks.callTool).toHaveBeenCalledOnce();
+    } finally {
+      // Abort cleanup still closes the native session even though the expired
+      // lease cannot dispatch stop_recording.
+      await computer.close("cancel").catch(() => {});
+      expect(mocks.close).toHaveBeenCalledOnce();
+    }
+  });
+
+  it("measures idle at admission rather than completion of a slow operation", async () => {
+    let now = 0;
+    const driver = createCuaDriver({ loadSdk: () => sdk as never, now: () => now });
+    const computer = await execution(driver, "win32");
+    mocks.callTool.mockImplementationOnce(async () => {
+      now = 301_000;
+      return cuaToolResult(CUA_DRIVER_CONTRACT_FIXTURES.listWindows);
+    });
+    try {
+      await computer.act('{"action":"list_windows"}');
+      mocks.callTool.mockResolvedValueOnce(cuaToolResult(CUA_DRIVER_CONTRACT_FIXTURES.listWindows));
+      await computer.act('{"action":"list_windows"}');
+      expect(mocks.createTrustedSession).toHaveBeenCalledTimes(2);
+      expect(mocks.close).toHaveBeenCalledOnce();
+    } finally {
+      await computer.close("completion");
+    }
   });
 
   it("matches the installed CUA Driver desktop input enum contract", async () => {
@@ -185,6 +465,9 @@ describe("CUA Driver direct session", () => {
 
     await Promise.all([driver.getDesktopState(), driver.callTool("list_windows", {})]);
     const sessionOptions = mocks.createTrustedSession.mock.calls[0]?.[1];
+    if (!sessionOptions) {
+      throw new Error("expected the native trusted session to have been created");
+    }
 
     expect(mocks.startSession).toHaveBeenCalledOnce();
     expect(mocks.startSession).toHaveBeenCalledWith(
@@ -217,6 +500,9 @@ describe("CUA Driver direct session", () => {
     await driver.escalateScope(EscalationReason.Other);
 
     const sessionOptions = mocks.createTrustedSession.mock.calls[0]?.[1];
+    if (!sessionOptions) {
+      throw new Error("expected the native trusted session to have been created");
+    }
     const target = { tag: "Desktop", inner: { displayId: "primary" } };
     expect(mocks.createDesktopTarget).toHaveBeenCalledOnce();
     expect(mocks.createDesktopTarget).toHaveBeenCalledWith({ displayId: "primary" });
