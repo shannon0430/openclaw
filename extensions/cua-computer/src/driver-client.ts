@@ -53,6 +53,7 @@ export interface CuaDriverSession {
   readonly generation: string;
   isAvailable(): boolean;
   prepareAvailability?(): Promise<void>;
+  prepareForObservation?(allowSessionRotation: boolean): Promise<void>;
   resetAvailabilityCache(): void;
   callTool(
     name: string,
@@ -105,6 +106,24 @@ const DRIVER_LIFECYCLE_CODES = new Set([
   "target_unavailable",
   "input_delivery_failed",
   "partial_input_delivery",
+]);
+const SESSION_AUTHORIZATION_FAILURE_CODES = new Set([
+  "permission_denied",
+  "authorization_required",
+  "authorization_declined",
+  "authorization_canceled",
+  "authorization_scope_mismatch",
+  "authorization_expired",
+  "authorization_host_failed",
+  "bounded_resource_outside_manifest",
+  "protected_resource_scope_stale",
+  "protected_resource_scope_invalid",
+  "unbounded_operation_requires_unrestricted",
+  "session_unavailable",
+  "session_ended",
+  "session_required",
+  "session_not_started",
+  "transport_lease_required",
 ]);
 const DRIVER_TOOL_NAMES = new Set([
   "list_apps",
@@ -172,17 +191,25 @@ export function driverFailureDiagnostic(error: unknown): string | undefined {
 
 class DirectCuaDriverSession {
   private readonly runtime: CuaDriverLike;
-  private readonly session: CuaDriverSessionLike;
-  private readonly publicSession = `openclaw-${randomUUID()}`;
+  private session: CuaDriverSessionLike;
+  private publicSession = `openclaw-${randomUUID()}`;
   private readonly desktopTarget: import("@trycua/cua-driver").ActionTarget;
   private startPromise: Promise<void> | undefined;
   private started = false;
   private disposed = false;
+  private readonly expiresAtMs: number;
+  private lastAuthorizedDispatchMs: number;
+  private rotationBlocked = false;
+  private sessionUnavailable = false;
+  private operationTail: Promise<void> = Promise.resolve();
 
   constructor(
     private readonly sdk: CuaDriverSdk,
-    private readonly generation: string,
+    private currentGeneration: string,
+    private readonly now: () => number,
   ) {
+    this.lastAuthorizedDispatchMs = now();
+    this.expiresAtMs = this.lastAuthorizedDispatchMs + 3_600_000;
     const unrestricted = sdk.SessionPermissionMode.Unrestricted;
     // This is an OpenClaw-owned ceiling, not plugin configuration or tool input.
     // The model cannot select a session or widen this authorization after start.
@@ -208,6 +235,83 @@ class DirectCuaDriverSession {
     // CUA 0.20 moves modality from session state to each action. Keep one
     // lifecycle/authority owner and make the desktop target explicit per call.
     this.desktopTarget = sdk.ActionTarget.Desktop.new({ displayId: "primary" });
+  }
+
+  get generation(): string {
+    return this.currentGeneration;
+  }
+
+  private async serialize<T>(operation: () => Promise<T>): Promise<T> {
+    const result = this.operationTail.then(operation);
+    this.operationTail = result.then(
+      () => {},
+      () => {},
+    );
+    return await result;
+  }
+
+  private assertExecutionLive(): void {
+    if (this.disposed) {
+      throw new Error(
+        "COMPUTER_DRIVER_UNAVAILABLE: cua-computer session is stopping or unavailable",
+      );
+    }
+    if (this.now() >= this.expiresAtMs) {
+      throw new Error(
+        "COMPUTER_REFUSED_permission_denied: computer execution authorization expired",
+      );
+    }
+  }
+
+  private assertLive(): void {
+    this.assertExecutionLive();
+    if (this.sessionUnavailable) {
+      throw new Error(
+        "COMPUTER_DRIVER_UNAVAILABLE: cua-computer session is stopping or unavailable",
+      );
+    }
+  }
+
+  private idleBoundaryReached(): boolean {
+    return this.now() - this.lastAuthorizedDispatchMs >= 300_000;
+  }
+
+  async prepareForObservation(allowSessionRotation: boolean): Promise<void> {
+    await this.serialize(async () => {
+      this.assertLive();
+      if (!this.idleBoundaryReached()) {
+        return;
+      }
+      // A native denial is never a request to mint replacement authority.
+      // Only a fresh, ref-free observation may cross a known local idle
+      // boundary, and never while execution-owned recording is active.
+      if (this.rotationBlocked || !allowSessionRotation) {
+        throw new Error(
+          "COMPUTER_REFUSED_permission_denied: computer session authorization expired",
+        );
+      }
+      this.sessionUnavailable = true;
+      await this.nativeOperation("session_close", () => this.session.close());
+      this.startPromise = undefined;
+      this.started = false;
+      this.assertExecutionLive();
+      const remainingSeconds = BigInt(Math.floor((this.expiresAtMs - this.now()) / 1_000));
+      if (remainingSeconds < 1n) {
+        throw new Error(
+          "COMPUTER_REFUSED_permission_denied: computer execution authorization expired",
+        );
+      }
+      this.publicSession = `openclaw-${randomUUID()}`;
+      this.session = this.sdk.createTrustedSession(this.runtime, {
+        mode: this.sdk.SessionPermissionMode.Unrestricted,
+        ttlSeconds: remainingSeconds,
+        idleTtlSeconds: remainingSeconds < 300n ? remainingSeconds : 300n,
+        publicSession: this.publicSession,
+      });
+      this.currentGeneration = randomUUID();
+      this.lastAuthorizedDispatchMs = this.now();
+      this.sessionUnavailable = false;
+    });
   }
 
   private async ensureSessionStarted(signal?: AbortSignal): Promise<void> {
@@ -239,8 +343,37 @@ class DirectCuaDriverSession {
     operation: () => Promise<T>,
     subphase = "call_tool",
   ): Promise<T> {
-    await this.ensureSessionStarted(signal);
-    return await this.nativeOperation("operation", operation, subphase);
+    return await this.serialize(async () => {
+      this.assertLive();
+      if (this.idleBoundaryReached()) {
+        throw new Error(
+          "COMPUTER_STALE_OBSERVATION: take a fresh window list or screenshot after the computer session idle boundary",
+        );
+      }
+      const dispatchedAt = this.now();
+      await this.ensureSessionStarted(signal);
+      this.assertLive();
+      if (this.idleBoundaryReached()) {
+        throw new Error(
+          "COMPUTER_STALE_OBSERVATION: take a fresh window list or screenshot after the computer session idle boundary",
+        );
+      }
+      const result = await this.nativeOperation("operation", operation, subphase);
+      if (result && typeof result === "object" && "isError" in result && result.isError) {
+        if (
+          "errorCode" in result &&
+          typeof result.errorCode === "string" &&
+          SESSION_AUTHORIZATION_FAILURE_CODES.has(result.errorCode)
+        ) {
+          this.rotationBlocked = true;
+        }
+      } else {
+        // Native idle time starts at authorized dispatch, not completion of a
+        // possibly slow operation. A refusal must not refresh this lease.
+        this.lastAuthorizedDispatchMs = dispatchedAt;
+      }
+      return result;
+    });
   }
 
   private async nativeOperation<T>(
@@ -256,6 +389,9 @@ class DirectCuaDriverSession {
         (typeof error !== "object" && typeof error !== "function") ||
         !this.sdk.DriverError.instanceOf(error)
       ) {
+        if (phase === "operation" || phase === "session_start") {
+          this.rotationBlocked = true;
+        }
         throw error;
       }
       const nativeCode = this.sdk.DriverError.Tool.instanceOf(error)
@@ -263,6 +399,13 @@ class DirectCuaDriverSession {
           ? error.inner.errorCode
           : "unclassified"
         : undefined;
+      const knownResourceFailure =
+        this.sdk.DriverError.Tool.instanceOf(error) &&
+        DRIVER_LIFECYCLE_CODES.has(error.inner.errorCode) &&
+        !SESSION_AUTHORIZATION_FAILURE_CODES.has(error.inner.errorCode);
+      if ((phase === "operation" || phase === "session_start") && !knownResourceFailure) {
+        this.rotationBlocked = true;
+      }
       const actionCompletion =
         error.tag === "ActionInterrupted"
           ? ["not_started", "completed", "unknown"][error.inner.completion]
@@ -416,6 +559,7 @@ class DirectCuaDriverSession {
       return;
     }
     this.disposed = true;
+    await this.operationTail;
     let failure: unknown;
     const cleanup: string[] = [];
     const cleanupFailures: {
@@ -500,14 +644,21 @@ function isPromise<T>(value: T | Promise<T>): value is Promise<T> {
 
 class LazyCuaDriverSession implements CuaDriverSession {
   // The execution owns this generation before and after its lazy runtime loads.
-  readonly generation = randomUUID();
+  private readonly initialGeneration = randomUUID();
   private runtime: DirectCuaDriverSession | undefined;
   private loadPromise: Promise<DirectCuaDriverSession> | undefined;
   private loadFailure: unknown;
   private hasLoadFailure = false;
   private disposed = false;
 
-  constructor(private readonly loadSdk: () => CuaDriverSdk | Promise<CuaDriverSdk>) {}
+  constructor(
+    private readonly loadSdk: () => CuaDriverSdk | Promise<CuaDriverSdk>,
+    private readonly now: () => number,
+  ) {}
+
+  get generation(): string {
+    return this.runtime?.generation ?? this.initialGeneration;
+  }
 
   private resolveRuntime(): DirectCuaDriverSession | undefined {
     if (this.disposed || this.hasLoadFailure || this.loadPromise) {
@@ -519,12 +670,12 @@ class LazyCuaDriverSession implements CuaDriverSession {
     try {
       const loadedSdk = this.loadSdk();
       if (!isPromise(loadedSdk)) {
-        this.runtime = new DirectCuaDriverSession(loadedSdk, this.generation);
+        this.runtime = new DirectCuaDriverSession(loadedSdk, this.initialGeneration, this.now);
         return this.runtime;
       }
 
       const loadPromise = loadedSdk
-        .then((sdk) => new DirectCuaDriverSession(sdk, this.generation))
+        .then((sdk) => new DirectCuaDriverSession(sdk, this.initialGeneration, this.now))
         .then((runtime) => {
           this.runtime = runtime;
           return runtime;
@@ -588,6 +739,10 @@ class LazyCuaDriverSession implements CuaDriverSession {
     }
   }
 
+  async prepareForObservation(allowSessionRotation: boolean): Promise<void> {
+    await (await this.requireRuntime()).prepareForObservation(allowSessionRotation);
+  }
+
   async getDesktopState(signal?: AbortSignal) {
     return await (await this.requireRuntime()).getDesktopState(signal);
   }
@@ -646,7 +801,10 @@ class LazyCuaDriverSession implements CuaDriverSession {
 }
 
 export function createCuaDriver(
-  options: { loadSdk?: () => CuaDriverSdk | Promise<CuaDriverSdk> } = {},
+  options: { loadSdk?: () => CuaDriverSdk | Promise<CuaDriverSdk>; now?: () => number } = {},
 ): CuaDriverSession {
-  return new LazyCuaDriverSession(options.loadSdk ?? loadCuaDriverSdk);
+  return new LazyCuaDriverSession(
+    options.loadSdk ?? loadCuaDriverSdk,
+    options.now ?? (() => performance.now()),
+  );
 }
