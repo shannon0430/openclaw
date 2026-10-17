@@ -30,6 +30,7 @@ import { LEGACY_PACKAGE_RECOVERY_HELPER } from "./package-update-activation-path
 import {
   preparePackageActivationJournal,
   PackageActivationArchiveError,
+  PackageActivationFingerprintUnavailableError,
   resolvePackageActivationRecoveryCommand as recoveryCommand,
   type PackageActivationPreparation,
 } from "./package-update-activation-prepare.js";
@@ -178,10 +179,20 @@ export async function preparePackageActivation(
   try {
     prepared = await preparePackageActivationJournal({ ...params, options }, assertOriginal);
   } catch (error) {
-    if (!(error instanceof PackageActivationArchiveError)) {
+    if (
+      !(error instanceof PackageActivationArchiveError) &&
+      !(error instanceof PackageActivationFingerprintUnavailableError)
+    ) {
       throw error;
     }
-    // Closed evidence cannot regain rollback authority; use ordinary package swap.
+    if (error instanceof PackageActivationFingerprintUnavailableError) {
+      // The bounded candidate walk precedes the journal's own admission checks.
+      // Falling back must not bypass an existing recovery owner or unsafe layout.
+      assertOriginal();
+      assertNoPendingPackageActivation(params.liveRoot);
+      assertOriginal();
+    }
+    // Unavailable standalone recovery leaves the existing package swap owner in charge.
     options.onUnavailable?.(error.message);
     return undefined;
   }
