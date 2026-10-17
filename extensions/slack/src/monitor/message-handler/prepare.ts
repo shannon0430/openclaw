@@ -1079,7 +1079,12 @@ export async function prepareSlackMessage(params: {
   });
 
   if (isBotMessage && allowBotsMode === "mentions") {
-    const botMentioned = isDirectMessage || effectiveWasMentioned || shouldBypassMention;
+    // Thread participation keeps human follow-ups flowing; it is not a bot request.
+    const botMentioned =
+      isDirectMessage ||
+      explicitlyMentionedBotUser ||
+      explicitlyMentionedBotSubteam ||
+      opts.source === "app_mention";
     if (!botMentioned) {
       return drop("bot-missing-mention");
     }

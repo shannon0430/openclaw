@@ -89,6 +89,41 @@ function fixture(
 }
 
 describe("Slack bot-thread mention configuration", () => {
+  it.each([false, true])(
+    "requires an explicit bot mention in a participating thread: mentioned=%s",
+    async (mentioned) => {
+      const test = fixture({
+        allowBots: "mentions",
+        channels: { C123: { users: ["U1"] } },
+        implicitMentions: { threadParticipation: true },
+      });
+      test.message.parent_user_id = "U_ROOT";
+      test.message.bot_id = "B_OTHER";
+      test.message.subtype = "bot_message";
+      test.message.text = mentioned ? "<@B1> Please review this" : "Completed; no further action";
+      recordSlackThreadParticipation("default", "C123", test.threadTs);
+
+      expect(Boolean(await test.prepare())).toBe(mentioned);
+      if (!mentioned) {
+        expect(test.info).toHaveBeenCalledWith(
+          expect.objectContaining({ reason: "bot-missing-mention" }),
+          expect.any(String),
+        );
+      }
+    },
+  );
+
+  it("preserves unmentioned human followups when bots require mentions", async () => {
+    const test = fixture({
+      allowBots: "mentions",
+      implicitMentions: { threadParticipation: true },
+    });
+    test.message.parent_user_id = "U_ROOT";
+    recordSlackThreadParticipation("default", "C123", test.threadTs);
+
+    expect((await test.prepare())?.ctxPayload.RawBody).toBe("Continue here");
+  });
+
   it("validates scoped boolean overrides without adding a default", () => {
     const parsed = SlackConfigSchema.parse({
       requireMentionInBotThreads: false,
