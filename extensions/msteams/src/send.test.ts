@@ -645,6 +645,7 @@ describe("editMessageMSTeams", () => {
         type: "message",
         id: "activity-123",
         text: "Updated message text",
+        textFormat: "extendedmarkdown",
         entities: [
           {
             type: "https://schema.org/Message",

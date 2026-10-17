@@ -431,6 +431,58 @@ describe("classifyEmbeddedAgentRunResultForModelFallback", () => {
     expect(result).toBeNull();
   });
 
+  it.each([{ finalAssistantRawText: "NO_REPLY" }, { terminalReplyKind: "silent-empty" }])(
+    "keeps deliberate silence ahead of an empty harness projection: %j",
+    (silence) => {
+      expect(
+        classifyEmbeddedAgentRunResultForModelFallback({
+          provider: "custom",
+          model: "primary",
+          result: {
+            payloads: [],
+            meta: { durationMs: 1, agentHarnessResultClassification: "empty", ...silence },
+          },
+        }),
+      ).toBeNull();
+    },
+  );
+
+  it.each([
+    { meta: {}, payloads: [], code: "empty_result" },
+    {
+      meta: { finalAssistantRawText: "NO_REPLY", agentMeta: { providerRefusal: {} } },
+      payloads: [],
+      code: "empty_result",
+    },
+    {
+      meta: { terminalReplyKind: "silent-empty" },
+      payloads: [{ text: "HTTP 529 overloaded", isError: true }],
+      code: "empty_result",
+    },
+    {
+      meta: {
+        finalAssistantRawText: "NO_REPLY",
+        error: { kind: "incomplete_turn", fallbackSafe: true },
+      },
+      payloads: [],
+      code: "incomplete_result",
+    },
+  ])(
+    "does not turn a failed or unproven empty result into silence: %j",
+    ({ meta, payloads, code }) => {
+      expect(
+        classifyEmbeddedAgentRunResultForModelFallback({
+          provider: "custom",
+          model: "primary",
+          result: {
+            payloads,
+            meta: { durationMs: 1, agentHarnessResultClassification: "empty", ...meta },
+          },
+        }),
+      ).toMatchObject({ code });
+    },
+  );
+
   it("does not retry unclassified non-GPT error payloads", () => {
     const result = classifyEmbeddedAgentRunResultForModelFallback({
       provider: "custom",

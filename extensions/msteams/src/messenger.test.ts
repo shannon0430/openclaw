@@ -267,12 +267,17 @@ describe("msteams messenger", () => {
       "sends $name via proactive send context",
       async ({ source, expected }) => {
         const texts: string[] = [];
+        const activities: Record<string, unknown>[] = [];
+        const recordActivity = createRecordedSendActivity(texts);
         let capturedConversationId: string | undefined;
 
         const ids = await sendMSTeamsMessages({
           replyStyle: "top-level",
           app: createMockApp({
-            createFn: createRecordedSendActivity(texts),
+            createFn: async (activity) => {
+              activities.push(activity as Record<string, unknown>);
+              return recordActivity(activity);
+            },
             onClientCreated: (_serviceUrl, conversationId) => {
               capturedConversationId = conversationId;
             },
@@ -285,6 +290,8 @@ describe("msteams messenger", () => {
         });
 
         expect(texts).toEqual([expected]);
+        expect(activities).toHaveLength(1);
+        expect(activities[0]?.textFormat).toBe("extendedmarkdown");
         expect(ids).toEqual([`id:${expected}`]);
         expect(capturedConversationId).toBe("19:abc@thread.tacv2");
       },

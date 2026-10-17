@@ -4,7 +4,7 @@ import { formatBillingErrorMessage } from "../../agents/failover/user-copy.js";
 import { readAgentRunTerminalOutcome } from "../../channels/turn/agent-run-terminal-outcome.js";
 import { RUN_STALE_TAKEOVER_MS } from "../../logging/diagnostic-run-activity.js";
 import { withReplyDispatcher } from "../dispatch-dispatcher.js";
-import { setReplyPayloadMetadata } from "../reply-payload.js";
+import { getReplyPayloadMetadata, setReplyPayloadMetadata } from "../reply-payload.js";
 import type { ReplyPayload } from "../types.js";
 import {
   createDispatcher,
@@ -37,15 +37,16 @@ const sessionKey = "agent:main:telegram:direct:1";
 
 function createVisibleDispatchParams(
   replyResolver: NonNullable<DispatchFromConfigParams["replyResolver"]>,
+  channel: "telegram" | "msteams" | "slack" = "telegram",
 ) {
   return {
     ctx: buildTestCtx({
-      Provider: "telegram",
-      Surface: "telegram",
-      OriginatingChannel: "telegram",
+      Provider: channel,
+      Surface: channel,
+      OriginatingChannel: channel,
       OriginatingTo: "user:1",
       ChatType: "direct",
-      SessionKey: sessionKey,
+      SessionKey: `agent:main:${channel}:direct:1`,
       MessageThreadId: "501.000",
       BodyForAgent: "second telegram direct turn",
     }),
@@ -129,6 +130,90 @@ describe("dispatchReplyFromConfig visible admission recovery", () => {
       text: `⚠️ Context compaction succeeded, but the later model request still failed. ${formatBillingErrorMessage().replace(/^⚠️\s*/u, "")}`,
       isError: true,
     });
+  });
+
+  it("localizes a final Teams failure without changing media or internal delivery facts", async () => {
+    const metadata = {
+      terminalProviderError: true as const,
+      assistantTranscriptOwned: true,
+      providerFailure: { reason: "overloaded" as const, rawError: "HTTP 529 overloaded" },
+      onFinalDeliverySuccess: vi.fn(),
+    };
+    const payload = setReplyPayloadMetadata(
+      {
+        text: "HTTP 529 overloaded",
+        isError: true,
+        mediaUrls: ["https://example.com/synthetic-error.png"],
+        replyToId: "synthetic-source",
+      },
+      metadata,
+    );
+    const params = createVisibleDispatchParams(async () => payload, "msteams");
+
+    await dispatchReplyFromConfig(params);
+
+    expect(params.dispatcher.sendFinalReply).toHaveBeenCalledOnce();
+    const delivered = vi.mocked(params.dispatcher.sendFinalReply).mock.calls[0]?.[0];
+    expect(delivered).toEqual({
+      ...payload,
+      text:
+        "一時的な不具合により、今回の依頼を完了できませんでした。" +
+        "実行済みの操作がある場合は、その状態を確認してから再開します。",
+    });
+    expect(getReplyPayloadMetadata(delivered!)).toMatchObject(metadata);
+    expect(payload.text).toBe("HTTP 529 overloaded");
+  });
+
+  it.each([
+    { channel: "slack" as const, flags: {} },
+    { channel: "msteams" as const, flags: { isError: false } },
+  ])("keeps non-final-error copy unchanged: %j", async ({ channel, flags }) => {
+    const payload = { text: "original diagnostic or response", isError: true, ...flags };
+    const params = createVisibleDispatchParams(async () => payload, channel);
+
+    await dispatchReplyFromConfig(params);
+
+    expect(params.dispatcher.sendFinalReply).toHaveBeenCalledWith(payload);
+  });
+
+  it.each([{ isCommentary: true }, { isReasoning: true }])(
+    "keeps Teams partial diagnostics separate from final-error localization: %j",
+    async (flags) => {
+      const diagnostic = { text: "original diagnostic", isError: true, ...flags };
+      const onPartialReply = vi.fn(async () => undefined);
+      const params = {
+        ...createVisibleDispatchParams(async (_ctx, options) => {
+          await options?.onPartialReply?.(diagnostic);
+          return { text: "ordinary final response" };
+        }, "msteams"),
+        replyOptions: { onPartialReply },
+      };
+
+      await dispatchReplyFromConfig(params);
+
+      expect(onPartialReply).toHaveBeenCalledWith(diagnostic);
+      expect(params.dispatcher.sendFinalReply).toHaveBeenCalledWith({
+        text: "ordinary final response",
+      });
+    },
+  );
+
+  it("keeps a revoked session writer from sending a localized Teams failure", async () => {
+    const payload = setReplyPayloadMetadata(
+      { text: "HTTP 529 overloaded", isError: true },
+      {
+        sessionWriterDeliveryAuthority: {
+          sessionKey: "agent:main:msteams:direct:1",
+          storePath: "/synthetic/sessions.sqlite",
+          expectedSessionId: "revoked-writer-session",
+        },
+      },
+    );
+    const params = createVisibleDispatchParams(async () => payload, "msteams");
+
+    await dispatchReplyFromConfig(params);
+
+    expect(params.dispatcher.sendFinalReply).not.toHaveBeenCalled();
   });
 
   it("records a failed reply operation when recovering a visible partial", async () => {

@@ -367,7 +367,7 @@ describe("createTeamsReplyStreamController", () => {
     ).toBeUndefined();
   });
 
-  it("preserves disabled quoted tables when finalizing formatted replies", async () => {
+  it("preserves Markdown and selects its final format without rewriting preview text", async () => {
     const { source: text, expected } = teamsQuotedTableReply;
     const stream = makeStream();
     const ctrl = createTeamsReplyStreamController({
@@ -384,11 +384,36 @@ describe("createTeamsReplyStreamController", () => {
       visibleReplySent: true,
       messageId: "stream-final",
       content: expected,
+    });
+    expect(stream.clearText).not.toHaveBeenCalled();
+    expect(stream.emit).toHaveBeenLastCalledWith(
+      expect.objectContaining({ type: "message", text: undefined, textFormat: "extendedmarkdown" }),
+    );
+    expect(stream.close).toHaveBeenCalledTimes(1);
+  });
+
+  it("replaces streamed text once when native table conversion changes the final text", async () => {
+    const text = "| A |\n| --- |\n| x |";
+    const stream = makeStream();
+    const ctrl = createTeamsReplyStreamController({
+      allowProviderPreview: true,
+      conversationType: "personal",
+      context: makeContext(stream),
+      feedbackLoopEnabled: false,
+      tableMode: "bullets",
+    });
+
+    ctrl.onPartialReply({ text });
+    expect(ctrl.preparePayload({ text })).toBeUndefined();
+    await expect(ctrl.finalize()).resolves.toEqual({
+      visibleReplySent: true,
+      messageId: "stream-final",
+      content: "• A: x",
       logicalContent: text,
     });
     expect(stream.clearText).toHaveBeenCalledTimes(1);
     expect(stream.emit).toHaveBeenLastCalledWith(
-      expect.objectContaining({ type: "message", text: expected }),
+      expect.objectContaining({ type: "message", text: "• A: x", textFormat: "extendedmarkdown" }),
     );
     expect(stream.close).toHaveBeenCalledTimes(1);
   });

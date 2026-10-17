@@ -238,6 +238,16 @@ export function classifyEmbeddedAgentRunResultForModelFallback(params: {
       preserveResultPriority: params.result.meta.error?.terminalPresentation === true ? 1 : 0,
     };
   }
+  // A host-proven silent terminal outranks the harness's empty-output projection.
+  if (
+    params.result.meta.error === undefined &&
+    params.result.meta.agentMeta?.providerRefusal === undefined &&
+    !payloads.some((payload) => payload.isError === true) &&
+    (params.result.meta.terminalReplyKind === "silent-empty" ||
+      hasDeliberateSilentTerminalReply(params.result))
+  ) {
+    return null;
+  }
   const harnessClassification = classifyHarnessResult({
     provider: params.provider,
     model: params.model,

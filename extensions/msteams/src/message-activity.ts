@@ -13,7 +13,7 @@ export function buildMSTeamsMessageActivity(text?: string) {
   const parsed = parseMentions(text ?? "");
   return {
     type: "message" as const,
-    ...(text === undefined ? {} : { text: parsed.text }),
+    ...(text === undefined ? {} : { text: parsed.text, textFormat: "extendedmarkdown" }),
     entities: [...parsed.entities, AI_GENERATED_ENTITY],
   };
 }

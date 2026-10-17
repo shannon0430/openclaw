@@ -297,7 +297,20 @@ export async function chooseDispatchRoute(state: PrepareDispatchOperationReadySt
         suppressionReason: preparation.reason,
       };
     }
-    const payload = renderPostCompactionModelFailurePayload(preparation.payload);
+    const terminalPayload = renderPostCompactionModelFailurePayload(preparation.payload);
+    // Final Teams failures are business receipts; retain progress and diagnostic paths.
+    const payload =
+      deliveryChannel === "msteams" &&
+      terminalPayload.isError === true &&
+      terminalPayload.isCommentary !== true &&
+      terminalPayload.isReasoning !== true
+        ? copyReplyPayloadMetadata(terminalPayload, {
+            ...terminalPayload,
+            text:
+              "一時的な不具合により、今回の依頼を完了できませんでした。" +
+              "実行済みの操作がある場合は、その状態を確認してから再開します。",
+          })
+        : terminalPayload;
     const payloadMetadata = getReplyPayloadMetadata(payload);
     const expectedWriterRunId = normalizeOptionalString(params.replyOptions?.runId);
     const expectedLifecycleRevision = sessionStoreEntry.entry?.lifecycleRevision;
