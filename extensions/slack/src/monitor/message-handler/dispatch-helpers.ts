@@ -3,8 +3,16 @@ import { resolveChannelProgressDraftConfig } from "openclaw/plugin-sdk/channel-o
 import type { SlackAccountConfig } from "openclaw/plugin-sdk/config-contracts";
 import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
 import { mergePairLoopGuardConfig } from "openclaw/plugin-sdk/pair-loop-guard-runtime";
-import { resolveSendableOutboundReplyParts } from "openclaw/plugin-sdk/reply-payload";
-import type { ReplyDispatchKind, ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
+import {
+  copyReplyPayloadMetadata,
+  getReplyPayloadMetadata,
+  resolveSendableOutboundReplyParts,
+} from "openclaw/plugin-sdk/reply-payload";
+import type {
+  ReplyDispatchKind,
+  ReplyDispatchRuntimeInfo,
+  ReplyPayload,
+} from "openclaw/plugin-sdk/reply-runtime";
 import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
 import {
   prepareSlackReply,
@@ -16,6 +24,40 @@ import { resolveSlackTimestampMs } from "./timestamp.js";
 import type { PreparedSlackMessage } from "./types.js";
 
 type SlackProgressConfigEntry = Pick<SlackAccountConfig, "streaming"> | null | undefined;
+
+export function formatSlackGroupThreadReply(text: string, participant: { name: string }): string {
+  const name = participant.name.replace(/[\\`*_{}[\]()<>#!|]/g, "\\$&").replace(/\s+/g, " ");
+  return `**${name}**\n${text}`;
+}
+
+export function prepareSlackFinalReplyPayload(
+  payload: ReplyPayload,
+  info: ReplyDispatchRuntimeInfo,
+): ReplyPayload {
+  if (info.kind !== "final") {
+    return payload;
+  }
+  const replyToIsExplicit = Boolean(
+    getReplyPayloadMetadata(payload)?.replyToIdExplicit ||
+    payload.replyToTag ||
+    payload.replyToCurrent,
+  );
+  // Core outbound treats payload reply IDs as explicit. Current/inherited
+  // child IDs must leave that field so the channel's resolved root owns routing.
+  const replyToId = payload.replyToCurrent || !replyToIsExplicit ? undefined : payload.replyToId;
+  const hasParticipantContent =
+    info.participant && (payload.text || payload.mediaUrl || payload.mediaUrls?.length);
+  if (!hasParticipantContent && replyToId === payload.replyToId) {
+    return payload;
+  }
+  return copyReplyPayloadMetadata(payload, {
+    ...payload,
+    replyToId,
+    ...(hasParticipantContent
+      ? { text: formatSlackGroupThreadReply(payload.text ?? "", info.participant!) }
+      : {}),
+  });
+}
 
 export function resolveSlackBotLoopProtection(
   prepared: PreparedSlackMessage,

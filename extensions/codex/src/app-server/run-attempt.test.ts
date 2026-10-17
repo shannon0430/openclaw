@@ -893,30 +893,53 @@ describe("runCodexAppServerAttempt", () => {
     },
   );
 
-  it("preserves preparation failure and records failed one-shot tool cleanup", async () => {
-    const preparationError = new Error("tool preparation failed");
-    const cleanupError = new Error("tool cleanup failed");
-    const cleanup = vi.fn(async () => {
-      throw cleanupError;
-    });
-    const { sessionFile, workspaceDir } = createRunPaths();
-    const params = createParams(sessionFile, workspaceDir);
-    setCodexTestToolFactory(params, (options) => {
-      options?.registerRunCleanup?.(cleanup);
-      throw preparationError;
-    });
-    const warning = vi.spyOn(embeddedAgentLog, "warn");
-    params.oneShotCliRun = true;
-    params.disableTools = false;
-    params.runtimePlan = createCodexRuntimePlanFixture();
-    setCodexTestModelSupportsTools(params, true);
+  it.each([
+    { oneShotCliRun: false, outcome: "preparation" },
+    { oneShotCliRun: true, outcome: "preparation" },
+    { oneShotCliRun: false, outcome: "completion" },
+    { oneShotCliRun: true, outcome: "completion" },
+  ] as const)(
+    "preserves $outcome outcome and records failed tool cleanup (one-shot: $oneShotCliRun)",
+    async ({ oneShotCliRun, outcome }) => {
+      const preparationError = new Error("tool preparation failed");
+      const cleanupError = new Error("tool cleanup failed");
+      const cleanup = vi.fn(async () => {
+        throw cleanupError;
+      });
+      const otherCleanup = vi.fn(async () => undefined);
+      const { sessionFile, workspaceDir } = createRunPaths();
+      const params = createParams(sessionFile, workspaceDir);
+      setCodexTestToolFactory(params, (options) => {
+        options?.registerRunCleanup?.(cleanup);
+        options?.registerRunCleanup?.(otherCleanup);
+        if (outcome === "preparation") {
+          throw preparationError;
+        }
+        return [createRuntimeDynamicTool("message")];
+      });
+      const warning = vi.spyOn(embeddedAgentLog, "warn");
+      params.oneShotCliRun = oneShotCliRun;
+      params.disableTools = false;
+      params.runtimePlan = createCodexRuntimePlanFixture();
+      setCodexTestModelSupportsTools(params, true);
 
-    await expect(runCodexAppServerAttempt(params)).rejects.toBe(preparationError);
-    expect(cleanup).toHaveBeenCalledOnce();
-    expect(warning).toHaveBeenCalledWith(
-      expect.stringContaining("step=codex-dynamic-tool-cleanup error=Codex tool cleanup failed"),
-    );
-  });
+      const harness = createStartedThreadHarness();
+      const run = runCodexAppServerAttempt(params);
+      if (outcome === "preparation") {
+        await expect(run).rejects.toBe(preparationError);
+      } else {
+        await harness.waitForMethod("turn/start");
+        await harness.completeTurn({ threadId: "thread-1", turnId: "turn-1" });
+        expect(readAttemptTerminal(await run)).toMatchObject({ promptError: null, aborted: false });
+      }
+      const reason = outcome === "preparation" ? "error" : "completion";
+      expect(cleanup).toHaveBeenCalledExactlyOnceWith(reason);
+      expect(otherCleanup).toHaveBeenCalledExactlyOnceWith(reason);
+      expect(warning).toHaveBeenCalledWith(
+        expect.stringContaining("step=codex-dynamic-tool-cleanup error=Codex tool cleanup failed"),
+      );
+    },
+  );
 
   it("executes and reports the same materialized SecretRef credential", async () => {
     const { sessionFile, workspaceDir, agentDir } = createRunPaths();

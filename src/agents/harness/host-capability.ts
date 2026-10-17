@@ -52,6 +52,7 @@ import {
 import { gateBoundTool } from "./host-bound-tool.js";
 import type { AgentHarnessHostCapabilities } from "./host-capability-types.js";
 import { captureRequiredWorkspaceToolFloor } from "./host-capability-workspace.js";
+import { createHarnessComputerPreparation } from "./host-computer.js";
 import { normalizeNativeOperationCwd, prepareAgentHarnessEnvironment } from "./host-environment.js";
 import { bindHarnessMedia } from "./host-media.js";
 import {
@@ -318,6 +319,13 @@ export function createAgentHarnessHostCapabilities(params: {
         : callerIdentity,
       run,
     );
+  const computer = createHarnessComputerPreparation({
+    attempt,
+    config,
+    operationalRunInstance,
+    assertCurrent: assertActive,
+    withCaller,
+  });
   const runBeforeToolCallWithAssertion = async (
     assertCurrent: () => void,
     {
@@ -451,6 +459,7 @@ export function createAgentHarnessHostCapabilities(params: {
     bindToolSurface,
     createToolSurface: (options, bindingOptions) => {
       assertActive();
+      const scopedComputerTransport = computer.transport();
       const effectiveOptions = { ...options, ...requiredWorkspace?.apply(options) };
       // Only host-created core tools can seed TTS provenance. Plugin-bound tools
       // must not replay a retained core result into this attempt's authority set.
@@ -470,6 +479,9 @@ export function createAgentHarnessHostCapabilities(params: {
                 ),
                 skillUsagePaths: options?.skillUsagePaths ?? skillUsagePaths,
                 operationalRunInstance,
+                ...(scopedComputerTransport && options?.computerTransport !== null
+                  ? { computerTransport: scopedComputerTransport }
+                  : {}),
               },
               // Sandboxes use their materialized snapshot paths, never host library pins.
               !requiredWorkspace &&
@@ -657,7 +669,10 @@ export function createAgentHarnessHostCapabilities(params: {
           ...getPluginRuntimeGatewayRequestScope(),
           ...nodeAuthorities,
         },
-        run,
+        async () => {
+          await computer.prepare();
+          return run();
+        },
       );
     },
     close: () => {

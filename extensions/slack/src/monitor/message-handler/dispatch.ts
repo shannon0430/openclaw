@@ -7,12 +7,14 @@ import {
 } from "openclaw/plugin-sdk/channel-inbound";
 import {
   createMessageReceiptFromOutboundResults,
+  deriveDurableFinalDeliveryRequirements,
   type LivePreviewDeliveryResult,
 } from "openclaw/plugin-sdk/channel-outbound";
 import { toErrorObject } from "openclaw/plugin-sdk/error-runtime";
 import { resolveMarkdownTableMode } from "openclaw/plugin-sdk/markdown-table-runtime";
 import {
   buildTtsSupplementMediaPayload,
+  getReplyPayloadMetadata,
   getReplyPayloadTtsSupplement,
   isReplyPayloadNonTerminalToolErrorWarning,
   resolveSendableOutboundReplyParts,
@@ -31,19 +33,19 @@ import {
   recordSlackThreadFailureNotice,
   recordSlackThreadParticipation,
 } from "../../sent-thread-cache.js";
+import { resolveSlackReplyThreadTs } from "../../thread-ts.js";
 import { countSlackTextUtf8Bytes } from "../../truncate.js";
 import { registerSlackSessionRun } from "../session-run-targets.js";
-import { resolveSlackBotLoopProtection } from "./dispatch-helpers.js";
+import {
+  formatSlackGroupThreadReply,
+  prepareSlackFinalReplyPayload,
+  resolveSlackBotLoopProtection,
+} from "./dispatch-helpers.js";
 import { createSlackProgressRuntime } from "./dispatch-progress.js";
 import { createSlackDispatchSetup, type SlackDispatchSetup } from "./dispatch-setup.js";
 import { createSlackStreamingDeliveryRuntime } from "./dispatch-streaming.js";
 import { finalizeSlackPreviewEdit } from "./preview-finalize.js";
 import type { PreparedSlackMessage } from "./types.js";
-
-function formatSlackGroupThreadReply(text: string, participant: { name: string }): string {
-  const name = participant.name.replace(/[\\`*_{}[\]()<>#!|]/g, "\\$&").replace(/\s+/g, " ");
-  return `**${name}**\n${text}`;
-}
 
 export async function dispatchPreparedSlackMessage(prepared: PreparedSlackMessage) {
   const setup = await createSlackDispatchSetup(prepared);
@@ -198,7 +200,11 @@ async function dispatchSlackMessageWithSetup(
     info: ReplyDispatchRuntimeInfo,
   ): Promise<LivePreviewDeliveryResult> => {
     let payload = incomingPayload;
-    if (info.participant && (payload.text || payload.mediaUrl || payload.mediaUrls?.length)) {
+    if (
+      info.kind !== "final" &&
+      info.participant &&
+      (payload.text || payload.mediaUrl || payload.mediaUrls?.length)
+    ) {
       payload = {
         ...payload,
         text: formatSlackGroupThreadReply(payload.text ?? "", info.participant),
@@ -436,7 +442,92 @@ async function dispatchSlackMessageWithSetup(
         humanDelay: resolveHumanDelayConfig(cfg, route.agentId),
       },
       delivery: {
+        preparePayload: prepareSlackFinalReplyPayload,
+        durable: async (payload, info) => {
+          const reply = resolveSendableOutboundReplyParts(payload);
+          if (
+            info.kind !== "final" ||
+            sourceReplyDeliveryMode === "message_tool_only" ||
+            (slackStreaming.mode !== "progress" && slackStreaming.mode !== "off") ||
+            setup.slackMessageMetadata ||
+            account.accountId !== route.accountId ||
+            prepared.eventScope ||
+            delivery.streamSession?.stoppedBySlack ||
+            !reply.hasText ||
+            reply.hasMedia ||
+            payload.presentation ||
+            payload.interactive ||
+            payload.channelData ||
+            payload.location
+          ) {
+            return false;
+          }
+          // Standalone finals belong to core's durable queue, not the optional
+          // progress stream. Unknown sends retain custody for exact reconciliation.
+          await progress.cancel();
+          if (delivery.streamSession?.stoppedBySlack) {
+            return false;
+          }
+          const forcedThreadTs =
+            slackStreaming.mode === "progress"
+              ? progress.useNativeProgressStreaming
+                ? (delivery.streamSession?.threadTs ?? delivery.nativeProgressStreamThreadTs)
+                : delivery.usedReplyThreadTs
+              : undefined;
+          const threadId = resolveSlackReplyThreadTs({
+            replyToMode: setup.replyDeliveryMode,
+            replyToId: payload.replyToId,
+            replyToIsExplicit: Boolean(
+              getReplyPayloadMetadata(payload)?.replyToIdExplicit ||
+              payload.replyToTag ||
+              payload.replyToCurrent,
+            ),
+            replyToCurrent: payload.replyToCurrent,
+            threadId: forcedThreadTs ?? replyPlan.peekThreadTs(),
+          });
+          return {
+            to: prepared.replyTarget,
+            threadId,
+            // The thread planner has already resolved the root; never inherit a child id.
+            replyToId: null,
+            replyToMode: setup.replyDeliveryMode,
+            ...(setup.slackIdentity
+              ? {
+                  identity: {
+                    name: setup.slackIdentity.username,
+                    avatarUrl: setup.slackIdentity.iconUrl,
+                    emoji: setup.slackIdentity.iconEmoji,
+                  },
+                }
+              : {}),
+            requiredCapabilities: deriveDurableFinalDeliveryRequirements({
+              payload,
+              threadId,
+              reconcileUnknownSend: true,
+            }),
+          };
+        },
         deliver: deliverSlackPayload,
+        onDelivered: async (payload, info, sent) => {
+          if (info.kind !== "final" || !sent?.deliveryIntent || sent.visibleReplySent !== true) {
+            return;
+          }
+          delivery.observedReplyDelivery = true;
+          delivery.rememberDeliveredThreadTs("final", sent.threadId ?? undefined);
+          replyPlan.markSent();
+          await previewLifecycle.observeDelivery(
+            { ...sent, visibleReplySent: true },
+            { isError: payload.isError === true },
+          );
+          if (
+            progress.useDraftProgressCard &&
+            !(await progress.finalizeDraftProgressCard(
+              payload.isError === true ? "error" : "success",
+            ))
+          ) {
+            await draftStream?.clear();
+          }
+        },
         onError: (err, info) => {
           // Core settles delivery errors without throwing; Slack closeout still owns the failure.
           dispatchError ??= err;
@@ -566,7 +657,9 @@ async function dispatchSlackMessageWithSetup(
   const completionChunks =
     progress.useNativeProgressStreaming && !progress.nativeProgressCompletionSent
       ? progress.buildNativeProgressCompletionChunks(
-          dispatchError || agentRunFailed ? "error" : progress.nativeProgressTerminalStatus,
+          dispatchError || agentRunFailed || sawTerminalFailurePayload
+            ? "error"
+            : progress.nativeProgressTerminalStatus,
         )
       : undefined;
   if (completionChunks?.length) {

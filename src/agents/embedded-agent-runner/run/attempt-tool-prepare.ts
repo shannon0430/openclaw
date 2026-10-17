@@ -10,6 +10,7 @@ import { resolveStagedInputMediaPaths } from "../../../media/staged-inputs.js";
 import { extractModelCompat } from "../../../plugins/provider-model-compat.js";
 import { getPluginToolMeta } from "../../../plugins/tool-metadata.js";
 import { isSubagentSessionKey } from "../../../routing/session-key.js";
+import { getAdmittedRunDelegatedAuthority } from "../../admitted-run-context.js";
 import {
   createOpenClawCodingToolsInternal,
   resolveToolLoopDetectionConfig,
@@ -30,6 +31,8 @@ import {
 import { resolveModelAuthMode } from "../../model-auth.js";
 import { supportsModelTools } from "../../model-tool-support.js";
 import { recordAgentCleanupFailure, runOwnedAgentCleanup } from "../../run-cleanup-timeout.js";
+import { hasScopedComputerPermission } from "../../scoped-computer-policy.js";
+import { prepareScopedPairedComputerTransport } from "../../scoped-paired-computer.js";
 import { resolveSessionPlacementComputer } from "../../session-placement-computer.js";
 import {
   resolveSessionPermissionExecMode,
@@ -44,6 +47,7 @@ import type {
   CronCreatorToolAllowlistEntry,
   CronToolsAllowCaptureRef,
 } from "../../tools/cron-tool.js";
+import { getInProcessGatewayToolContext } from "../../tools/in-process-gateway.js";
 import { log } from "../logger.js";
 import { createAttemptNestedToolActivityState } from "./attempt-nested-tool-activity.js";
 import type { EmbeddedAttemptSetup } from "./attempt-setup.js";
@@ -220,7 +224,7 @@ export async function prepareEmbeddedAttemptToolBase(params: {
     trustedInternalHandoff: attempt.trustedInternalHandoff,
     pluginMetadataSnapshot: attempt.preparedModelRuntime?.metadataSnapshot,
   });
-  const computerTransport = resolveSessionPlacementComputer(
+  let computerTransport = resolveSessionPlacementComputer(
     attempt.admittedRunContext.operationalRunInstance,
   );
   const computerAllowed =
@@ -230,6 +234,41 @@ export async function prepareEmbeddedAttemptToolBase(params: {
       toolNames: ["computer"],
       warn: () => undefined,
     }).length === 1;
+  if (
+    computerAllowed &&
+    computerTransport === undefined &&
+    attempt.senderIsOwner === false &&
+    !params.setup.sandbox?.enabled &&
+    attempt.model.input?.includes("image") &&
+    !isEmbeddedMode()
+  ) {
+    const authority = getAdmittedRunDelegatedAuthority(attempt.admittedRunContext);
+    const assertCurrent = () => {
+      params.runAbortController.signal.throwIfAborted();
+      if (
+        !authority ||
+        getAdmittedRunDelegatedAuthority(attempt.admittedRunContext) !== authority
+      ) {
+        throw new Error("Scoped computer preparation lost its admitted run");
+      }
+    };
+    computerTransport = await prepareScopedPairedComputerTransport({
+      assertCurrent,
+      signal: params.runAbortController.signal,
+      canUseComputer: () =>
+        hasScopedComputerPermission(
+          resolveConversationCapabilityProfile({
+            ...buildConversationContext(),
+            config:
+              getInProcessGatewayToolContext()?.getRuntimeConfig?.() ?? toolSearchRuntimeConfig,
+            agentId: attempt.sandboxAgentId ?? params.setup.sessionAgentId,
+            conversationToolPolicy: attempt.conversationToolPolicy,
+            sandboxToolPolicy: params.setup.sandbox?.tools,
+            inheritRuntimeToolAllowlist: true,
+          }),
+        ),
+    });
+  }
   const pairedNodeComputerUse = (
     await loadPairedComputerUseAvailabilityForSurface({
       computerAllowed,

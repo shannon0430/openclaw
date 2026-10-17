@@ -18,6 +18,8 @@ export function prepareSessionPortalToolAccess(input: {
   senderIsOwner?: boolean;
   sandboxed: boolean;
   hasAutomationGrant: boolean;
+  /** Only a host-issued, target-bound computer instance qualifies. */
+  hasScopedComputerGrant?: boolean;
 }) {
   const sessionPortalTarget =
     input.senderIsOwner === false && !input.sandboxed
@@ -31,6 +33,7 @@ export function prepareSessionPortalToolAccess(input: {
           (name) =>
             (name !== "portal" || !sessionPortalTarget) &&
             name !== "sessions" &&
+            (name !== "computer" || !input.hasScopedComputerGrant) &&
             (name !== AUTOMATIONS_TOOL_NAME || !input.hasAutomationGrant),
         )
       : [];

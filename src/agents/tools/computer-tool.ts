@@ -10,6 +10,7 @@ import { COMPUTER_USE_V2_ACTION_NAMES } from "../../plugins/computer-use-contrac
 import { sleep } from "../../utils/sleep.js";
 import type { PreparedPairedComputerUse } from "../computer-use-node-capabilities.js";
 import { resolveImageSanitizationLimits } from "../image-sanitization.js";
+import { isScopedPairedComputerTransport } from "../scoped-paired-computer.js";
 import { type AnyAgentTool, readFiniteNumberParam, readToolStringParam } from "./common.js";
 import { buildComputerToolDescription } from "./computer-tool-guidance.js";
 import { ComputerToolSession } from "./computer-tool-node.js";
@@ -75,6 +76,19 @@ export function createComputerTool(options?: {
   /** Attempt owner for deterministic provider-execution cleanup. */
   registerRunCleanup?: (cleanup: (reason: string) => Promise<void>) => void;
 }): AnyAgentTool {
+  const prepareArguments = (args: unknown): unknown => {
+    // Reject selectors before blank normalization and cached-target reuse.
+    if (
+      isScopedPairedComputerTransport(options?.transport) &&
+      isRecord(args) &&
+      ["target", "node", "environmentId", "gatewayUrl", "gatewayToken"].some((key) =>
+        Object.hasOwn(args, key),
+      )
+    ) {
+      throw new Error("Computer control is bound to the host-approved paired node");
+    }
+    return prepareComputerArguments(args);
+  };
   const executionId = crypto.randomUUID();
   const hasCleanupOwner = options?.registerRunCleanup !== undefined;
   const availableActions = (actions: readonly ComputerUseV2ActionName[]) =>
@@ -191,11 +205,11 @@ export function createComputerTool(options?: {
     executionMode: "sequential",
     description: buildComputerToolDescription(initialCapabilities, targetScope),
     parameters: parameterSchema,
-    prepareArguments: prepareComputerArguments,
+    prepareArguments,
     execute: (toolCallId, args, signal) =>
       serialize(async () => {
         signal?.throwIfAborted();
-        const params = prepareComputerArguments(args) as Record<string, unknown>;
+        const params = prepareArguments(args) as Record<string, unknown>;
         const action = readToolStringParam(params, "action", {
           required: true,
         }) as ComputerToolAction;

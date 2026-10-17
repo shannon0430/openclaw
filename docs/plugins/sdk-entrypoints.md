@@ -52,6 +52,14 @@ OpenClaw classifies loaded plugins by their registration behavior:
 
 Use `openclaw plugins inspect <id>` to see a plugin's shape.
 
+## Reply payload metadata
+
+`openclaw/plugin-sdk/reply-payload` exports `getReplyPayloadMetadata` to read the
+host's canonical delivery facts, including whether a reply target was explicit.
+Treat those facts as read-only and preserve them with `copyReplyPayloadMetadata`
+when transforming a payload. Internal metadata stays separate from wire payloads;
+an implicit current-message reply ID must not override the channel's thread root.
+
 ## Related
 
 - [Plugin SDK overview](/plugins/sdk-overview) - registration API and subpath reference

@@ -54,6 +54,8 @@ import { prepareCoreToolPolicy } from "./prepared-tool-surface.js";
 import { resolveSandboxFileIdentity } from "./sandbox/file-mutation-identity.js";
 import { createEmbeddedMessageInvocationPolicy } from "./scheduled-message-invocation.js";
 import { resolveScheduledToolCallerContext } from "./scheduled-tool-policy.js";
+import { hasScopedComputerPermission } from "./scoped-computer-policy.js";
+import { isScopedPairedComputerTransport } from "./scoped-paired-computer.js";
 import { projectEffectiveExecPolicy } from "./session-permission-exec-mode.js";
 import { resolveSessionPlacementComputer } from "./session-placement-computer.js";
 import { subagentAttachmentRootForRun } from "./subagents/subagent-attachment-paths.js";
@@ -309,6 +311,11 @@ export function createOpenClawCodingToolsInternal(
       : [];
   const cronCreatorAuthorityResolver = bindActiveCronCreatorAuthorityResolver(options?.runId);
   const cronManagementGrant = bindCronManagementGrant(options?.runId);
+  const computerTransport =
+    options?.computerTransport === null
+      ? null
+      : (options?.computerTransport ??
+        resolveSessionPlacementComputer(options?.operationalRunInstance));
   const { sessionPortalTarget, ownerOnlyCoreToolDenylist, ownerOnlyCoreToolPolicy } =
     prepareSessionPortalToolAccess({
       sessionKey: executionSessionKey,
@@ -317,6 +324,10 @@ export function createOpenClawCodingToolsInternal(
       senderIsOwner: options?.senderIsOwner,
       sandboxed: Boolean(sandbox),
       hasAutomationGrant: Boolean(cronCreatorAuthorityResolver || cronManagementGrant),
+      hasScopedComputerGrant:
+        !sandbox &&
+        isScopedPairedComputerTransport(computerTransport) &&
+        hasScopedComputerPermission(capabilityProfile),
     });
   const pluginToolAllowlist = appendRuntimePluginToolGrant(
     capabilityProfile.policy.explicitToolAllowlist,
@@ -460,11 +471,7 @@ export function createOpenClawCodingToolsInternal(
             cronCreatorToolAllowlistCaptureRef: options?.cronCreatorToolAllowlistCaptureRef,
             resolveCronCreatorToolAuthority: cronCreatorAuthorityResolver,
             currentChatType: options?.chatType,
-            computerTransport:
-              options?.computerTransport === null
-                ? null
-                : (options?.computerTransport ??
-                  resolveSessionPlacementComputer(options?.operationalRunInstance)),
+            computerTransport,
             sourceReplyOnly,
             enableHeartbeatTool,
             disablePluginTools: !includePluginTools,

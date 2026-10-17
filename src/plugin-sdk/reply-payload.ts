@@ -75,6 +75,7 @@ export {
   buildTtsSupplementMediaPayload,
   copyReplyPayloadMetadata,
   FAST_MODE_AUTO_PROGRESS_KIND,
+  getReplyPayloadMetadata,
   getReplyPayloadTtsSupplement,
   isFastModeAutoProgressPayload,
   isReplyPayloadNonTerminalToolErrorWarning,

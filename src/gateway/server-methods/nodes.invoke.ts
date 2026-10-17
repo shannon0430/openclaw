@@ -53,7 +53,15 @@ import type { GatewayRequestHandlers } from "./types.js";
 import { assertValidParams } from "./validation.js";
 
 export const nodeInvokeHandlers: GatewayRequestHandlers = {
-  "node.invoke": async ({ params, respond, context, client, req, signal }) => {
+  "node.invoke": async ({
+    params,
+    respond,
+    context,
+    client,
+    req,
+    signal,
+    sessionMutationCommitGuard,
+  }) => {
     if (!assertValidParams(params, validateNodeInvokeParams, "node.invoke", respond)) {
       return;
     }
@@ -61,6 +69,14 @@ export const nodeInvokeHandlers: GatewayRequestHandlers = {
     const nodeId = normalizeOptionalString(p.nodeId) ?? "";
     const command = normalizeOptionalString(p.command) ?? "";
     const sessionKey = normalizeOptionalString(p.sessionKey);
+    const isRequestAuthorityCurrent = () => {
+      try {
+        sessionMutationCommitGuard?.();
+        return true;
+      } catch {
+        return false;
+      }
+    };
     const assertUploadAllowed = captureGatewayClientUploadCommitGuard({
       method: "node.invoke",
       requestParams: p,
@@ -175,6 +191,7 @@ export const nodeInvokeHandlers: GatewayRequestHandlers = {
       return true;
     };
     await respondUnavailableOnThrow(respond, async () => {
+      sessionMutationCommitGuard?.();
       const generation = await awaitWithinDeadline(
         () => captureNodePairingGeneration(nodeId),
         invokeDeadlineAtMs,
@@ -380,6 +397,7 @@ export const nodeInvokeHandlers: GatewayRequestHandlers = {
           }
         }
         const isForwardedApprovalAuthorityActive = () =>
+          isRequestAuthorityCurrent() &&
           isUploadAllowed() &&
           isForwardedNodeInvokeApprovalAuthorityActive({
             manager: context.execApprovalManager,
@@ -418,7 +436,9 @@ export const nodeInvokeHandlers: GatewayRequestHandlers = {
                   nodeId,
                   generation,
                   lifecycle: wakeLifecycle,
-                })) && isUploadAllowed(),
+                })) &&
+                isRequestAuthorityCurrent() &&
+                isUploadAllowed(),
               isApprovalAuthorityActive: isForwardedApprovalAuthorityActive,
               ...(nodeInvokeStream ? { nodeInvokeStream } : {}),
             }),
@@ -515,6 +535,7 @@ export const nodeInvokeHandlers: GatewayRequestHandlers = {
         if (rejectDisabledUpload()) {
           return;
         }
+        sessionMutationCommitGuard?.();
         const res = await invokeNodeWithReadinessRetry(context.nodeRegistry, {
           nodeId,
           expectedConnId: nodeSession.connId,
@@ -531,6 +552,7 @@ export const nodeInvokeHandlers: GatewayRequestHandlers = {
             idleTimeoutMs: nodeInvokeStream.idleTimeoutMs,
           }),
           isDispatchAuthorized: () =>
+            isRequestAuthorityCurrent() &&
             isUploadAllowed() &&
             (nodeInvokeStream?.isRuntimeCurrent() ?? true) &&
             resolveNodeInvokeRuntimeAuthorityError({
