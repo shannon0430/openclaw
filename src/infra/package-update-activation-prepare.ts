@@ -36,6 +36,7 @@ import {
 } from "./package-update-activation-sqlite.js";
 import {
   createPackageIntegrityReader,
+  isPackageIntegrityResourceError,
   type PackageIntegrityFingerprint,
 } from "./package-update-integrity.js";
 import type { PackageActivationOptions } from "./package-update-swap-contract.js";
@@ -64,6 +65,8 @@ function readPackageActivationRuntime(): Buffer {
 }
 
 export class PackageActivationArchiveError extends Error {}
+
+export class PackageActivationFingerprintUnavailableError extends Error {}
 
 function packageActivationRecoveryCommand(
   node: string,
@@ -163,7 +166,22 @@ export async function preparePackageActivationJournal(
   assertCurrent();
   assertRuntime();
   const reader = createPackageIntegrityReader();
-  const candidate = await reader.tree(stageRoot);
+  let candidate: PackageIntegrityFingerprint;
+  try {
+    candidate = await reader.tree(stageRoot);
+  } catch (error) {
+    assertCurrent();
+    assertRuntime();
+    if (!isPackageIntegrityResourceError(error)) {
+      throw error;
+    }
+    // No recovery artifact or custody exists yet; the ordinary swap still owns
+    // its verified previous package and launcher backup. Later failures stay hard.
+    throw new PackageActivationFingerprintUnavailableError(
+      `Standalone package publication repair is unavailable: candidate fingerprint exceeded its verification budget (${error.message}); the existing package backup and rollback path remains in use.`,
+      { cause: error },
+    );
+  }
   const launchers = [];
   for (const entry of params.launchers) {
     const source = path.join(launcherRoot, entry.name);
